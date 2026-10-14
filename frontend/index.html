@@ -42,29 +42,36 @@
       --sidebar-bg: rgba(7, 9, 14, 0.90);
       --btn-mirror-bg: rgba(84, 101, 255, 0.10);  /* 90% Transparent */
       --btn-mirror-border: rgba(191, 215, 255, 0.32);
+      --btn-mirror-hover-bg: rgba(84, 101, 255, 0.22);
+      --btn-mirror-hover-border: rgba(226, 253, 255, 0.6);
+      --btn-mirror-hover-shadow: 0 0 24px rgba(84, 101, 255, 0.45);
       --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
       --glare-opacity: 0.15;
     }
 
     :root[data-theme="light"] {
+      /* User Requested Light Mode Palette: #EDE3FF, #E0F7FA, #FCE4EC, #F9F9FB, #FCE4EC */
       --bg-page: #F9F9FB;               /* #F9F9FB Clean Light Background */
-      --bg-surface: #EDE3FF;            /* #EDE3FF Soft Lavender Surface */
-      --bg-surface-elevated: #E0F7FA;   /* #E0F7FA Soft Aqua Accent Surface */
-      --border-app: #FCE4EC;            /* #FCE4EC Soft Sakura Pink Border */
-      --border-subtle: rgba(237, 227, 255, 0.8);
-      --accent-primary: #7c3aed;        /* Royal Violet */
-      --accent-hover: #6d28d9;
-      --accent-soft: #EDE3FF;
-      --accent-ice: #E0F7FA;
-      --accent-frost: #FCE4EC;
+      --bg-surface: #EDE3FF;            /* #EDE3FF Soft Lavender Primary Surface */
+      --bg-surface-elevated: #E0F7FA;   /* #E0F7FA Soft Aqua Elevated Surface */
+      --border-app: #FCE4EC;            /* #FCE4EC Soft Pink Border */
+      --border-subtle: #FCE4EC;         /* #FCE4EC Subtle Pink Border */
+      --accent-primary: #EDE3FF;        /* #EDE3FF Soft Lavender */
+      --accent-hover: #E0F7FA;          /* #E0F7FA Soft Aqua */
+      --accent-soft: #FCE4EC;           /* #FCE4EC Soft Pink */
+      --accent-ice: #E0F7FA;            /* #E0F7FA Soft Aqua */
+      --accent-frost: #EDE3FF;          /* #EDE3FF Soft Lavender */
       --text-muted: #434A50;            /* Readable Slate Text */
       --text-primary: #17181B;          /* Deep Carbon Slate Primary */
       --yuzuru-gold: #d97706;
-      --header-bg: rgba(249, 249, 251, 0.92);
-      --sidebar-bg: rgba(237, 227, 255, 0.88);
-      --btn-mirror-bg: rgba(224, 247, 250, 0.45); /* #E0F7FA 90% Transparent Mirror */
-      --btn-mirror-border: rgba(252, 228, 236, 0.9); /* #FCE4EC Pink Rim */
-      --card-shadow: 0 10px 30px rgba(237, 227, 255, 0.8);
+      --header-bg: rgba(249, 249, 251, 0.95);         /* #F9F9FB */
+      --sidebar-bg: rgba(237, 227, 255, 0.95);        /* #EDE3FF */
+      --btn-mirror-bg: rgba(224, 247, 250, 0.50);     /* #E0F7FA 90% Transparent Mirror */
+      --btn-mirror-border: #FCE4EC;                   /* #FCE4EC Pink Rim */
+      --btn-mirror-hover-bg: rgba(237, 227, 255, 0.75);/* #EDE3FF Hover */
+      --btn-mirror-hover-border: #E0F7FA;             /* #E0F7FA Aqua Rim */
+      --btn-mirror-hover-shadow: 0 0 20px rgba(224, 247, 250, 0.85);
+      --card-shadow: 0 10px 30px rgba(237, 227, 255, 0.65);
       --glare-opacity: 0.25;
     }
 
@@ -186,10 +193,10 @@
       left: 150%;
     }
     .btn-mirror:hover {
-      background: rgba(84, 101, 255, 0.22);
-      border-color: rgba(226, 253, 255, 0.6);
+      background: var(--btn-mirror-hover-bg);
+      border-color: var(--btn-mirror-hover-border);
       box-shadow: inset 0 1px 2px 0 rgba(255, 255, 255, 0.5),
-                  0 0 24px rgba(84, 101, 255, 0.45);
+                  var(--btn-mirror-hover-shadow);
       transform: translateY(-2px);
     }
     .btn-mirror:active {
@@ -237,11 +244,37 @@
       box-shadow: 0 0 30px rgba(84, 101, 255, 0.35);
     }
 
+    /* Light Mode Cursor Overrides */
+    [data-theme="light"] #cursor-dot {
+      background-color: #EDE3FF;
+      box-shadow: 0 0 10px #E0F7FA, 0 0 20px #FCE4EC;
+    }
+    [data-theme="light"] #cursor-ring {
+      border-color: rgba(252, 228, 236, 0.9);
+      background-color: rgba(224, 247, 250, 0.35);
+    }
+    [data-theme="light"].cursor-hover #cursor-ring {
+      border-color: #EDE3FF;
+      background-color: rgba(237, 227, 255, 0.45);
+      box-shadow: 0 0 20px rgba(224, 247, 250, 0.85);
+    }
+    [data-theme="light"].cursor-hover #cursor-dot {
+      background-color: #E0F7FA;
+    }
+
     /* Scrollbars */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: rgba(120, 139, 255, 0.3); border-radius: 9999px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(120, 139, 255, 0.6); }
+
+    [data-theme="light"] ::-webkit-scrollbar-thumb {
+      background: rgba(237, 227, 255, 0.85);
+      border: 1px solid #FCE4EC;
+    }
+    [data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+      background: #E0F7FA;
+    }
   </style>
 </head>
 <body class="min-h-screen flex relative selection:bg-[#5465FF] selection:text-white">
@@ -1595,7 +1628,7 @@
       if (Math.random() < 0.6) {
         const colors = currentTheme === 'dark' 
           ? ['#5465FF', '#788BFF', '#9BB1FF', '#BFD7FF', '#E2FDFF']
-          : ['#EDE3FF', '#E0F7FA', '#FCE4EC', '#c084fc', '#38bdf8'];
+          : ['#EDE3FF', '#E0F7FA', '#FCE4EC', '#F9F9FB', '#FCE4EC'];
         particles.push({
           x: mouseX,
           y: mouseY,
@@ -1746,24 +1779,37 @@
           innerRing.material.opacity = 0.35;
         }
       } else {
-        // Light Mode: #EDE3FF Lavender, #E0F7FA Aqua, #FCE4EC Blush Pink
+        // Light Mode: Strictly user-requested palette: #EDE3FF, #E0F7FA, #FCE4EC, #F9F9FB, #FCE4EC
         c1 = new THREE.Color(0xEDE3FF);
         c2 = new THREE.Color(0xE0F7FA);
         c3 = new THREE.Color(0xFCE4EC);
         scene.fog = new THREE.FogExp2(0xF9F9FB, 0.0006);
         if (outerMesh) {
           outerMesh.material.color.setHex(0xEDE3FF);
-          outerMesh.material.opacity = 0.45;
+          outerMesh.material.opacity = 0.55;
         }
         if (innerRing) {
           innerRing.material.color.setHex(0xE0F7FA);
-          innerRing.material.opacity = 0.60;
+          innerRing.material.opacity = 0.70;
         }
       }
 
+      const lightPalette = [
+        new THREE.Color(0xEDE3FF),
+        new THREE.Color(0xE0F7FA),
+        new THREE.Color(0xFCE4EC),
+        new THREE.Color(0xF9F9FB),
+        new THREE.Color(0xFCE4EC)
+      ];
+
       for (let i = 0; i < count; i++) {
-        const r = Math.random();
-        const pick = r < 0.33 ? c1 : (r < 0.66 ? c2 : c3);
+        let pick;
+        if (theme === 'dark') {
+          const r = Math.random();
+          pick = r < 0.33 ? c1 : (r < 0.66 ? c2 : c3);
+        } else {
+          pick = lightPalette[Math.floor(Math.random() * lightPalette.length)];
+        }
         colors[i * 3] = pick.r;
         colors[i * 3 + 1] = pick.g;
         colors[i * 3 + 2] = pick.b;
