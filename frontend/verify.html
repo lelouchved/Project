@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Official Certificate Verification - MSOT</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+    
+    :root[data-theme="dark"] {
+      --bg-page: #000000;
+      --bg-surface: #17181B;
+      --bg-surface-elevated: #202226;
+      --border-app: #434A50;
+      --accent-primary: #4B6170;
+      --text-muted: #979DA1;
+      --text-primary: #EFE9E0;
+    }
+    :root[data-theme="light"] {
+      --bg-page: #F9F9FB;
+      --bg-surface: #FFFFFF;
+      --bg-surface-elevated: #EDE3FF;
+      --border-app: #EDE3FF;
+      --accent-primary: #7c3aed;
+      --text-muted: #4B6170;
+      --text-primary: #17181B;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+  <div class="max-w-xl w-full rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative border" style="background-color: var(--bg-surface); border-color: var(--border-app);">
+    <!-- Top badge -->
+    <div class="flex items-center justify-between border-b pb-4" style="border-color: var(--border-app);">
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 rounded-xl flex items-center justify-center text-white" style="background-color: var(--accent-primary);">
+          <i data-lucide="shield-check" class="w-5 h-5 text-emerald-400"></i>
+        </div>
+        <div>
+          <span class="text-xs font-mono uppercase tracking-widest block" style="color: var(--text-muted);">MSOT Credentials</span>
+          <span class="text-sm font-black" style="color: var(--text-primary);">Public Verification Gateway</span>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2">
+        <button onclick="toggleTheme()" class="px-2.5 py-1 rounded-xl text-xs font-bold border" style="border-color: var(--border-app); background-color: var(--bg-surface-elevated); color: var(--text-primary);">
+          <span id="themeBtnIcon">☀️</span>
+        </button>
+        <a href="/" class="text-xs font-mono font-bold hover:underline" style="color: var(--accent-primary);">
+          <span>&larr; Portal</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Status Indicator -->
+    <div id="statusBox" class="p-4 rounded-2xl border flex items-center space-x-3" style="background-color: var(--bg-surface-elevated); border-color: var(--border-app);">
+      <div class="w-3 h-3 rounded-full bg-amber-400 animate-ping"></div>
+      <span class="text-xs font-mono" style="color: var(--text-primary);">Validating cryptographic certificate signature...</span>
+    </div>
+
+    <!-- Certificate Details Card -->
+    <div id="certCard" class="hidden space-y-4">
+      <div class="p-5 rounded-2xl border space-y-3" style="background-color: var(--bg-surface-elevated); border-color: var(--border-app);">
+        <div>
+          <span class="text-[10px] font-mono uppercase font-semibold" style="color: var(--text-muted);">Awarded To</span>
+          <h2 class="text-2xl font-black" id="certStudentName" style="color: var(--text-primary);">--</h2>
+          <span class="text-xs font-mono font-bold text-sky-400" id="certRollNo">--</span>
+        </div>
+
+        <div class="border-t pt-3" style="border-color: var(--border-app);">
+          <span class="text-[10px] font-mono uppercase font-semibold" style="color: var(--text-muted);">Citation & Achievement</span>
+          <h3 class="text-base font-bold text-amber-400" id="certTitle">--</h3>
+          <p class="text-xs mt-0.5" id="certClub" style="color: var(--text-muted);">--</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 text-xs font-mono pt-2 border-t" style="border-color: var(--border-app); color: var(--text-muted);">
+          <div>
+            <span class="block text-[10px]" style="color: var(--text-muted);">Certificate No.</span>
+            <span class="font-bold" id="certNo" style="color: var(--text-primary);">--</span>
+          </div>
+          <div>
+            <span class="block text-[10px]" style="color: var(--text-muted);">Issue Date</span>
+            <span class="font-bold" id="certDate" style="color: var(--text-primary);">--</span>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t" style="border-color: var(--border-app);">
+          <span class="block text-[10px] font-mono" style="color: var(--text-muted);">SHA-256 Verification Hash</span>
+          <span class="text-[11px] font-mono text-emerald-400 break-all select-all" id="certHash">--</span>
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <a id="certDownloadLink" href="#" target="_blank" class="w-full text-white font-bold text-xs py-2.5 rounded-xl text-center shadow-lg transition flex items-center justify-center space-x-2" style="background-color: var(--accent-primary);">
+          <i data-lucide="file-text" class="w-4 h-4"></i>
+          <span>Download Official PDF Certificate</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let theme = localStorage.getItem('msot_theme') || 'dark';
+    function applyTheme(t) {
+      theme = t;
+      document.documentElement.setAttribute('data-theme', t);
+      localStorage.setItem('msot_theme', t);
+      document.getElementById('themeBtnIcon').innerText = t === 'dark' ? '☀️' : '🌙';
+    }
+    function toggleTheme() {
+      applyTheme(theme === 'dark' ? 'light' : 'dark');
+    }
+
+    async function verify() {
+      applyTheme(theme);
+      const pathParts = window.location.pathname.split('/');
+      const certId = pathParts[pathParts.length - 1];
+
+      try {
+        const res = await fetch(`/api/certificates/verify/${certId}`);
+        const data = await res.json();
+        const box = document.getElementById('statusBox');
+
+        if (data.valid && data.status === 'VERIFIED_AUTHENTIC') {
+          box.className = 'p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/40 flex items-center space-x-3 text-emerald-300';
+          box.innerHTML = `
+            <i data-lucide="check-circle-2" class="w-6 h-6 text-emerald-400 shrink-0"></i>
+            <div>
+              <div class="font-extrabold text-sm text-emerald-200">VERIFIED AUTHENTIC RECORD</div>
+              <div class="text-[11px] text-emerald-400/80">Cryptographic signature and tamper check successfully verified.</div>
+            </div>
+          `;
+          document.getElementById('certStudentName').innerText = data.student_name;
+          document.getElementById('certRollNo').innerText = `Roll No: ${data.roll_no || 'N/A'} • Campus: ${data.campus}`;
+          document.getElementById('certTitle').innerText = `"${data.title}"`;
+          document.getElementById('certClub').innerText = `${data.club_name} (${data.cert_type})`;
+          document.getElementById('certNo').innerText = data.certificate_number;
+          document.getElementById('certDate').innerText = data.issue_date;
+          document.getElementById('certHash').innerText = data.verification_hash;
+          if (data.pdf_url) {
+            document.getElementById('certDownloadLink').href = data.pdf_url;
+          }
+          document.getElementById('certCard').classList.remove('hidden');
+        } else {
+          box.className = 'p-4 rounded-2xl bg-rose-950/60 border border-rose-500/40 flex items-center space-x-3 text-rose-300';
+          box.innerHTML = `
+            <i data-lucide="alert-octagon" class="w-6 h-6 text-rose-400 shrink-0"></i>
+            <div>
+              <div class="font-extrabold text-sm text-rose-200">UNVERIFIED OR TAMPERED RECORD</div>
+              <div class="text-[11px] text-rose-400/80">${data.message || 'Signature mismatch: this credential is invalid.'}</div>
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+      lucide.createIcons();
+    }
+    document.addEventListener('DOMContentLoaded', verify);
+  </script>
+</body>
+</html>

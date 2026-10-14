@@ -1,0 +1,2945 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Mirai Clubs | Governance & Activities Ecosystem</title>
+  
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Three.js for Immersive 3D Space & Parallax Particles -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- QRCode.js & Html5-Qrcode scanner -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+    
+    /* ========================================================
+       THEME DESIGN TOKENS
+       - Dark Mode: Coolors Palette (#5465FF, #788BFF, #9BB1FF,
+         #BFD7FF, #E2FDFF) over Absolute Black (#000000).
+       - Light Mode: User Specified Palette (#EDE3FF Lavender,
+         #E0F7FA Aqua, #FCE4EC Blush Pink, #F9F9FB Clean Page).
+       ======================================================== */
+    :root[data-theme="dark"] {
+      --bg-page: #000000;               /* Absolute Black */
+      --bg-surface: #07090E;            /* Dark Void Surface */
+      --bg-surface-elevated: #0F1422;   /* Elevated Card Surface */
+      --border-app: rgba(120, 139, 255, 0.22);
+      --border-subtle: rgba(84, 101, 255, 0.15);
+      --accent-primary: #5465FF;        /* Vibrant Royal Blue */
+      --accent-hover: #788BFF;          /* Cornflower Blue */
+      --accent-soft: #9BB1FF;           /* Periwinkle */
+      --accent-ice: #BFD7FF;            /* Glacial Ice Blue */
+      --accent-frost: #E2FDFF;          /* Frost Glow */
+      --text-muted: #9BB1FF;            /* Muted Periwinkle */
+      --text-primary: #E2FDFF;          /* Frost Primary Text */
+      --yuzuru-gold: #f59e0b;
+      --header-bg: rgba(7, 9, 14, 0.88);
+      --sidebar-bg: rgba(7, 9, 14, 0.90);
+      --btn-mirror-bg: rgba(84, 101, 255, 0.10);  /* 90% Transparent */
+      --btn-mirror-border: rgba(191, 215, 255, 0.32);
+      --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+      --glare-opacity: 0.15;
+    }
+
+    :root[data-theme="light"] {
+      --bg-page: #F9F9FB;               /* #F9F9FB Clean Light Background */
+      --bg-surface: #EDE3FF;            /* #EDE3FF Soft Lavender Surface */
+      --bg-surface-elevated: #E0F7FA;   /* #E0F7FA Soft Aqua Accent Surface */
+      --border-app: #FCE4EC;            /* #FCE4EC Soft Sakura Pink Border */
+      --border-subtle: rgba(237, 227, 255, 0.8);
+      --accent-primary: #7c3aed;        /* Royal Violet */
+      --accent-hover: #6d28d9;
+      --accent-soft: #EDE3FF;
+      --accent-ice: #E0F7FA;
+      --accent-frost: #FCE4EC;
+      --text-muted: #434A50;            /* Readable Slate Text */
+      --text-primary: #17181B;          /* Deep Carbon Slate Primary */
+      --yuzuru-gold: #d97706;
+      --header-bg: rgba(249, 249, 251, 0.92);
+      --sidebar-bg: rgba(237, 227, 255, 0.88);
+      --btn-mirror-bg: rgba(224, 247, 250, 0.45); /* #E0F7FA 90% Transparent Mirror */
+      --btn-mirror-border: rgba(252, 228, 236, 0.9); /* #FCE4EC Pink Rim */
+      --card-shadow: 0 10px 30px rgba(237, 227, 255, 0.8);
+      --glare-opacity: 0.25;
+    }
+
+    * {
+      box-sizing: border-box;
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+      cursor: default;
+    }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* ========================================================
+       CUSTOM 3D ANIMATED CURSOR & STARDUST TRAIL
+       ======================================================== */
+    #cursor-dot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 8px;
+      height: 8px;
+      background-color: #E2FDFF;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99999;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 12px #5465FF, 0 0 24px #788BFF;
+      transition: width 0.2s, height 0.2s, background-color 0.2s;
+    }
+    #cursor-ring {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 36px;
+      height: 36px;
+      border: 1.5px solid rgba(120, 139, 255, 0.6);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99998;
+      transform: translate(-50%, -50%);
+      transition: width 0.25s ease-out, height 0.25s ease-out, border-color 0.25s ease-out, background-color 0.25s ease-out;
+      backdrop-filter: blur(1.5px);
+    }
+    #cursor-trail-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 99997;
+    }
+    .cursor-hover #cursor-ring {
+      width: 56px;
+      height: 56px;
+      border-color: #E2FDFF;
+      background-color: rgba(84, 101, 255, 0.15);
+      box-shadow: 0 0 20px rgba(120, 139, 255, 0.4);
+    }
+    .cursor-hover #cursor-dot {
+      width: 12px;
+      height: 12px;
+      background-color: #5465FF;
+    }
+
+    /* 3D Canvas Background */
+    #threeCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ========================================================
+       MIRROR EFFECT BUTTONS (90% TRANSPARENCY)
+       ======================================================== */
+    .btn-mirror {
+      position: relative;
+      overflow: hidden;
+      background: var(--btn-mirror-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--btn-mirror-border);
+      box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.35), 
+                  0 8px 24px -4px rgba(0, 0, 0, 0.35);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-mirror::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -150%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.45) 50%,
+        transparent 100%
+      );
+      transform: skewX(-25deg);
+      transition: left 0.65s ease;
+      pointer-events: none;
+    }
+    .btn-mirror:hover::before {
+      left: 150%;
+    }
+    .btn-mirror:hover {
+      background: rgba(84, 101, 255, 0.22);
+      border-color: rgba(226, 253, 255, 0.6);
+      box-shadow: inset 0 1px 2px 0 rgba(255, 255, 255, 0.5),
+                  0 0 24px rgba(84, 101, 255, 0.45);
+      transform: translateY(-2px);
+    }
+    .btn-mirror:active {
+      transform: translateY(0px) scale(0.98);
+    }
+
+    /* 3D Card Interactive Tilt & Specular Glare */
+    .card-3d {
+      transform-style: preserve-3d;
+      perspective: 1200px;
+      transition: transform 0.12s ease-out, box-shadow 0.25s ease;
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-app);
+      box-shadow: var(--card-shadow);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(14px);
+    }
+    .card-3d::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, var(--glare-opacity)) 0%, transparent 60%);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .card-3d:hover::after {
+      opacity: 1;
+    }
+
+    .bg-theme-surface { background-color: var(--bg-surface); }
+    .bg-theme-elevated { background-color: var(--bg-surface-elevated); }
+    .border-theme { border-color: var(--border-app); }
+    .text-theme-primary { color: var(--text-primary); }
+    .text-theme-muted { color: var(--text-muted); }
+
+    .glow-yuzuru {
+      box-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
+    }
+    .glow-mirai {
+      box-shadow: 0 0 30px rgba(84, 101, 255, 0.35);
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(120, 139, 255, 0.3); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(120, 139, 255, 0.6); }
+  </style>
+</head>
+<body class="min-h-screen flex relative selection:bg-[#5465FF] selection:text-white">
+
+  <!-- 3D INTERACTIVE THREE.JS CANVAS -->
+  <canvas id="threeCanvas"></canvas>
+  <!-- DYNAMIC 3D CURSOR CANVAS & ELEMENTS -->
+  <canvas id="cursor-trail-canvas"></canvas>
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- ======================================================== -->
+  <!-- LEFT VERTICAL SIDEBAR NAVIGATION (FIXED) -->
+  <!-- ======================================================== -->
+  <aside id="appSidebar" class="w-64 fixed left-0 top-0 bottom-0 z-40 border-r border-theme flex flex-col justify-between backdrop-blur-xl transition-transform duration-300 -translate-x-full lg:translate-x-0" style="background-color: var(--sidebar-bg);">
+    
+    <!-- Top Brand & Hierarchy -->
+    <div class="p-5 border-b border-theme space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('explore')">
+          <div class="w-10 h-10 rounded-2xl flex items-center justify-center text-white shadow-xl glow-mirai" style="background: linear-gradient(135deg, #5465FF, #788BFF);">
+            <i data-lucide="compass" class="w-5 h-5 text-[#E2FDFF]"></i>
+          </div>
+          <div>
+            <span class="text-base font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-[#E2FDFF] to-[#788BFF] block leading-none">
+              Mirai Clubs
+            </span>
+            <span class="text-[10px] text-theme-muted font-mono font-semibold">MSOT Ecosystem</span>
+          </div>
+        </div>
+        <!-- Mobile close button -->
+        <button onclick="toggleMobileSidebar()" class="lg:hidden text-theme-muted hover:text-theme-primary p-1">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- User Status Card / Guest Indicator -->
+      <div id="userStatusCard" class="card-3d p-3 rounded-2xl border border-theme text-xs space-y-1.5" style="background-color: var(--bg-surface-elevated);">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-mono uppercase text-theme-muted font-bold tracking-wider">Session</span>
+          <span id="roleBadge" class="px-2 py-0.5 rounded-full text-[10px] font-mono border border-theme bg-theme-surface text-theme-muted">
+            Guest / Public
+          </span>
+        </div>
+        <div id="userDisplayName" class="font-bold text-sm text-theme-primary truncate">Welcome, Visitor</div>
+        <div id="userCampusCode" class="text-[11px] text-theme-muted font-mono">HIET • RIT • JU</div>
+      </div>
+    </div>
+
+    <!-- Vertical Navigation Links -->
+    <nav class="p-4 space-y-1.5 overflow-y-auto flex-1 text-xs font-bold" id="sidebarNav">
+      <button onclick="switchTab('explore')" id="tab-explore" class="tab-btn w-full px-3.5 py-2.5 rounded-xl flex items-center space-x-3 text-left transition btn-mirror border border-theme" style="background-color: var(--bg-surface-elevated); color: var(--text-primary);">
+        <i data-lucide="layers" class="w-4 h-4 text-[#788BFF]"></i>
+        <span>Campuses & Clubs</span>
+      </button>
+
+      <button onclick="switchTab('events')" id="tab-events" class="tab-btn w-full px-3.5 py-2.5 rounded-xl flex items-center space-x-3 text-left transition btn-mirror text-theme-muted hover:text-theme-primary">
+        <i data-lucide="calendar" class="w-4 h-4 text-[#9BB1FF]"></i>
+        <span>Events & Calendar</span>
+      </button>
+
+      <button onclick="guardAction(() => switchTab('student'))" id="tab-student" class="tab-btn w-full px-3.5 py-2.5 rounded-xl flex items-center space-x-3 text-left transition btn-mirror text-theme-muted hover:text-theme-primary">
+        <i data-lucide="user-check" class="w-4 h-4 text-[#BFD7FF]"></i>
+        <span>My Portfolio & Attn</span>
+      </button>
+
+      <button onclick="guardAction(() => switchTab('budget'))" id="tab-budget" class="tab-btn w-full px-3.5 py-2.5 rounded-xl flex items-center space-x-3 text-left transition btn-mirror text-theme-muted hover:text-theme-primary">
+        <i data-lucide="wallet" class="w-4 h-4 text-emerald-400"></i>
+        <span>Finances & Budgets</span>
+      </button>
+
+      <!-- Authority Console Tab (Unlocked via 'Yuzuru') -->
+      <button onclick="switchTab('authority')" id="tab-authority" class="hidden tab-btn w-full px-3.5 py-2.5 rounded-xl flex items-center space-x-3 text-left transition btn-mirror text-amber-400 hover:text-amber-300 border border-amber-500/40 glow-yuzuru">
+        <i data-lucide="shield-alert" class="w-4 h-4 text-amber-400"></i>
+        <span>Domain Authority</span>
+      </button>
+
+      <div class="pt-3 pb-1 border-t border-theme">
+        <span class="text-[10px] font-mono text-theme-muted uppercase tracking-wider px-2">Fast Actions</span>
+      </div>
+
+      <!-- Quick Scan Check-In Button -->
+      <button onclick="guardAction(openCheckInScanner)" class="btn-mirror w-full px-3.5 py-2.5 rounded-xl flex items-center space-x-3 text-left font-bold text-white shadow" style="background: linear-gradient(135deg, rgba(84, 101, 255, 0.4), rgba(120, 139, 255, 0.2));">
+        <i data-lucide="qr-code" class="w-4 h-4 text-[#E2FDFF]"></i>
+        <span>Scan Dynamic QR</span>
+      </button>
+
+      <div class="pt-3 pb-1 border-t border-theme">
+        <span class="text-[10px] font-mono text-theme-muted uppercase tracking-wider px-2">Official Portals</span>
+      </div>
+
+      <a href="https://bit.ly/3LolV37" target="_blank" rel="noopener noreferrer" class="btn-mirror w-full px-3 py-2 rounded-xl flex items-center justify-between text-left text-[11px] text-[#788BFF] hover:text-[#5465FF] transition">
+        <span class="flex items-center space-x-2">
+          <span>🎓</span>
+          <span class="font-bold">Apply MAINS 2026</span>
+        </span>
+        <i data-lucide="external-link" class="w-3 h-3 text-theme-muted"></i>
+      </a>
+
+      <a href="https://forms.gle/5fv17mszkaFghWFP8" target="_blank" rel="noopener noreferrer" class="btn-mirror w-full px-3 py-2 rounded-xl flex items-center justify-between text-left text-[11px] text-emerald-400 hover:text-emerald-300 transition">
+        <span class="flex items-center space-x-2">
+          <span>🤖</span>
+          <span class="font-bold">AI Internship</span>
+        </span>
+        <i data-lucide="external-link" class="w-3 h-3 text-theme-muted"></i>
+      </a>
+
+      <a href="https://www.youtube.com/@MiraiSchoolofTechnology" target="_blank" rel="noopener noreferrer" class="btn-mirror w-full px-3 py-2 rounded-xl flex items-center justify-between text-left text-[11px] text-rose-400 hover:text-rose-300 transition">
+        <span class="flex items-center space-x-2">
+          <i data-lucide="youtube" class="w-3.5 h-3.5"></i>
+          <span class="font-bold">YouTube Channel</span>
+        </span>
+        <i data-lucide="external-link" class="w-3 h-3 text-theme-muted"></i>
+      </a>
+
+      <a href="https://instagram.com/miraischooloftechnology" target="_blank" rel="noopener noreferrer" class="btn-mirror w-full px-3 py-2 rounded-xl flex items-center justify-between text-left text-[11px] text-pink-400 hover:text-pink-300 transition">
+        <span class="flex items-center space-x-2">
+          <i data-lucide="instagram" class="w-3.5 h-3.5"></i>
+          <span class="font-bold">Instagram</span>
+        </span>
+        <i data-lucide="external-link" class="w-3 h-3 text-theme-muted"></i>
+      </a>
+
+      <a href="https://linkedin.com/company/mirai-school-of-technology" target="_blank" rel="noopener noreferrer" class="btn-mirror w-full px-3 py-2 rounded-xl flex items-center justify-between text-left text-[11px] text-blue-400 hover:text-blue-300 transition">
+        <span class="flex items-center space-x-2">
+          <i data-lucide="linkedin" class="w-3.5 h-3.5"></i>
+          <span class="font-bold">LinkedIn</span>
+        </span>
+        <i data-lucide="external-link" class="w-3 h-3 text-theme-muted"></i>
+      </a>
+    </nav>
+
+    <!-- Sidebar Footer & Controls -->
+    <div class="p-4 border-t border-theme space-y-3">
+      <!-- Theme Switcher -->
+      <button onclick="toggleTheme()" id="themeToggleBtn" class="btn-mirror w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-between text-theme-primary">
+        <span class="flex items-center space-x-2">
+          <span id="themeIcon">☀️</span>
+          <span id="themeLabel">Light Mode</span>
+        </span>
+        <span class="text-[10px] font-mono text-theme-muted">Palette</span>
+      </button>
+
+      <!-- Demo Role Quick Switcher -->
+      <div class="space-y-1">
+        <label class="block text-[10px] font-mono text-theme-muted uppercase">Fast Role Preview</label>
+        <select id="demoUserSelector" onchange="switchDemoUser(this.value)" class="w-full text-xs rounded-xl px-2.5 py-1.5 border border-theme font-semibold focus:outline-none" style="background-color: var(--bg-surface); color: var(--text-primary);">
+          <option value="">-- Switch Account --</option>
+          <option value="admin_alok">👑 Dr. Alok Verma (Admin/Authority)</option>
+          <option value="aarav_lead">⭐ Aarav (Nextcell President)</option>
+          <option value="priya_fin">💰 Priya (Nextcell Finance Pres)</option>
+          <option value="tanvi_lead">🎨 Tanvi (Kaizen President)</option>
+          <option value="student_1">🎓 Student Candidate 1</option>
+          <option value="cm_sunita">🏛️ Prof. Sunita (Campus Manager)</option>
+        </select>
+      </div>
+
+      <!-- Auth Controls (Sign In / Register / Logout) -->
+      <div class="pt-1 flex items-center gap-2">
+        <button onclick="openAuthModal('login')" id="loginNavBtn" class="btn-mirror flex-1 py-2 rounded-xl text-xs font-bold text-theme-primary">
+          Sign In
+        </button>
+        <button onclick="openAuthModal('register')" id="registerNavBtn" class="btn-mirror flex-1 py-2 rounded-xl text-xs font-black text-white" style="background: rgba(84, 101, 255, 0.35);">
+          Register
+        </button>
+        <button onclick="logout()" id="logoutNavBtn" class="hidden btn-mirror w-full py-2 rounded-xl text-xs font-bold text-rose-400 border-rose-500/30 hover:bg-rose-950/40">
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ======================================================== -->
+  <!-- MAIN CONTENT AREA (OFFSET BY LEFT SIDEBAR) -->
+  <!-- ======================================================== -->
+  <div class="flex-1 lg:ml-64 flex flex-col min-h-screen relative z-10">
+    
+    <!-- TOP MOBILE BAR (Visible on mobile) -->
+    <header class="lg:hidden border-b border-theme py-3 px-4 sticky top-0 z-30 backdrop-blur-md flex items-center justify-between" style="background-color: var(--header-bg);">
+      <button onclick="toggleMobileSidebar()" class="btn-mirror p-2 rounded-xl text-theme-primary">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+      <div class="flex items-center space-x-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="font-extrabold text-sm tracking-tight text-theme-primary">Mirai Clubs</span>
+      </div>
+      <button onclick="openAuthModal('login')" class="btn-mirror px-3 py-1.5 rounded-xl text-xs font-bold text-theme-primary">
+        Account
+      </button>
+    </header>
+
+    <!-- NOTIFICATION ALERT BANNER -->
+    <div id="alertBanner" class="hidden max-w-6xl mx-auto px-4 sm:px-6 pt-4 w-full relative z-20"></div>
+
+    <!-- DOMAIN AUTHORITY SUPREME BANNER -->
+    <div id="authorityBanner" class="hidden max-w-6xl mx-auto px-4 sm:px-6 pt-4 w-full relative z-20">
+      <div class="card-3d rounded-3xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs border border-amber-500/50 glow-yuzuru" style="background-color: var(--bg-surface-elevated);">
+        <div class="flex items-center space-x-3.5">
+          <div class="w-11 h-11 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xl shadow-lg shrink-0">
+            👑
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="font-black text-amber-400 text-base">Supreme Domain Authority Active</span>
+              <span class="bg-amber-500/20 text-amber-400 font-mono text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-500/40">Verified Keyholder</span>
+            </div>
+            <p class="text-theme-muted mt-0.5 text-xs">
+              You possess supreme authority to modify club member posts (President, VP, Finance, Media), oversee attendance, and audit all operations across HIET, RIT, and JU campuses.
+            </p>
+          </div>
+        </div>
+        <button onclick="switchTab('authority')" class="btn-mirror px-5 py-2.5 rounded-xl font-black text-xs text-amber-400 border-amber-500/40 hover:bg-amber-500/20 shrink-0">
+          Open Console &rarr;
+        </button>
+      </div>
+    </div>
+
+    <!-- MAIN APP VIEWS CONTAINER -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-10">
+
+      <!-- ========================================== -->
+      <!-- 1. EXPLORE CLUBS & CAMPUSES VIEW (HOME) -->
+      <!-- ========================================== -->
+      <section id="view-explore" class="space-y-10">
+        
+        <!-- HERO SECTION: WELCOME TO MIRAI CLUBS -->
+        <div class="card-3d rounded-3xl p-8 sm:p-12 border border-theme relative overflow-hidden glow-mirai" style="background-color: var(--bg-surface);">
+          <div class="max-w-3xl space-y-5 relative z-10">
+            
+            <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-xs font-mono font-bold border border-theme btn-mirror" style="color: var(--accent-frost);">
+              <span class="w-2 h-2 rounded-full bg-[#5465FF] animate-ping"></span>
+              <span>Autonomous Student Governance Ecosystem</span>
+            </div>
+
+            <!-- MANDATORY PROMPT TITLE -->
+            <h1 class="text-3xl sm:text-6xl font-black tracking-tight leading-tight text-transparent bg-clip-text bg-gradient-to-r from-[#E2FDFF] via-[#9BB1FF] to-[#5465FF]">
+              Welcome to Mirai Clubs
+            </h1>
+
+            <p class="text-theme-muted text-sm sm:text-base leading-relaxed">
+              Empowering student-led innovation across <strong>RIT</strong> (Rathinam Institute), <strong>HIET</strong> (Hi Tech Institute of Engineering), and <strong>JU</strong> (Jagannath University). Track Saturday Club Days, verify attendance via dynamic 20-second TOTP, and build verifiable co-curricular portfolios.
+            </p>
+
+            <!-- Quick Key Highlights with Mirror Buttons -->
+            <div class="flex flex-wrap gap-3 pt-2 text-xs font-mono">
+              <div class="btn-mirror px-3.5 py-2 rounded-xl text-theme-primary">
+                🏛️ <strong>3 Campuses:</strong> RIT • HIET • JU
+              </div>
+              <div class="btn-mirror px-3.5 py-2 rounded-xl text-theme-primary">
+                ⚡ <strong>HIET Flagship:</strong> 4 Official Clubs
+              </div>
+              <div class="btn-mirror px-3.5 py-2 rounded-xl text-theme-primary">
+                👥 <strong>Policy:</strong> Max 2 Clubs per Student
+              </div>
+            </div>
+
+            <!-- Action CTA -->
+            <div class="pt-3 flex flex-wrap gap-3">
+              <button onclick="guardAction(() => switchTab('events'))" class="btn-mirror px-5 py-3 rounded-2xl text-xs font-black text-white" style="background: rgba(84, 101, 255, 0.45);">
+                Explore Saturday Club Days &rarr;
+              </button>
+              <button onclick="openAuthModal('register')" class="btn-mirror px-5 py-3 rounded-2xl text-xs font-bold text-theme-primary">
+                Register with OTP Verification
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- OFFICIAL MIRAI PORTALS & FAST ACCESS RIBBON -->
+        <!-- ==================================================== -->
+        <div class="card-3d rounded-3xl p-5 sm:p-6 border border-theme space-y-4" style="background-color: var(--bg-surface);">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-theme pb-3">
+            <div class="flex items-center space-x-3">
+              <div class="w-9 h-9 rounded-2xl bg-gradient-to-tr from-[#5465FF] to-[#788BFF] text-white flex items-center justify-center font-black text-base shadow-md">
+                ★
+              </div>
+              <div>
+                <div class="flex items-center space-x-2">
+                  <h3 class="text-base font-black text-theme-primary">Mirai Official Portals & Verified Links</h3>
+                  <span class="bg-[#5465FF]/20 text-[#788BFF] font-mono text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#5465FF]/30">Verified</span>
+                </div>
+                <p class="text-[11px] text-theme-muted">Official applications, internships, webinars, and media handles directly from Mirai School of Technology.</p>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-[11px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                <i data-lucide="phone-call" class="w-3.5 h-3.5"></i>
+                <span>Admissions Helpline: Phone Verified ℹ️</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 pt-1 text-xs font-semibold">
+            <!-- Apply For Mirai MAINS 2026 -->
+            <a href="https://bit.ly/3LolV37" target="_blank" rel="noopener noreferrer" class="btn-mirror p-3.5 rounded-2xl border border-[#5465FF]/40 flex flex-col justify-between hover:scale-[1.02] transition group text-left">
+              <div class="flex items-center justify-between text-amber-400 mb-2">
+                <span class="text-lg">🎓</span>
+                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-theme-muted group-hover:text-amber-400 transition"></i>
+              </div>
+              <div>
+                <span class="font-extrabold text-xs text-theme-primary block">Apply MAINS 2026</span>
+                <span class="text-[10px] text-[#788BFF] font-mono">bit.ly/3LolV37</span>
+              </div>
+            </a>
+
+            <!-- Summer AI Internship -->
+            <a href="https://forms.gle/5fv17mszkaFghWFP8" target="_blank" rel="noopener noreferrer" class="btn-mirror p-3.5 rounded-2xl border border-emerald-500/40 flex flex-col justify-between hover:scale-[1.02] transition group text-left">
+              <div class="flex items-center justify-between text-emerald-400 mb-2">
+                <span class="text-lg">🤖</span>
+                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-theme-muted group-hover:text-emerald-400 transition"></i>
+              </div>
+              <div>
+                <span class="font-extrabold text-xs text-theme-primary block">Summer AI Internship</span>
+                <span class="text-[10px] text-emerald-400 font-mono">forms.gle/5fv17...</span>
+              </div>
+            </a>
+
+            <!-- Microsoft & AI Careers Webinar -->
+            <a href="https://us06web.zoom.us/meeting/register/i23dt0JlRNqHo8hcfL8m5Q#/registration" target="_blank" rel="noopener noreferrer" class="btn-mirror p-3.5 rounded-2xl border border-blue-500/40 flex flex-col justify-between hover:scale-[1.02] transition group text-left">
+              <div class="flex items-center justify-between text-blue-400 mb-2">
+                <span class="text-lg">💼</span>
+                <i data-lucide="video" class="w-3.5 h-3.5 text-theme-muted group-hover:text-blue-400 transition"></i>
+              </div>
+              <div>
+                <span class="font-extrabold text-xs text-theme-primary block">Microsoft & AI Careers</span>
+                <span class="text-[10px] text-blue-400 font-mono">Zoom Webinar</span>
+              </div>
+            </a>
+
+            <!-- Official Website -->
+            <a href="https://miraisot.com" target="_blank" rel="noopener noreferrer" class="btn-mirror p-3.5 rounded-2xl border border-theme flex flex-col justify-between hover:scale-[1.02] transition group text-left">
+              <div class="flex items-center justify-between text-theme-primary mb-2">
+                <span class="text-lg">🌐</span>
+                <i data-lucide="external-link" class="w-3.5 h-3.5 text-theme-muted group-hover:text-theme-primary transition"></i>
+              </div>
+              <div>
+                <span class="font-extrabold text-xs text-theme-primary block">Official Website</span>
+                <span class="text-[10px] text-theme-muted font-mono">miraisot.com</span>
+              </div>
+            </a>
+
+            <!-- YouTube Channel -->
+            <a href="https://www.youtube.com/@MiraiSchoolofTechnology" target="_blank" rel="noopener noreferrer" class="btn-mirror p-3.5 rounded-2xl border border-rose-500/30 flex flex-col justify-between hover:scale-[1.02] transition group text-left">
+              <div class="flex items-center justify-between text-rose-500 mb-2">
+                <i data-lucide="youtube" class="w-5 h-5"></i>
+                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-theme-muted group-hover:text-rose-400 transition"></i>
+              </div>
+              <div>
+                <span class="font-extrabold text-xs text-theme-primary block">YouTube Hub</span>
+                <span class="text-[10px] text-rose-400 font-mono">@MiraiSchool...</span>
+              </div>
+            </a>
+
+            <!-- Instagram Feed -->
+            <a href="https://instagram.com/miraischooloftechnology" target="_blank" rel="noopener noreferrer" class="btn-mirror p-3.5 rounded-2xl border border-pink-500/30 flex flex-col justify-between hover:scale-[1.02] transition group text-left">
+              <div class="flex items-center justify-between text-pink-400 mb-2">
+                <i data-lucide="instagram" class="w-5 h-5"></i>
+                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 text-theme-muted group-hover:text-pink-400 transition"></i>
+              </div>
+              <div>
+                <span class="font-extrabold text-xs text-theme-primary block">Instagram Feed</span>
+                <span class="text-[10px] text-pink-400 font-mono">@miraischool...</span>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- MIRAI MEDIA SHOWCASE: YOUTUBE PLAYLIST & SOCIAL STREAM -->
+        <!-- ==================================================== -->
+        <div class="space-y-6">
+          <div class="flex items-center justify-between border-b border-theme pb-3">
+            <div>
+              <div class="flex items-center space-x-2">
+                <span class="text-rose-500 font-black text-sm">▶</span>
+                <h2 class="text-2xl font-black text-theme-primary">Mirai Pulse: Videos & Live Social Stream</h2>
+              </div>
+              <p class="text-xs text-theme-muted">Official YouTube showcase, verified social posts, and campus activities from @MiraiSchoolofTechnology.</p>
+            </div>
+            <a href="https://www.youtube.com/@MiraiSchoolofTechnology" target="_blank" rel="noopener noreferrer" class="hidden sm:inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-[11px] font-mono border border-rose-500/40 text-rose-400 btn-mirror">
+              <i data-lucide="youtube" class="w-3.5 h-3.5"></i>
+              <span>Channel: 12.4K Subs</span>
+            </a>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+            
+            <!-- YouTube Video Showcase Card (7 Cols) with Interactive Playlist Selector -->
+            <div class="lg:col-span-7 card-3d rounded-3xl border border-theme p-5 sm:p-6 flex flex-col justify-between space-y-4">
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-full bg-rose-600/20 text-rose-500 flex items-center justify-center font-bold">
+                      <i data-lucide="youtube" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                      <div class="flex items-center space-x-1.5">
+                        <span class="font-extrabold text-sm text-theme-primary block leading-none">Mirai School of Technology</span>
+                        <span class="text-blue-400 text-xs font-bold" title="Verified Channel">✓</span>
+                      </div>
+                      <span class="text-[10px] text-theme-muted font-mono">@MiraiSchoolofTechnology • 12.4K Subscribers</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <span id="videoBadge" class="bg-rose-500/20 text-rose-400 font-mono text-[10px] font-bold px-2 py-0.5 rounded-full border border-rose-500/30">
+                      Official Channel
+                    </span>
+                    <a href="https://www.youtube.com/@MiraiSchoolofTechnology?sub_confirmation=1" target="_blank" rel="noopener noreferrer" class="btn-mirror px-3 py-1 rounded-xl text-[10px] font-bold text-white bg-rose-600/70 hover:bg-rose-500">
+                      Subscribe
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Video Player Container with Real Mirai Video Cover / Embed -->
+                <div id="videoContainer" class="w-full aspect-video rounded-2xl overflow-hidden border border-theme shadow-2xl relative bg-black/80 group cursor-pointer" onclick="togglePlayMiraiVideo()">
+                  <!-- Video Cover: Mirai 24h Hackathon / Active Video Poster -->
+                  <img id="videoCoverImg" src="/uploads/mirai_24h_hackathon.png" class="w-full h-full object-cover transition duration-700 group-hover:scale-105" alt="Mirai 24h Non-Stop Coding Marathon" />
+                  
+                  <!-- Gradient Overlay & Play Button -->
+                  <div id="videoPlayOverlay" class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent flex flex-col items-center justify-center space-y-3 p-4">
+                    <div class="w-16 h-16 rounded-full bg-rose-600 group-hover:bg-rose-500 text-white flex items-center justify-center shadow-2xl transition transform group-hover:scale-110 glow-mirai">
+                      <i data-lucide="play" class="w-8 h-8 fill-current ml-1 text-white"></i>
+                    </div>
+                    <div class="text-center px-4">
+                      <span class="text-[11px] font-mono uppercase tracking-wider text-rose-300 font-bold block mb-1">Click to Watch Official Video</span>
+                      <span id="videoOverlayTitle" class="text-sm font-black text-white drop-shadow">Will They Survive 24 Hours of Non-Stop Coding at Mirai?</span>
+                    </div>
+                  </div>
+
+                  <!-- Iframe Video (Hidden until Play clicked) -->
+                  <iframe 
+                    id="videoIframe"
+                    class="w-full h-full hidden"
+                    src="" 
+                    title="Mirai School of Technology Official Video" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                  </iframe>
+
+                  <!-- Duration Badge -->
+                  <span id="videoDurationBadge" class="absolute bottom-3 right-3 bg-black/80 text-white font-mono text-[10px] font-bold px-2 py-0.5 rounded-md backdrop-blur-md">
+                    24:00
+                  </span>
+                </div>
+              </div>
+
+              <!-- Active Video Title & Details -->
+              <div class="pt-2 border-t border-theme flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+                <div>
+                  <h4 id="featuredVideoTitle" class="font-bold text-sm text-theme-primary">Will They Survive 24 Hours of Non-Stop Coding at Mirai?</h4>
+                  <p id="featuredVideoDesc" class="text-[11px] text-theme-muted">Official Mirai School of Technology • Hackathon Sprint & Student Culture • 18.2K views</p>
+                </div>
+                <div class="flex items-center space-x-2 shrink-0">
+                  <button onclick="togglePlayMiraiVideo()" id="playToggleBtn" class="btn-mirror px-3 py-1.5 rounded-xl text-[11px] font-bold text-rose-400 border-rose-500/30">
+                    <i data-lucide="play" class="w-3.5 h-3.5 inline mr-1"></i> Play
+                  </button>
+                  <a id="openYoutubeLink" href="https://www.youtube.com/watch?v=V-h7Egd617Y" target="_blank" rel="noopener noreferrer" class="btn-mirror px-3 py-1.5 rounded-xl text-[11px] font-bold text-theme-primary">
+                    Open on YT ↗
+                  </a>
+                </div>
+              </div>
+
+              <!-- Interactive Multi-Video Selector (Tabs for 6 Official Channel Videos) -->
+              <div class="space-y-2 pt-1 border-t border-theme">
+                <div class="flex items-center justify-between text-[11px] font-mono text-theme-muted">
+                  <span class="font-bold uppercase tracking-wider">Official Video Playlist:</span>
+                  <span>Click to Load & Play</span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="videoPlaylistGrid">
+                  <!-- Video 1 -->
+                  <button onclick="selectMiraiVideo(0)" class="video-tab-btn btn-mirror p-2 rounded-xl text-left border border-rose-500/40 flex items-center space-x-2 transition hover:bg-rose-950/20" data-idx="0">
+                    <span class="text-rose-400 font-bold text-xs shrink-0">⚡ 01</span>
+                    <div class="truncate">
+                      <div class="font-bold text-[11px] text-theme-primary truncate">24H Hackathon Sprint</div>
+                      <div class="text-[9px] text-theme-muted font-mono">24:00 • 18.2K views</div>
+                    </div>
+                  </button>
+                  <!-- Video 2 -->
+                  <button onclick="selectMiraiVideo(1)" class="video-tab-btn btn-mirror p-2 rounded-xl text-left border border-theme flex items-center space-x-2 transition hover:bg-theme-surface" data-idx="1">
+                    <span class="text-amber-400 font-bold text-xs shrink-0">🏆 02</span>
+                    <div class="truncate">
+                      <div class="font-bold text-[11px] text-theme-primary truncate">ET Changemakers Award</div>
+                      <div class="text-[9px] text-theme-muted font-mono">04:15 • 29.5K views</div>
+                    </div>
+                  </button>
+                  <!-- Video 3 -->
+                  <button onclick="selectMiraiVideo(2)" class="video-tab-btn btn-mirror p-2 rounded-xl text-left border border-theme flex items-center space-x-2 transition hover:bg-theme-surface" data-idx="2">
+                    <span class="text-blue-400 font-bold text-xs shrink-0">🤖 03</span>
+                    <div class="truncate">
+                      <div class="font-bold text-[11px] text-theme-primary truncate">AI Impact Summit 2026</div>
+                      <div class="text-[9px] text-theme-muted font-mono">08:42 • 15.1K views</div>
+                    </div>
+                  </button>
+                  <!-- Video 4 -->
+                  <button onclick="selectMiraiVideo(3)" class="video-tab-btn btn-mirror p-2 rounded-xl text-left border border-theme flex items-center space-x-2 transition hover:bg-theme-surface" data-idx="3">
+                    <span class="text-emerald-400 font-bold text-xs shrink-0">🎓 04</span>
+                    <div class="truncate">
+                      <div class="font-bold text-[11px] text-theme-primary truncate">All About Mirai | AI B.Tech</div>
+                      <div class="text-[9px] text-theme-muted font-mono">12:10 • 42.8K views</div>
+                    </div>
+                  </button>
+                  <!-- Video 5 -->
+                  <button onclick="selectMiraiVideo(4)" class="video-tab-btn btn-mirror p-2 rounded-xl text-left border border-theme flex items-center space-x-2 transition hover:bg-theme-surface" data-idx="4">
+                    <span class="text-purple-400 font-bold text-xs shrink-0">💡 05</span>
+                    <div class="truncate">
+                      <div class="font-bold text-[11px] text-theme-primary truncate">Founder's Edition Truth</div>
+                      <div class="text-[9px] text-theme-muted font-mono">16:45 • 21.0K views</div>
+                    </div>
+                  </button>
+                  <!-- Video 6 -->
+                  <button onclick="selectMiraiVideo(5)" class="video-tab-btn btn-mirror p-2 rounded-xl text-left border border-theme flex items-center space-x-2 transition hover:bg-theme-surface" data-idx="5">
+                    <span class="text-pink-400 font-bold text-xs shrink-0">🏛️ 06</span>
+                    <div class="truncate">
+                      <div class="font-bold text-[11px] text-theme-primary truncate">Mirai Campus Tour & Life</div>
+                      <div class="text-[9px] text-theme-muted font-mono">11:22 • 31.4K views</div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Social Media Column (5 Cols): Instagram Post Carousel + LinkedIn Update -->
+            <div class="lg:col-span-5 space-y-4 flex flex-col justify-between">
+              
+              <!-- Official Instagram Card with Photo Carousel Switcher -->
+              <div class="card-3d rounded-3xl border border-theme p-5 space-y-3.5">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-600 flex items-center justify-center text-white text-xs p-0.5 shadow">
+                      <div class="w-full h-full rounded-full bg-slate-950 flex items-center justify-center">
+                        <i data-lucide="instagram" class="w-4 h-4 text-pink-400"></i>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="flex items-center space-x-1">
+                        <span class="font-extrabold text-xs text-theme-primary block leading-none">miraischooloftechnology</span>
+                        <span class="text-blue-400 text-xs font-bold" title="Verified">✓</span>
+                      </div>
+                      <span class="text-[10px] text-theme-muted">HIET Campus & Tech Labs • Original Post</span>
+                    </div>
+                  </div>
+                  <a href="https://instagram.com/miraischooloftechnology" target="_blank" rel="noopener noreferrer" class="btn-mirror px-2.5 py-1 rounded-xl text-[10px] font-bold text-pink-400 hover:text-pink-300">
+                    Follow
+                  </a>
+                </div>
+
+                <!-- Instagram Photo Carousel with Prev/Next Controls -->
+                <div class="w-full aspect-[4/3] rounded-2xl overflow-hidden border border-theme shadow-md relative group">
+                  <img id="instaPhotoImg" src="/uploads/mirai_24h_hackathon.png" class="w-full h-full object-cover transition duration-500" alt="Mirai Official Activity Post" />
+                  
+                  <!-- Tag Badge -->
+                  <div class="absolute bottom-2.5 left-2.5 px-2.5 py-1 rounded-xl bg-black/70 text-white font-mono text-[10px] backdrop-blur-md border border-white/10 flex items-center space-x-1">
+                    <span id="instaBadgeIcon">💻</span>
+                    <span id="instaBadgeLabel">24H Hackathon Sprint</span>
+                  </div>
+
+                  <!-- Prev / Next Controls -->
+                  <button onclick="changeInstaSlide(-1)" class="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center opacity-80 hover:opacity-100 backdrop-blur-sm transition">
+                    ‹
+                  </button>
+                  <button onclick="changeInstaSlide(1)" class="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center opacity-80 hover:opacity-100 backdrop-blur-sm transition">
+                    ›
+                  </button>
+
+                  <!-- Indicators (Dots) -->
+                  <div class="absolute bottom-2.5 right-2.5 flex space-x-1.5 bg-black/50 px-2 py-1 rounded-full backdrop-blur-sm">
+                    <button onclick="setInstaSlide(0)" class="w-1.5 h-1.5 rounded-full bg-white transition" id="instaDot-0"></button>
+                    <button onclick="setInstaSlide(1)" class="w-1.5 h-1.5 rounded-full bg-white/40 transition" id="instaDot-1"></button>
+                    <button onclick="setInstaSlide(2)" class="w-1.5 h-1.5 rounded-full bg-white/40 transition" id="instaDot-2"></button>
+                  </div>
+                </div>
+
+                <!-- Instagram Action Icons -->
+                <div class="flex items-center justify-between pt-1 text-sm text-theme-primary">
+                  <div class="flex items-center space-x-3">
+                    <button onclick="toggleInstagramLike()" id="instaLikeBtn" class="hover:text-rose-500 transition flex items-center space-x-1 text-xs font-bold">
+                      <i data-lucide="heart" id="instaHeartIcon" class="w-4 h-4"></i>
+                      <span id="instaLikesCount">3,124</span>
+                    </button>
+                    <button class="hover:text-[#788BFF] transition flex items-center space-x-1 text-xs">
+                      <i data-lucide="message-circle" class="w-4 h-4"></i>
+                      <span>182</span>
+                    </button>
+                    <button class="hover:text-emerald-400 transition">
+                      <i data-lucide="send" class="w-4 h-4"></i>
+                    </button>
+                  </div>
+                  <a href="https://instagram.com/miraischooloftechnology" target="_blank" rel="noopener noreferrer" class="hover:text-pink-400 transition text-[11px] font-mono">
+                    View on Instagram &rarr;
+                  </a>
+                </div>
+
+                <!-- Caption referencing extracted links -->
+                <p class="text-xs text-theme-muted leading-relaxed">
+                  <strong class="text-theme-primary">miraischooloftechnology</strong> 24 Hours. Zero Sleep. Pure Code. 🔥 Mirai students pushing limits during Saturday Club Days with <strong>Nextcell AI</strong> & <strong>Kaizen</strong> clubs at HIET Campus.
+                  <br/>
+                  🎓 Apply For Mirai MAINS 2026: <a href="https://bit.ly/3LolV37" target="_blank" class="text-[#788BFF] hover:underline font-mono">bit.ly/3LolV37</a>
+                  <br/>
+                  🤖 Summer AI Internship: <a href="https://forms.gle/5fv17mszkaFghWFP8" target="_blank" class="text-emerald-400 hover:underline font-mono">forms.gle/5fv17...</a>
+                </p>
+                
+                <div class="text-[10px] font-mono text-[#788BFF]">
+                  #MiraiSchoolofTechnology #HIETCampus #Nextcell #Kaizen #MiraiMAINS2026
+                </div>
+              </div>
+
+              <!-- Official LinkedIn Post Card (Featuring Microsoft & AI Careers Webinar) -->
+              <div class="card-3d rounded-3xl border border-theme p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shadow">
+                      <i data-lucide="linkedin" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                      <div class="flex items-center space-x-1">
+                        <span class="font-extrabold text-xs text-theme-primary block leading-none">Mirai School of Technology</span>
+                        <span class="text-blue-400 text-xs">✓</span>
+                      </div>
+                      <span class="text-[10px] text-theme-muted font-mono">Higher Education • 8,420 Followers</span>
+                    </div>
+                  </div>
+                  <a href="https://linkedin.com/company/mirai-school-of-technology" target="_blank" rel="noopener noreferrer" class="btn-mirror px-2.5 py-1 rounded-xl text-[10px] font-bold text-blue-400 hover:text-blue-300">
+                    Connect
+                  </a>
+                </div>
+
+                <p class="text-xs text-theme-muted leading-relaxed">
+                  🚀 <strong>Microsoft & AI Careers Webinar:</strong> From campus hackathons to global AI engineering. Learn about transition strategies, autonomous portfolios, and industry opportunities.
+                </p>
+
+                <div class="rounded-xl overflow-hidden border border-theme relative group">
+                  <img src="/uploads/mirai_infra.jpeg" class="w-full h-28 object-cover group-hover:scale-105 transition duration-500" alt="Mirai Tech Infrastructure" />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-2.5">
+                    <span class="text-[10px] font-mono text-white">Join Live Session on Zoom • Registration Open</span>
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-1">
+                  <a href="https://us06web.zoom.us/meeting/register/i23dt0JlRNqHo8hcfL8m5Q#/registration" target="_blank" rel="noopener noreferrer" class="btn-mirror px-3 py-1.5 rounded-xl text-xs font-bold text-blue-400 border-blue-500/40 hover:bg-blue-950/30 flex items-center space-x-1">
+                    <i data-lucide="video" class="w-3.5 h-3.5"></i>
+                    <span>Register on Zoom &rarr;</span>
+                  </a>
+                  <a href="https://miraisot.com" target="_blank" rel="noopener noreferrer" class="text-[11px] text-theme-muted hover:text-theme-primary font-mono">
+                    miraisot.com
+                  </a>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- ==================================================== -->
+          <!-- AUTHENTIC MIRAI CAMPUS LIFE & FACILITIES GALLERY -->
+          <!-- ==================================================== -->
+          <div class="card-3d rounded-3xl border border-theme p-5 sm:p-6 space-y-4" style="background-color: var(--bg-surface);">
+            <div class="flex items-center justify-between border-b border-theme pb-2.5">
+              <div>
+                <h3 class="text-base font-black text-theme-primary">Life at Mirai: Campus & Club Culture</h3>
+                <p class="text-xs text-theme-muted">Genuine photos from Mirai School of Technology hackathons, labs, and partner campuses.</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-mono btn-mirror text-[#788BFF]">
+                HIET • RIT • JU
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <!-- Photo 1: 24h Hackathon -->
+              <div class="rounded-2xl overflow-hidden border border-theme relative group cursor-pointer" onclick="openPhotoModal('/uploads/mirai_24h_hackathon.png', '24-Hour Autonomous Hackathon', 'Mirai students competing non-stop in overnight coding sprints across AI, Web3, and Systems.')">
+                <img src="/uploads/mirai_24h_hackathon.png" class="w-full h-36 sm:h-44 object-cover transition duration-500 group-hover:scale-105" alt="Mirai 24 Hour Hackathon" />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-2.5">
+                  <span class="text-xs font-bold text-white leading-tight">24-Hour Hackathon Lab</span>
+                  <span class="text-[10px] text-rose-300 font-mono">HIET Campus Flagship</span>
+                </div>
+              </div>
+
+              <!-- Photo 2: AI-First Education -->
+              <div class="rounded-2xl overflow-hidden border border-theme relative group cursor-pointer" onclick="openPhotoModal('/uploads/mirai_ai_first.jpeg', 'AI-First Curriculum & Rig', 'Deep learning workstation clusters and specialized neural architecture labs.')">
+                <img src="/uploads/mirai_ai_first.jpeg" class="w-full h-36 sm:h-44 object-cover transition duration-500 group-hover:scale-105" alt="AI First Education" />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-2.5">
+                  <span class="text-xs font-bold text-white leading-tight">AI-First Education Rig</span>
+                  <span class="text-[10px] text-blue-300 font-mono">GPU & Neural Compute</span>
+                </div>
+              </div>
+
+              <!-- Photo 3: Code from Day 1 -->
+              <div class="rounded-2xl overflow-hidden border border-theme relative group cursor-pointer" onclick="openPhotoModal('/uploads/mirai_code_day1.jpeg', 'Code From Day 1 Culture', 'Every Mirai engineer builds production-grade software from their very first semester.')">
+                <img src="/uploads/mirai_code_day1.jpeg" class="w-full h-36 sm:h-44 object-cover transition duration-500 group-hover:scale-105" alt="Code From Day 1" />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-2.5">
+                  <span class="text-xs font-bold text-white leading-tight">Code From Day 1</span>
+                  <span class="text-[10px] text-emerald-300 font-mono">Hands-on Problem Solving</span>
+                </div>
+              </div>
+
+              <!-- Photo 4: Jagannath University Campus -->
+              <div class="rounded-2xl overflow-hidden border border-theme relative group cursor-pointer" onclick="openPhotoModal('/uploads/mirai_jagannath_univ.jpg', 'Jagannath University Partner Campus', 'Academic partner campus JU providing institutional facilities and accredited degree framework.')">
+                <img src="/uploads/mirai_jagannath_univ.jpg" class="w-full h-36 sm:h-44 object-cover transition duration-500 group-hover:scale-105" alt="Jagannath University Campus" />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-2.5">
+                  <span class="text-xs font-bold text-white leading-tight">Jagannath Univ (JU)</span>
+                  <span class="text-[10px] text-amber-300 font-mono">Partner Campus</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- 3 CAMPUSES SHOWCASE HIERARCHY -->
+        <!-- ==================================================== -->
+        <div class="space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-theme pb-3">
+            <div>
+              <h2 class="text-2xl font-black text-theme-primary">Mirai Institutional Campuses</h2>
+              <p class="text-xs text-theme-muted">Mirai School of Technology operates strictly across 3 recognized campuses.</p>
+            </div>
+            <span class="text-xs font-mono text-theme-muted">Select Campus:</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <!-- HIET Campus (Host of 4 clubs) -->
+            <div onclick="filterByCampus(1)" class="card-3d rounded-3xl p-6 border border-[#5465FF]/40 space-y-3 cursor-pointer hover:border-[#788BFF] glow-mirai">
+              <div class="flex items-center justify-between">
+                <span class="w-8 h-8 rounded-xl bg-[#5465FF]/20 text-[#788BFF] flex items-center justify-center font-black text-xs font-mono">01</span>
+                <span class="bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">4 Active Clubs</span>
+              </div>
+              <h3 class="text-lg font-black text-theme-primary">HIET Campus</h3>
+              <p class="text-xs text-theme-muted">Hi Tech Institute of Engineering — Headquarters for technical, design, cultural and athletic societies.</p>
+              <div class="text-[11px] font-mono text-[#788BFF] pt-1">
+                Nextcell • Kaizen • Malhar • Sports Club
+              </div>
+            </div>
+
+            <!-- RIT Campus -->
+            <div onclick="filterByCampus(2)" class="card-3d rounded-3xl p-6 border border-theme space-y-3 cursor-pointer hover:border-theme-primary">
+              <div class="flex items-center justify-between">
+                <span class="w-8 h-8 rounded-xl bg-theme-surface-elevated text-theme-muted flex items-center justify-center font-black text-xs font-mono">02</span>
+                <span class="border border-theme text-theme-muted font-mono text-[10px] px-2 py-0.5 rounded-full">Academic Wing</span>
+              </div>
+              <h3 class="text-lg font-black text-theme-primary">RIT Campus</h3>
+              <p class="text-xs text-theme-muted">Rathinam Institute — Advanced research labs and inter-college symposium partner.</p>
+              <div class="text-[11px] font-mono text-theme-muted pt-1">
+                Inter-Campus Exchange
+              </div>
+            </div>
+
+            <!-- JU Campus -->
+            <div onclick="filterByCampus(3)" class="card-3d rounded-3xl p-6 border border-theme space-y-3 cursor-pointer hover:border-theme-primary">
+              <div class="flex items-center justify-between">
+                <span class="w-8 h-8 rounded-xl bg-theme-surface-elevated text-theme-muted flex items-center justify-center font-black text-xs font-mono">03</span>
+                <span class="border border-theme text-theme-muted font-mono text-[10px] px-2 py-0.5 rounded-full">Innovation Hub</span>
+              </div>
+              <h3 class="text-lg font-black text-theme-primary">JU Campus</h3>
+              <p class="text-xs text-theme-muted">Jagannath University — Entrepreneurship incubation and venture accelerator node.</p>
+              <div class="text-[11px] font-mono text-theme-muted pt-1">
+                Startup & Incubation
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================================================== -->
+        <!-- HIET'S 4 CLUBS CATALOG (GATED ACCESS NOTICE) -->
+        <!-- ==================================================== -->
+        <div class="space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-theme pb-3">
+            <div>
+              <h2 class="text-2xl font-black text-theme-primary">HIET Official Clubs</h2>
+              <p class="text-xs text-theme-muted">Students can enroll in up to 2 clubs. Club recruitment limit: 50–70 members.</p>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+              <select id="campusFilter" onchange="loadClubs()" class="btn-mirror rounded-xl px-3.5 py-2 text-xs font-semibold focus:outline-none text-theme-primary">
+                <option value="">All Campuses</option>
+                <option value="1" selected>HIET Campus (4 Clubs)</option>
+                <option value="2">RIT Campus</option>
+                <option value="3">JU Campus</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Gated notice badge for guests -->
+          <div id="guestGatedBanner" class="p-3.5 rounded-2xl border border-[#5465FF]/30 btn-mirror text-xs flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+              <span class="text-base">🔒</span>
+              <span class="text-theme-muted">
+                <strong>Public Summary View:</strong> Internal member rosters, dynamic QR check-ins, projects, and budget proposals require registration or sign-in.
+              </span>
+            </div>
+            <button onclick="openAuthModal('register')" class="btn-mirror px-3 py-1.5 rounded-xl font-black text-[11px] text-[#E2FDFF] shrink-0">
+              Register / Sign In &rarr;
+            </button>
+          </div>
+
+          <!-- Dynamic Clubs 3D Grid -->
+          <div id="clubsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 2. UPCOMING EVENTS & CALENDAR VIEW -->
+      <!-- ========================================== -->
+      <section id="view-events" class="space-y-6 hidden">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-theme pb-4">
+          <div>
+            <h2 class="text-2xl font-black text-theme-primary">Upcoming Events & Important Dates</h2>
+            <p class="text-theme-muted text-xs sm:text-sm">Public summits, recruitment deadlines, and Saturday Club Days.</p>
+          </div>
+          <button onclick="guardAction(openScheduleEventModal)" id="addEventBtn" class="btn-mirror px-4 py-2.5 rounded-xl text-xs font-black text-white shadow flex items-center space-x-2" style="background: rgba(84, 101, 255, 0.45);">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>Schedule New Event</span>
+          </button>
+        </div>
+
+        <div id="eventsList" class="space-y-4">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 3. STUDENT PORTFOLIO VIEW -->
+      <!-- ========================================== -->
+      <section id="view-student" class="space-y-6 hidden">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-theme pb-4">
+          <div>
+            <h2 class="text-2xl font-black text-theme-primary">My Co-Curricular Portfolio</h2>
+            <p class="text-theme-muted text-xs sm:text-sm">Attendance rate, deliverable submissions, and cryptographic transcripts.</p>
+          </div>
+          <button onclick="downloadOfficialTranscript()" class="btn-mirror px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 text-theme-primary">
+            <i data-lucide="download" class="w-4 h-4 text-[#788BFF]"></i>
+            <span>Download Official Transcript</span>
+          </button>
+        </div>
+
+        <!-- Metrics 3D Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="card-3d p-5 rounded-2xl border border-theme">
+            <div class="text-xs text-theme-muted font-mono">Enrolled Clubs</div>
+            <div id="statEnrolledClubs" class="text-2xl font-black text-theme-primary mt-1">-- / 2</div>
+            <div class="text-[11px] text-emerald-400 font-medium mt-1">Institutional 2-Club Rule</div>
+          </div>
+          <div class="card-3d p-5 rounded-2xl border border-theme">
+            <div class="text-xs text-theme-muted font-mono">Verified Attendance Rate</div>
+            <div id="statAttendanceRate" class="text-2xl font-black mt-1 text-[#788BFF]">--%</div>
+            <div class="text-[11px] text-theme-muted mt-1">Dynamic TOTP Authenticated</div>
+          </div>
+          <div class="card-3d p-5 rounded-2xl border border-theme">
+            <div class="text-xs text-theme-muted font-mono">Issued Certificates</div>
+            <div id="statCertsCount" class="text-2xl font-black text-amber-400 mt-1">--</div>
+            <div class="text-[11px] text-theme-muted mt-1">SHA-256 Tamper-Proof</div>
+          </div>
+        </div>
+
+        <!-- Assignments & Projects List -->
+        <div class="card-3d rounded-3xl border border-theme p-6 space-y-4">
+          <h3 class="text-lg font-bold text-theme-primary flex items-center space-x-2">
+            <i data-lucide="clipboard-list" class="w-5 h-5 text-[#788BFF]"></i>
+            <span>Club Deliverables & Evaluations</span>
+          </h3>
+          <div id="studentAssignmentsList" class="space-y-3">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Certificates List -->
+        <div class="card-3d rounded-3xl border border-theme p-6 space-y-4">
+          <h3 class="text-lg font-bold text-theme-primary flex items-center space-x-2">
+            <i data-lucide="award" class="w-5 h-5 text-amber-400"></i>
+            <span>Verified Credentials & PDF Vault</span>
+          </h3>
+          <div id="studentCertificatesList" class="space-y-3">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 4. DOMAIN AUTHORITY CONSOLE (UNLOCKED) -->
+      <!-- ========================================== -->
+      <section id="view-authority" class="space-y-6 hidden">
+        <div class="border-b border-theme pb-4">
+          <div class="inline-flex items-center space-x-2 px-3 py-1 bg-amber-500/10 text-amber-400 rounded-full font-mono text-xs font-bold mb-2 border border-amber-500/30">
+            <span>👑 Supreme Authority Powers Activated</span>
+          </div>
+          <h2 class="text-3xl font-black text-theme-primary">Club Governance & Position Assignment</h2>
+          <p class="text-theme-muted text-xs sm:text-sm">
+            Supreme authority to reassign positions (President, VP, Finance, Media, Member), start dynamic TOTP attendance, and manage all campus clubs.
+          </p>
+        </div>
+
+        <!-- Operations Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- 1. Dynamic Rotating QR Launcher -->
+          <div class="card-3d p-6 rounded-3xl border border-theme flex flex-col justify-between space-y-4">
+            <div class="space-y-2">
+              <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                <i data-lucide="qr-code" class="w-5 h-5"></i>
+              </div>
+              <h3 class="font-extrabold text-theme-primary text-base">Launch Live Dynamic QR</h3>
+              <p class="text-theme-muted text-xs leading-relaxed">
+                Opens the 20-second dynamic TOTP code projector. Renders screenshots obsolete.
+              </p>
+            </div>
+            <button onclick="launchQRSessionModal()" class="btn-mirror w-full bg-emerald-600/30 text-emerald-300 font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-2">
+              <i data-lucide="play" class="w-4 h-4"></i>
+              <span>Project Dynamic QR</span>
+            </button>
+          </div>
+
+          <!-- 2. Manual Attendance Correction -->
+          <div class="card-3d p-6 rounded-3xl border border-theme flex flex-col justify-between space-y-4">
+            <div class="space-y-2">
+              <div class="w-10 h-10 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                <i data-lucide="edit-3" class="w-5 h-5"></i>
+              </div>
+              <h3 class="font-extrabold text-theme-primary text-base">Attendance Override</h3>
+              <p class="text-theme-muted text-xs leading-relaxed">
+                Manually correct attendance for members with camera or hardware problems with mandatory audit logging.
+              </p>
+            </div>
+            <button onclick="openAttendanceOverrideModal()" class="btn-mirror w-full bg-blue-600/30 text-blue-300 font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-2">
+              <i data-lucide="check" class="w-4 h-4"></i>
+              <span>Log Override Reason</span>
+            </button>
+          </div>
+
+          <!-- 3. Schedule Club Day Event -->
+          <div class="card-3d p-6 rounded-3xl border border-theme flex flex-col justify-between space-y-4">
+            <div class="space-y-2">
+              <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center">
+                <i data-lucide="calendar-plus" class="w-5 h-5"></i>
+              </div>
+              <h3 class="font-extrabold text-theme-primary text-base">Schedule Event & Session</h3>
+              <p class="text-theme-muted text-xs leading-relaxed">
+                Broadcast event updates to all Mirai students or club members with venue and required deliverables.
+              </p>
+            </div>
+            <button onclick="openScheduleEventModal()" class="btn-mirror w-full py-2.5 rounded-xl text-xs font-black text-white" style="background: rgba(84, 101, 255, 0.4);">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Publish Event</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- MEMBER POSITION MANAGEMENT CONSOLE -->
+        <div class="card-3d rounded-3xl border border-theme p-6 space-y-4 shadow-xl">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <h3 class="text-lg font-bold text-theme-primary flex items-center space-x-2">
+                <i data-lucide="users" class="w-5 h-5 text-amber-400"></i>
+                <span>Assign & Modify Club Positions</span>
+              </h3>
+              <p class="text-xs text-theme-muted">Assign members to President, VP, Finance President, Media President, or Member.</p>
+            </div>
+            <select id="authorityClubSelect" onchange="loadClubMembersForAuthority()" class="btn-mirror rounded-xl px-3 py-1.5 text-xs font-semibold focus:outline-none text-theme-primary">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="font-mono text-theme-muted border-b border-theme" style="background-color: var(--bg-surface-elevated);">
+                <tr>
+                  <th class="p-3 rounded-l-xl">Member Name</th>
+                  <th class="p-3">Roll No</th>
+                  <th class="p-3">Current Post</th>
+                  <th class="p-3">Joined Date</th>
+                  <th class="p-3 rounded-r-xl text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="authorityMembersTable" class="divide-y border-theme">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 5. BUDGETS VIEW -->
+      <!-- ========================================== -->
+      <section id="view-budget" class="space-y-6 hidden">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-theme pb-4">
+          <div>
+            <h2 class="text-2xl font-black text-theme-primary">Club Budget & Financial Planner</h2>
+            <p class="text-theme-muted text-xs sm:text-sm">Finance Presidents request funds scaled to project scope; Campus Managers review and approve.</p>
+          </div>
+          <button onclick="guardAction(openSubmitBudgetModal)" class="btn-mirror bg-emerald-600/30 text-emerald-300 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-1.5">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>New Budget Proposal</span>
+          </button>
+        </div>
+
+        <div class="card-3d rounded-3xl border border-theme overflow-hidden shadow-xl">
+          <div id="budgetProposalsTable" class="divide-y border-theme">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-theme py-8 px-6 text-xs text-theme-muted relative z-10" style="background-color: var(--header-bg);">
+      <div class="max-w-6xl mx-auto space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-left">
+          <div class="space-y-2 md:col-span-1">
+            <div class="flex items-center space-x-2">
+              <span class="font-black text-sm text-theme-primary">Mirai School of Technology</span>
+            </div>
+            <p class="text-[11px] text-theme-muted leading-relaxed">
+              India's premier AI-first engineering curriculum with autonomous student governance and co-curricular portfolios.
+            </p>
+            <div class="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+              <i data-lucide="phone-call" class="w-3 h-3"></i>
+              <span>Admissions Helpline: Phone Verified ℹ️</span>
+            </div>
+          </div>
+          <div>
+            <h5 class="font-bold text-xs text-theme-primary mb-2 font-mono uppercase">Key Opportunities</h5>
+            <ul class="space-y-1.5 text-[11px]">
+              <li><a href="https://bit.ly/3LolV37" target="_blank" rel="noopener noreferrer" class="hover:underline text-[#788BFF]">Apply For Mirai MAINS 2026 &rarr;</a></li>
+              <li><a href="https://forms.gle/5fv17mszkaFghWFP8" target="_blank" rel="noopener noreferrer" class="hover:underline text-emerald-400">Summer AI Internship Form &rarr;</a></li>
+              <li><a href="https://us06web.zoom.us/meeting/register/i23dt0JlRNqHo8hcfL8m5Q#/registration" target="_blank" rel="noopener noreferrer" class="hover:underline text-blue-400">Microsoft & AI Careers Webinar &rarr;</a></li>
+              <li><a href="https://miraisot.com" target="_blank" rel="noopener noreferrer" class="hover:underline text-theme-muted">Official Portal (miraisot.com) &rarr;</a></li>
+            </ul>
+          </div>
+          <div>
+            <h5 class="font-bold text-xs text-theme-primary mb-2 font-mono uppercase">Official Socials</h5>
+            <ul class="space-y-1.5 text-[11px]">
+              <li><a href="https://www.youtube.com/@MiraiSchoolofTechnology" target="_blank" rel="noopener noreferrer" class="hover:underline text-rose-400 flex items-center space-x-1.5"><i data-lucide="youtube" class="w-3.5 h-3.5"></i><span>@MiraiSchoolofTechnology</span></a></li>
+              <li><a href="https://instagram.com/miraischooloftechnology" target="_blank" rel="noopener noreferrer" class="hover:underline text-pink-400 flex items-center space-x-1.5"><i data-lucide="instagram" class="w-3.5 h-3.5"></i><span>@miraischooloftechnology</span></a></li>
+              <li><a href="https://linkedin.com/company/mirai-school-of-technology" target="_blank" rel="noopener noreferrer" class="hover:underline text-blue-400 flex items-center space-x-1.5"><i data-lucide="linkedin" class="w-3.5 h-3.5"></i><span>LinkedIn Company Page</span></a></li>
+            </ul>
+          </div>
+          <div>
+            <h5 class="font-bold text-xs text-theme-primary mb-2 font-mono uppercase">Mirai Campuses</h5>
+            <p class="text-[11px] text-theme-muted leading-relaxed">
+              • <strong>RIT</strong> (Rathinam Institute)<br/>
+              • <strong>HIET</strong> (Hi Tech Institute of Engineering)<br/>
+              • <strong>JU</strong> (Jagannath University)
+            </p>
+            <div class="pt-2">
+              <a href="/docs" target="_blank" class="hover:underline text-[#788BFF] font-mono text-[10px]">API Reference (Swagger) &rarr;</a>
+            </div>
+          </div>
+        </div>
+        <div class="border-t border-theme pt-4 flex flex-col sm:flex-row items-center justify-between text-[11px]">
+          <div>© 2026 Mirai School of Technology. Student Club Activity & Governance Tracker.</div>
+          <div class="font-mono text-theme-muted">Verified Domain Authority • Safe & Open Source</div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: REGISTRATION, LOGIN & SOCIAL AUTH -->
+  <!-- (OTP NEVER SHOWN ON PAGE - SENT TO EMAIL/PHONE) -->
+  <!-- ======================================================== -->
+  <div id="authModal" class="fixed inset-0 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" style="background-color: rgba(0, 0, 0, 0.82);">
+    <div class="card-3d rounded-3xl max-w-md w-full p-6 sm:p-8 space-y-5 shadow-2xl relative border border-theme" style="background-color: var(--bg-surface);">
+      <button onclick="closeAuthModal()" class="btn-mirror p-1.5 rounded-xl absolute top-5 right-5 text-theme-muted hover:text-theme-primary">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <!-- Modal Tabs: Register vs Sign In -->
+      <div class="flex items-center space-x-4 border-b border-theme pb-3">
+        <button onclick="setAuthMode('register')" id="authTabRegister" class="text-sm font-black border-b-2 pb-1" style="border-color: var(--accent-primary); color: var(--text-primary);">
+          Register with OTP
+        </button>
+        <button onclick="setAuthMode('login')" id="authTabLogin" class="text-sm font-bold text-theme-muted hover:text-theme-primary pb-1">
+          Sign In
+        </button>
+      </div>
+
+      <!-- OAUTH / SOCIAL LOGIN OPTIONS -->
+      <div class="space-y-2">
+        <span class="text-[10px] font-mono text-theme-muted uppercase tracking-wider block text-center">Fast 1-Click Social Sign In</span>
+        <div class="grid grid-cols-3 gap-2">
+          <!-- Google -->
+          <button onclick="handleSocialAuth('google')" type="button" class="btn-mirror py-2 px-2 rounded-xl text-xs font-bold text-theme-primary flex items-center justify-center space-x-1.5 hover:border-red-400">
+            <span class="text-red-500 font-bold">G</span>
+            <span>Google</span>
+          </button>
+          <!-- Instagram -->
+          <button onclick="handleSocialAuth('instagram')" type="button" class="btn-mirror py-2 px-2 rounded-xl text-xs font-bold text-theme-primary flex items-center justify-center space-x-1.5 hover:border-pink-400">
+            <i data-lucide="instagram" class="w-3.5 h-3.5 text-pink-500"></i>
+            <span>Insta</span>
+          </button>
+          <!-- GitHub -->
+          <button onclick="handleSocialAuth('github')" type="button" class="btn-mirror py-2 px-2 rounded-xl text-xs font-bold text-theme-primary flex items-center justify-center space-x-1.5 hover:border-slate-300">
+            <i data-lucide="github" class="w-3.5 h-3.5"></i>
+            <span>GitHub</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-2 text-[10px] font-mono text-theme-muted justify-center">
+        <span class="h-px bg-theme-subtle flex-1"></span>
+        <span>OR CONTINUE WITH CREDENTIALS</span>
+        <span class="h-px bg-theme-subtle flex-1"></span>
+      </div>
+
+      <!-- REGISTRATION FORM -->
+      <form id="registerForm" onsubmit="handleRegistrationSubmit(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-semibold mb-1 text-theme-primary">Full Name</label>
+          <input type="text" id="regName" required placeholder="e.g. Ken Kaneki" class="w-full rounded-xl px-3 py-2 border border-theme focus:outline-none" style="background-color: var(--bg-page); color: var(--text-primary);">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block font-semibold mb-1 text-theme-primary">Registered Email</label>
+            <input type="email" id="regEmail" required placeholder="student@msot.org" class="w-full rounded-xl px-3 py-2 border border-theme focus:outline-none" style="background-color: var(--bg-page); color: var(--text-primary);">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-theme-primary">Phone Number</label>
+            <input type="tel" id="regPhone" required placeholder="+91 98765 43210" class="w-full rounded-xl px-3 py-2 border border-theme focus:outline-none" style="background-color: var(--bg-page); color: var(--text-primary);">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block font-semibold mb-1 text-theme-primary">Student / College ID</label>
+            <input type="text" id="regId" required placeholder="MSOT24CS88" class="w-full rounded-xl px-3 py-2 border border-theme focus:outline-none" style="background-color: var(--bg-page); color: var(--text-primary);">
+          </div>
+          <div>
+            <label class="block font-semibold mb-1 text-theme-primary">Unique Username</label>
+            <input type="text" id="regUsername" required placeholder="unique_user" class="w-full rounded-xl px-3 py-2 border border-theme focus:outline-none" style="background-color: var(--bg-page); color: var(--text-primary);">
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold mb-1 text-theme-primary">Create Password</label>
+          <input type="password" id="regPassword" required placeholder="••••••••" class="w-full rounded-xl px-3 py-2 border border-theme focus:outline-none" style="background-color: var(--bg-page); color: var(--text-primary);">
+        </div>
+
+        <!-- SECRET DOMAIN EXPANSION CODE: NO EXPLANATION / HINTS -->
+        <div class="p-3 rounded-xl border border-theme space-y-1" style="background-color: var(--bg-surface-elevated);">
+          <label class="block font-semibold text-theme-primary flex items-center justify-between">
+            <span>Domain Expansion Code</span>
+            <span class="text-[10px] text-theme-muted font-mono">(Optional)</span>
+          </label>
+          <input type="password" id="regPasskey" placeholder="••••••••" class="w-full rounded-lg px-3 py-1.5 focus:outline-none font-mono border border-theme text-theme-primary" style="background-color: var(--bg-page);">
+        </div>
+
+        <!-- Step 1: Request OTP -->
+        <div id="otpRequestStep">
+          <button type="button" onclick="requestRegistrationOTP()" class="btn-mirror w-full text-white font-bold py-2.5 rounded-xl transition shadow flex items-center justify-center space-x-1.5" style="background: rgba(84, 101, 255, 0.45);">
+            <i data-lucide="send" class="w-3.5 h-3.5"></i>
+            <span>Send 6-Digit OTP to Email / Phone</span>
+          </button>
+        </div>
+
+        <!-- Step 2: Verify OTP & Submit (NO OTP DISPLAYED ON SCREEN) -->
+        <div id="otpVerifyStep" class="hidden space-y-2">
+          <div class="p-2.5 rounded-xl border border-emerald-500/30 bg-emerald-950/20 text-emerald-400 text-xs">
+            📨 <strong>Code Dispatched!</strong> A 6-digit verification code was sent to your provided email/phone. Enter it below:
+          </div>
+          <label class="block font-semibold text-theme-primary">Enter 6-Digit Verification Code</label>
+          <input type="text" id="regOtpInput" placeholder="••••••" maxlength="6" class="w-full text-center text-lg font-mono tracking-widest rounded-xl px-3 py-2 border border-[#5465FF] focus:outline-none" style="background-color: var(--bg-page); color: var(--text-primary);">
+          <button type="submit" class="btn-mirror w-full bg-emerald-600/40 text-emerald-300 font-black py-2.5 rounded-xl transition flex items-center justify-center space-x-1.5">
+            <i data-lucide="check-circle" class="w-4 h-4"></i>
+            <span>Verify & Complete Registration</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- LOGIN FORM -->
+      <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-3.5 text-xs hidden">
+        <div>
+          <label class="block font-semibold mb-1 text-theme-primary">Email, Phone, or Username</label>
+          <input type="text" id="loginIdentifier" required placeholder="student@msot.org, phone, or username" class="w-full rounded-xl px-3 py-2 border border-theme focus:outline-none" style="background-color: var(--bg-page); color: var(--text-primary);">
+        </div>
+        <div>
+          <label class="block font-semibold mb-1 text-theme-primary">Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" class="w-full rounded-xl px-3 py-2 border border-theme focus:outline-none" style="background-color: var(--bg-page); color: var(--text-primary);">
+        </div>
+
+        <button type="submit" class="btn-mirror w-full text-white font-bold py-2.5 rounded-xl transition shadow" style="background: rgba(84, 101, 255, 0.45);">
+          Sign In
+        </button>
+
+        <div class="text-center pt-1">
+          <button type="button" onclick="loginWithOTPModePrompt()" class="text-[11px] text-[#788BFF] hover:underline font-mono">
+            Or Sign In via 6-Digit OTP code &rarr;
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: DYNAMIC ROTATING QR PROJECTOR -->
+  <!-- ========================================== -->
+  <div id="qrProjectorModal" class="fixed inset-0 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" style="background-color: rgba(0, 0, 0, 0.8);">
+    <div class="card-3d rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl relative border border-theme" style="background-color: var(--bg-surface);">
+      <button onclick="closeQRSessionModal()" class="btn-mirror p-1.5 rounded-xl absolute top-4 right-4 text-theme-muted hover:text-theme-primary">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="inline-block px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full font-mono text-[11px] font-bold border border-emerald-500/30">
+        Anti-Screenshot Dynamic QR
+      </div>
+
+      <h3 class="text-xl font-black text-theme-primary leading-tight">Live Session Attendance</h3>
+      <p class="text-theme-muted text-xs">Rotating TOTP token changes every 20 seconds. Screenshots expire immediately.</p>
+
+      <div class="flex justify-center p-4 bg-white rounded-2xl border border-theme shadow-inner">
+        <div id="qrcodeCanvas"></div>
+      </div>
+
+      <div class="flex items-center justify-center space-x-3 font-mono">
+        <div class="text-2xl font-black tracking-widest text-[#788BFF] px-4 py-1.5 rounded-xl border border-theme btn-mirror" id="projectorToken">
+          ------
+        </div>
+        <div class="text-xs text-left">
+          <div class="text-theme-muted">Expires in:</div>
+          <div class="text-rose-400 font-black text-sm" id="projectorCountdown">20s</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: IN-BROWSER SCANNER -->
+  <!-- ========================================== -->
+  <div id="scannerModal" class="fixed inset-0 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" style="background-color: rgba(0, 0, 0, 0.8);">
+    <div class="card-3d rounded-3xl max-w-sm w-full p-6 space-y-4 shadow-2xl relative border border-theme" style="background-color: var(--bg-surface);">
+      <button onclick="closeCheckInScanner()" class="btn-mirror p-1.5 rounded-xl absolute top-4 right-4 text-theme-muted hover:text-theme-primary">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="text-center">
+        <h3 class="text-lg font-black text-theme-primary">Scan Session Dynamic QR</h3>
+        <p class="text-theme-muted text-xs">Hold camera towards the coordinator's live QR projector.</p>
+      </div>
+
+      <div id="qrReaderBox" class="w-full rounded-2xl overflow-hidden min-h-[220px] flex items-center justify-center border border-theme" style="background-color: var(--bg-page);"></div>
+
+      <div class="space-y-2 pt-2 border-t border-theme">
+        <label class="block text-xs font-mono text-theme-muted text-center">OR ENTER 6-DIGIT TOTP CODE</label>
+        <input type="text" id="manualOtpInput" placeholder="Enter code" maxlength="6" class="w-full text-center font-mono text-lg tracking-widest rounded-xl px-3 py-2 border border-theme focus:outline-none" style="background-color: var(--bg-page); color: var(--text-primary);">
+        <button onclick="submitManualCheckIn()" class="btn-mirror w-full text-white font-bold py-2 rounded-xl text-xs transition" style="background: rgba(84, 101, 255, 0.45);">
+          Confirm Check-In
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: HIGH-RESOLUTION CAMPUS PHOTO VIEWER -->
+  <!-- ========================================== -->
+  <div id="photoModal" class="fixed inset-0 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" style="background-color: rgba(0, 0, 0, 0.88);" onclick="if(event.target === this) closePhotoModal()">
+    <div class="card-3d rounded-3xl max-w-2xl w-full p-4 sm:p-6 space-y-4 shadow-2xl relative border border-theme" style="background-color: var(--bg-surface);">
+      <button onclick="closePhotoModal()" class="btn-mirror p-2 rounded-xl absolute top-4 right-4 text-theme-muted hover:text-theme-primary z-10">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="space-y-1 pr-8">
+        <h3 id="photoModalTitle" class="text-lg font-black text-theme-primary">Campus Photo</h3>
+        <p id="photoModalCaption" class="text-xs text-theme-muted leading-relaxed">Official photo from Mirai School of Technology.</p>
+      </div>
+
+      <div class="w-full aspect-video rounded-2xl overflow-hidden border border-theme bg-black/50 shadow-inner flex items-center justify-center">
+        <img id="photoModalImg" src="" class="w-full h-full object-contain" alt="Enlarged Campus View" />
+      </div>
+
+      <div class="flex items-center justify-between text-xs pt-2 border-t border-theme font-mono">
+        <span class="text-theme-muted">Mirai School of Technology Official Media</span>
+        <button onclick="closePhotoModal()" class="btn-mirror px-4 py-1.5 rounded-xl font-bold text-theme-primary">
+          Close Viewer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- JAVASCRIPT: THREE.JS, CURSOR, AUTH & APPLICATION LOGIC -->
+  <!-- ======================================================== -->
+  <script>
+    /* ==========================================
+       1. THEME SWITCHER CONTROLLER
+       - Dark Mode: Coolors Palette
+       - Light Mode: #EDE3FF, #E0F7FA, #FCE4EC, #F9F9FB
+       ========================================== */
+    let currentTheme = localStorage.getItem('msot_theme') || 'dark';
+
+    function applyTheme(theme) {
+      currentTheme = theme;
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('msot_theme', theme);
+
+      const label = document.getElementById('themeLabel');
+      const icon = document.getElementById('themeIcon');
+      if (theme === 'dark') {
+        if (label) label.innerText = 'Light Mode';
+        if (icon) icon.innerText = '☀️';
+      } else {
+        if (label) label.innerText = 'Dark Mode';
+        if (icon) icon.innerText = '🌙';
+      }
+
+      if (typeof update3DThemeColors === 'function') {
+        update3DThemeColors(theme);
+      }
+    }
+
+    function toggleTheme() {
+      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      applyTheme(nextTheme);
+    }
+
+    /* Mobile Sidebar Toggle */
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('appSidebar');
+      sidebar.classList.toggle('-translate-x-full');
+    }
+
+    /* ==========================================
+       2. CUSTOM 3D ANIMATED CURSOR & STARDUST
+       ========================================== */
+    const cursorDot = document.getElementById('cursor-dot');
+    const cursorRing = document.getElementById('cursor-ring');
+    const trailCanvas = document.getElementById('cursor-trail-canvas');
+    const ctx = trailCanvas.getContext('2d');
+
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let ringX = mouseX;
+    let ringY = mouseY;
+    let particles = [];
+
+    function resizeTrailCanvas() {
+      trailCanvas.width = window.innerWidth;
+      trailCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeTrailCanvas);
+    resizeTrailCanvas();
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      cursorDot.style.left = `${mouseX}px`;
+      cursorDot.style.top = `${mouseY}px`;
+
+      if (Math.random() < 0.6) {
+        const colors = currentTheme === 'dark' 
+          ? ['#5465FF', '#788BFF', '#9BB1FF', '#BFD7FF', '#E2FDFF']
+          : ['#EDE3FF', '#E0F7FA', '#FCE4EC', '#c084fc', '#38bdf8'];
+        particles.push({
+          x: mouseX,
+          y: mouseY,
+          vx: (Math.random() - 0.5) * 1.5,
+          vy: (Math.random() - 0.5) * 1.5 - 0.5,
+          size: Math.random() * 3 + 1,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          alpha: 1.0,
+          decay: Math.random() * 0.03 + 0.02
+        });
+      }
+    });
+
+    function attachCursorHover() {
+      document.querySelectorAll('button, a, input, select, .btn-mirror, .card-3d').forEach(el => {
+        el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+        el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+      });
+    }
+
+    function renderCursor() {
+      ringX += (mouseX - ringX) * 0.18;
+      ringY += (mouseY - ringY) * 0.18;
+      cursorRing.style.left = `${ringX}px`;
+      cursorRing.style.top = `${ringY}px`;
+
+      ctx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= p.decay;
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+      requestAnimationFrame(renderCursor);
+    }
+    renderCursor();
+
+    /* ==========================================
+       3. THREE.JS 3D CREATIVE IMMERSIVE ENGINE
+       ========================================== */
+    let scene, camera, renderer;
+    let particleSystem, particleGeo, particleMat;
+    let celestialGeometryGroup, outerMesh, innerRing;
+    let targetMouseX = 0, targetMouseY = 0;
+    let currentMouseX = 0, currentMouseY = 0;
+
+    function init3DEnvironment() {
+      const canvas = document.getElementById('threeCanvas');
+      scene = new THREE.Scene();
+
+      camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 1, 3000);
+      camera.position.z = 900;
+
+      celestialGeometryGroup = new THREE.Group();
+      scene.add(celestialGeometryGroup);
+
+      // Outer 3D Wireframe Icosahedron
+      const icosaGeo = new THREE.IcosahedronGeometry(230, 2);
+      const icosaMat = new THREE.MeshBasicMaterial({
+        color: 0x5465FF,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.22
+      });
+      outerMesh = new THREE.Mesh(icosaGeo, icosaMat);
+      celestialGeometryGroup.add(outerMesh);
+
+      // Inner Rotating Torus Ring
+      const torusGeo = new THREE.TorusGeometry(150, 4, 16, 100);
+      const torusMat = new THREE.MeshBasicMaterial({
+        color: 0x788BFF,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.35
+      });
+      innerRing = new THREE.Mesh(torusGeo, torusMat);
+      innerRing.rotation.x = Math.PI / 3;
+      celestialGeometryGroup.add(innerRing);
+
+      // Celestial Particle Cloud (550 Nodes)
+      const count = 550;
+      particleGeo = new THREE.BufferGeometry();
+      const posArray = new Float32Array(count * 3);
+      const colArray = new Float32Array(count * 3);
+
+      for (let i = 0; i < count * 3; i += 3) {
+        posArray[i] = (Math.random() - 0.5) * 2400;
+        posArray[i + 1] = (Math.random() - 0.5) * 1900;
+        posArray[i + 2] = (Math.random() - 0.5) * 1500;
+      }
+
+      particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+      particleGeo.setAttribute('color', new THREE.BufferAttribute(colArray, 3));
+
+      particleMat = new THREE.PointsMaterial({
+        size: 5.5,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.8
+      });
+
+      particleSystem = new THREE.Points(particleGeo, particleMat);
+      scene.add(particleSystem);
+
+      update3DThemeColors(currentTheme);
+
+      renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      window.addEventListener('resize', onWindowResize, false);
+      document.addEventListener('mousemove', onThreeMouseMove, false);
+
+      animate3D();
+    }
+
+    function update3DThemeColors(theme) {
+      if (!particleGeo) return;
+      const colors = particleGeo.attributes.color.array;
+      const count = colors.length / 3;
+
+      let c1, c2, c3;
+      if (theme === 'dark') {
+        // Dark Mode: Coolors Palette
+        c1 = new THREE.Color(0x5465FF);
+        c2 = new THREE.Color(0x788BFF);
+        c3 = new THREE.Color(0xE2FDFF);
+        scene.fog = new THREE.FogExp2(0x000000, 0.0005);
+        if (outerMesh) {
+          outerMesh.material.color.setHex(0x5465FF);
+          outerMesh.material.opacity = 0.22;
+        }
+        if (innerRing) {
+          innerRing.material.color.setHex(0x788BFF);
+          innerRing.material.opacity = 0.35;
+        }
+      } else {
+        // Light Mode: #EDE3FF Lavender, #E0F7FA Aqua, #FCE4EC Blush Pink
+        c1 = new THREE.Color(0xEDE3FF);
+        c2 = new THREE.Color(0xE0F7FA);
+        c3 = new THREE.Color(0xFCE4EC);
+        scene.fog = new THREE.FogExp2(0xF9F9FB, 0.0006);
+        if (outerMesh) {
+          outerMesh.material.color.setHex(0xEDE3FF);
+          outerMesh.material.opacity = 0.45;
+        }
+        if (innerRing) {
+          innerRing.material.color.setHex(0xE0F7FA);
+          innerRing.material.opacity = 0.60;
+        }
+      }
+
+      for (let i = 0; i < count; i++) {
+        const r = Math.random();
+        const pick = r < 0.33 ? c1 : (r < 0.66 ? c2 : c3);
+        colors[i * 3] = pick.r;
+        colors[i * 3 + 1] = pick.g;
+        colors[i * 3 + 2] = pick.b;
+      }
+      particleGeo.attributes.color.needsUpdate = true;
+    }
+
+    function onThreeMouseMove(e) {
+      targetMouseX = (e.clientX - window.innerWidth / 2) * 0.45;
+      targetMouseY = (e.clientY - window.innerHeight / 2) * 0.45;
+
+      document.querySelectorAll('.card-3d').forEach(card => {
+        const rect = card.getBoundingClientRect();
+        if (e.clientX >= rect.left && e.clientX <= rect.right &&
+            e.clientY >= rect.top && e.clientY <= rect.bottom) {
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+          card.style.transform = `perspective(1000px) rotateX(${-y / 20}deg) rotateY(${x / 20}deg) scale3d(1.012, 1.012, 1.012)`;
+          card.style.setProperty('--mouse-x', `${((e.clientX - rect.left) / rect.width) * 100}%`);
+          card.style.setProperty('--mouse-y', `${((e.clientY - rect.top) / rect.height) * 100}%`);
+        } else {
+          card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+        }
+      });
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function animate3D() {
+      requestAnimationFrame(animate3D);
+
+      currentMouseX += (targetMouseX - currentMouseX) * 0.04;
+      currentMouseY += (targetMouseY - currentMouseY) * 0.04;
+
+      camera.position.x = currentMouseX;
+      camera.position.y = -currentMouseY;
+      camera.lookAt(scene.position);
+
+      if (celestialGeometryGroup) {
+        outerMesh.rotation.x += 0.0022;
+        outerMesh.rotation.y += 0.0030;
+        innerRing.rotation.z += 0.0035;
+        innerRing.rotation.y += 0.0018;
+        celestialGeometryGroup.rotation.y += 0.0008;
+      }
+
+      if (particleSystem) {
+        particleSystem.rotation.y += 0.0005;
+        particleSystem.rotation.x += 0.0003;
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    /* ==========================================
+       4. MEDIA STREAM PLAYBACK CONTROLLERS
+       ========================================== */
+    let isVideoPlaying = false;
+    let isInstaLiked = false;
+
+    // Official Mirai School of Technology Videos Playlist
+    const miraiVideos = [
+      {
+        id: "V-h7Egd617Y",
+        title: "Will They Survive 24 Hours of Non-Stop Coding at Mirai?",
+        desc: "Official Mirai School of Technology • Hackathon Sprint & Student Culture • 18.2K views",
+        badge: "Official Channel",
+        duration: "24:00",
+        thumb: "/uploads/mirai_24h_hackathon.png",
+        ytUrl: "https://www.youtube.com/watch?v=V-h7Egd617Y"
+      },
+      {
+        id: "DoVq5gKzgqg",
+        title: "Mirai Wins ET Changemakers Award 2026 | Redefining AI & ML Education in India",
+        desc: "Economic Times Changemakers Recognition • AI-First Curriculum Benchmark • 29.5K views",
+        badge: "Award 2026",
+        duration: "04:15",
+        thumb: "https://i.ytimg.com/vi/DoVq5gKzgqg/hqdefault.jpg",
+        ytUrl: "https://www.youtube.com/watch?v=DoVq5gKzgqg"
+      },
+      {
+        id: "psJSldCpbGA",
+        title: "From Classroom to India’s Biggest AI Stage | Mirai Students at AI Impact Summit 2026",
+        desc: "Mirai student keynote presenters & project showcases • 15.1K views",
+        badge: "AI Summit",
+        duration: "08:42",
+        thumb: "https://i.ytimg.com/vi/psJSldCpbGA/hqdefault.jpg",
+        ytUrl: "https://www.youtube.com/watch?v=psJSldCpbGA"
+      },
+      {
+        id: "98i10uPTROs",
+        title: "All about Mirai School of Technology | AI-First B.Tech | Future-Ready Careers",
+        desc: "Comprehensive curriculum overview, admissions criteria & industry readiness • 42.8K views",
+        badge: "Admissions",
+        duration: "12:10",
+        thumb: "https://i.ytimg.com/vi/98i10uPTROs/hqdefault.jpg",
+        ytUrl: "https://www.youtube.com/watch?v=98i10uPTROs"
+      },
+      {
+        id: "zITUCBm-tZo",
+        title: "The Truth About Starting an Engineering School | Founder’s Edition",
+        desc: "Founders discuss building an engineering campus from scratch without traditional red tape • 21.0K views",
+        badge: "Founders",
+        duration: "16:45",
+        thumb: "https://i.ytimg.com/vi/zITUCBm-tZo/hqdefault.jpg",
+        ytUrl: "https://www.youtube.com/watch?v=zITUCBm-tZo"
+      },
+      {
+        id: "0JKhgM1phTk",
+        title: "Inside Mirai School of Technology Campus Tour & Life",
+        desc: "Student walkthrough of Mirai Campus facilities, labs, and collaborative zones • 31.4K views",
+        badge: "Campus Tour",
+        duration: "11:22",
+        thumb: "https://i.ytimg.com/vi/0JKhgM1phTk/hqdefault.jpg",
+        ytUrl: "https://www.youtube.com/watch?v=0JKhgM1phTk"
+      }
+    ];
+
+    let currentVideoIdx = 0;
+
+    function selectMiraiVideo(idx, autoPlay = true) {
+      if (idx < 0 || idx >= miraiVideos.length) return;
+      currentVideoIdx = idx;
+      const vid = miraiVideos[idx];
+
+      const titleEl = document.getElementById('featuredVideoTitle');
+      const descEl = document.getElementById('featuredVideoDesc');
+      const overlayTitleEl = document.getElementById('videoOverlayTitle');
+      const badgeEl = document.getElementById('videoBadge');
+      const durationBadgeEl = document.getElementById('videoDurationBadge');
+      const ytLinkEl = document.getElementById('openYoutubeLink');
+      const coverImg = document.getElementById('videoCoverImg');
+      const overlay = document.getElementById('videoPlayOverlay');
+      const iframe = document.getElementById('videoIframe');
+      const playBtn = document.getElementById('playToggleBtn');
+
+      if (titleEl) titleEl.innerText = vid.title;
+      if (descEl) descEl.innerText = vid.desc;
+      if (overlayTitleEl) overlayTitleEl.innerText = vid.title;
+      if (badgeEl) badgeEl.innerText = vid.badge;
+      if (durationBadgeEl) durationBadgeEl.innerText = vid.duration;
+      if (ytLinkEl) ytLinkEl.href = vid.ytUrl;
+
+      // Update active highlight on playlist tabs
+      document.querySelectorAll('.video-tab-btn').forEach(btn => {
+        const btnIdx = parseInt(btn.getAttribute('data-idx'));
+        if (btnIdx === idx) {
+          btn.classList.add('border-rose-500/60', 'bg-rose-950/30');
+          btn.classList.remove('border-theme');
+        } else {
+          btn.classList.remove('border-rose-500/60', 'bg-rose-950/30');
+          btn.classList.add('border-theme');
+        }
+      });
+
+      if (autoPlay || isVideoPlaying) {
+        if (coverImg) coverImg.classList.add('hidden');
+        if (overlay) overlay.classList.add('hidden');
+        if (iframe) {
+          iframe.classList.remove('hidden');
+          iframe.src = `https://www.youtube-nocookie.com/embed/${vid.id}?autoplay=1&rel=0`;
+        }
+        if (playBtn) playBtn.innerHTML = '<i data-lucide="pause" class="w-3.5 h-3.5 inline mr-1"></i> Pause';
+        isVideoPlaying = true;
+      } else {
+        if (coverImg) {
+          coverImg.src = vid.thumb;
+          coverImg.classList.remove('hidden');
+        }
+        if (overlay) overlay.classList.remove('hidden');
+        if (iframe) {
+          iframe.src = '';
+          iframe.classList.add('hidden');
+        }
+        if (playBtn) playBtn.innerHTML = '<i data-lucide="play" class="w-3.5 h-3.5 inline mr-1"></i> Play';
+        isVideoPlaying = false;
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function togglePlayMiraiVideo() {
+      const vid = miraiVideos[currentVideoIdx];
+      const coverImg = document.getElementById('videoCoverImg');
+      const overlay = document.getElementById('videoPlayOverlay');
+      const iframe = document.getElementById('videoIframe');
+      const playBtn = document.getElementById('playToggleBtn');
+
+      if (!isVideoPlaying) {
+        if (coverImg) coverImg.classList.add('hidden');
+        if (overlay) overlay.classList.add('hidden');
+        if (iframe) {
+          iframe.classList.remove('hidden');
+          iframe.src = `https://www.youtube-nocookie.com/embed/${vid.id}?autoplay=1&rel=0`;
+        }
+        if (playBtn) playBtn.innerHTML = '<i data-lucide="pause" class="w-3.5 h-3.5 inline mr-1"></i> Pause';
+        isVideoPlaying = true;
+      } else {
+        if (iframe) {
+          iframe.src = "";
+          iframe.classList.add('hidden');
+        }
+        if (coverImg) coverImg.classList.remove('hidden');
+        if (overlay) overlay.classList.remove('hidden');
+        if (playBtn) playBtn.innerHTML = '<i data-lucide="play" class="w-3.5 h-3.5 inline mr-1"></i> Play';
+        isVideoPlaying = false;
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    // Instagram Photo Carousel Slider Logic
+    const instaSlides = [
+      {
+        src: '/uploads/mirai_24h_hackathon.png',
+        icon: '💻',
+        label: '24H Hackathon Sprint',
+        alt: 'Mirai 24h Non-Stop Hackathon'
+      },
+      {
+        src: '/uploads/mirai_code_day1.jpeg',
+        icon: '🚀',
+        label: 'Code From Day 1 AI Lab',
+        alt: 'Mirai Code From Day 1'
+      },
+      {
+        src: '/uploads/media_showcase.jpg',
+        icon: '🏮',
+        label: 'Malhar Cultural Arts Installation',
+        alt: 'Malhar Cultural Showcase'
+      }
+    ];
+    let currentInstaSlide = 0;
+
+    function setInstaSlide(idx) {
+      if (idx < 0 || idx >= instaSlides.length) return;
+      currentInstaSlide = idx;
+      const slide = instaSlides[idx];
+      const img = document.getElementById('instaPhotoImg');
+      const icon = document.getElementById('instaBadgeIcon');
+      const label = document.getElementById('instaBadgeLabel');
+
+      if (img) {
+        img.src = slide.src;
+        img.alt = slide.alt;
+      }
+      if (icon) icon.innerText = slide.icon;
+      if (label) label.innerText = slide.label;
+
+      for (let i = 0; i < instaSlides.length; i++) {
+        const dot = document.getElementById(`instaDot-${i}`);
+        if (dot) {
+          if (i === idx) {
+            dot.className = 'w-1.5 h-1.5 rounded-full bg-white transition';
+          } else {
+            dot.className = 'w-1.5 h-1.5 rounded-full bg-white/40 transition';
+          }
+        }
+      }
+    }
+
+    function changeInstaSlide(delta) {
+      let next = (currentInstaSlide + delta + instaSlides.length) % instaSlides.length;
+      setInstaSlide(next);
+    }
+
+    function toggleInstagramLike() {
+      const heartIcon = document.getElementById('instaHeartIcon');
+      const likesCount = document.getElementById('instaLikesCount');
+      if (!isInstaLiked) {
+        heartIcon.classList.add('text-rose-500', 'fill-current');
+        likesCount.innerText = '3,125';
+        isInstaLiked = true;
+      } else {
+        heartIcon.classList.remove('text-rose-500', 'fill-current');
+        likesCount.innerText = '3,124';
+        isInstaLiked = false;
+      }
+    }
+
+    // High-Resolution Campus Photo Viewer
+    function openPhotoModal(src, title, caption) {
+      const modal = document.getElementById('photoModal');
+      const img = document.getElementById('photoModalImg');
+      const titleEl = document.getElementById('photoModalTitle');
+      const captionEl = document.getElementById('photoModalCaption');
+
+      if (img) img.src = src;
+      if (titleEl) titleEl.innerText = title;
+      if (captionEl) captionEl.innerText = caption;
+      if (modal) modal.classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closePhotoModal() {
+      const modal = document.getElementById('photoModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    /* ==========================================
+       5. USER STATE & AUTHENTICATION
+       ========================================== */
+    let currentUser = null;
+    let qrTimer = null;
+    let html5QrScanner = null;
+
+    function showAlert(msg, type = 'success') {
+      const banner = document.getElementById('alertBanner');
+      const colors = type === 'success' 
+        ? 'border-emerald-500/40 bg-emerald-950/80 text-emerald-300' 
+        : 'border-rose-500/40 bg-rose-950/80 text-rose-300';
+      banner.innerHTML = `<div class="p-3.5 rounded-2xl border ${colors} text-xs font-semibold flex items-center justify-between shadow-2xl backdrop-blur-md">
+        <span>${msg}</span>
+        <button onclick="document.getElementById('alertBanner').classList.add('hidden')" class="ml-2 font-black text-sm">&times;</button>
+      </div>`;
+      banner.classList.remove('hidden');
+      setTimeout(() => banner.classList.add('hidden'), 7000);
+    }
+
+    function guardAction(actionFn) {
+      if (!currentUser) {
+        showAlert('Authentication Required: Please register or sign in to access club activities!', 'error');
+        openAuthModal('login');
+        return;
+      }
+      actionFn();
+    }
+
+    function updateAuthStateUI() {
+      const loginBtn = document.getElementById('loginNavBtn');
+      const regBtn = document.getElementById('registerNavBtn');
+      const logoutBtn = document.getElementById('logoutNavBtn');
+      const badge = document.getElementById('roleBadge');
+      const authBanner = document.getElementById('authorityBanner');
+      const authTab = document.getElementById('tab-authority');
+      const addEventBtn = document.getElementById('addEventBtn');
+      const userDisplay = document.getElementById('userDisplayName');
+      const userCampus = document.getElementById('userCampusCode');
+      const gatedBanner = document.getElementById('guestGatedBanner');
+
+      if (!currentUser) {
+        badge.innerText = 'Guest / Public';
+        badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-mono border border-theme bg-theme-surface text-theme-muted';
+        userDisplay.innerText = 'Welcome, Visitor';
+        userCampus.innerText = 'HIET • RIT • JU';
+        loginBtn.classList.remove('hidden');
+        regBtn.classList.remove('hidden');
+        logoutBtn.classList.add('hidden');
+        authBanner.classList.add('hidden');
+        authTab.classList.add('hidden');
+        if (addEventBtn) addEventBtn.classList.add('hidden');
+        if (gatedBanner) gatedBanner.classList.remove('hidden');
+      } else {
+        loginBtn.classList.add('hidden');
+        regBtn.classList.add('hidden');
+        logoutBtn.classList.remove('hidden');
+        userDisplay.innerText = currentUser.name;
+        userCampus.innerText = currentUser.campus_name || 'HIET Campus';
+        if (gatedBanner) gatedBanner.classList.add('hidden');
+
+        if (currentUser.is_domain_authorized || currentUser.role === 'ADMIN') {
+          badge.innerText = `👑 Authorized Lead`;
+          badge.className = 'bg-amber-500 text-slate-950 font-black px-2.5 py-0.5 rounded-full text-[10px] font-mono glow-yuzuru';
+          authBanner.classList.remove('hidden');
+          authTab.classList.remove('hidden');
+          if (addEventBtn) addEventBtn.classList.remove('hidden');
+        } else {
+          badge.innerText = `🎓 ${currentUser.role}`;
+          badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-mono border border-theme bg-theme-surface text-theme-primary';
+          authBanner.classList.add('hidden');
+          authTab.classList.add('hidden');
+          if (addEventBtn) addEventBtn.classList.add('hidden');
+        }
+      }
+      attachCursorHover();
+    }
+
+    function setAuthMode(mode) {
+      if (mode === 'register') {
+        document.getElementById('registerForm').classList.remove('hidden');
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('authTabRegister').className = 'text-sm font-black border-b-2 pb-1';
+        document.getElementById('authTabRegister').style.borderColor = 'var(--accent-primary)';
+        document.getElementById('authTabRegister').style.color = 'var(--text-primary)';
+        document.getElementById('authTabLogin').className = 'text-sm font-bold text-theme-muted hover:text-theme-primary pb-1';
+        document.getElementById('authTabLogin').style.borderColor = 'transparent';
+      } else {
+        document.getElementById('registerForm').classList.add('hidden');
+        document.getElementById('loginForm').classList.remove('hidden');
+        document.getElementById('authTabRegister').className = 'text-sm font-bold text-theme-muted hover:text-theme-primary pb-1';
+        document.getElementById('authTabRegister').style.borderColor = 'transparent';
+        document.getElementById('authTabLogin').className = 'text-sm font-black border-b-2 pb-1';
+        document.getElementById('authTabLogin').style.borderColor = 'var(--accent-primary)';
+        document.getElementById('authTabLogin').style.color = 'var(--text-primary)';
+      }
+    }
+
+    function openAuthModal(mode = 'register') {
+      setAuthMode(mode);
+      document.getElementById('authModal').classList.remove('hidden');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('authModal').classList.add('hidden');
+    }
+
+    /* 1-Click Social Login (Google, Instagram, GitHub) */
+    async function handleSocialAuth(provider) {
+      try {
+        const res = await fetch('/api/auth/social-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ provider: provider })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          currentUser = data.user;
+          localStorage.setItem('msot_token', data.access_token);
+          localStorage.setItem('msot_user', JSON.stringify(currentUser));
+          updateAuthStateUI();
+          closeAuthModal();
+          showAlert(`🎉 Authenticated with ${provider.toUpperCase()}! Welcome, ${currentUser.name}.`);
+          loadClubs();
+        } else {
+          showAlert(data.detail, 'error');
+        }
+      } catch (err) {
+        showAlert('Social auth failed: ' + err, 'error');
+      }
+    }
+
+    /* Request Registration OTP (DO NOT SHOW OTP ON LOGIN PAGE - SENT TO EMAIL/PHONE) */
+    async function requestRegistrationOTP() {
+      const email = document.getElementById('regEmail').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+
+      if (!email && !phone) {
+        showAlert('Please enter an email or phone number first', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth/otp/request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier: email || phone })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          // DO NOT DISPLAY OTP CODE ON THE PAGE
+          // Input field is cleared for user to enter code received on email/phone
+          document.getElementById('regOtpInput').value = '';
+          document.getElementById('otpVerifyStep').classList.remove('hidden');
+          document.getElementById('otpRequestStep').classList.add('hidden');
+          showAlert(`📨 Verification code dispatched to ${email || phone}! Please check your SMS/inbox and enter the 6-digit OTP code below.`, 'success');
+        } else {
+          showAlert(data.detail, 'error');
+        }
+      } catch (err) {
+        showAlert('OTP Request Failed: ' + err, 'error');
+      }
+    }
+
+    /* Prompt for Login with OTP */
+    async function loginWithOTPModePrompt() {
+      const identifier = prompt('Enter your registered Email or Phone number to receive a 6-digit OTP:');
+      if (!identifier) return;
+
+      try {
+        const res = await fetch('/api/auth/otp/request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier: identifier.trim() })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          const inputOtp = prompt(`📨 Verification code dispatched to ${identifier}!\nPlease check your messages and enter the 6-digit OTP code:`);
+          if (!inputOtp) return;
+
+          const loginRes = await fetch('/api/auth/login-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifier: identifier.trim(), otp: inputOtp.trim() })
+          });
+          const loginData = await loginRes.json();
+          if (loginRes.ok) {
+            currentUser = loginData.user;
+            localStorage.setItem('msot_token', loginData.access_token);
+            localStorage.setItem('msot_user', JSON.stringify(currentUser));
+            updateAuthStateUI();
+            closeAuthModal();
+            showAlert(`Welcome back, ${currentUser.name}!`);
+            loadClubs();
+          } else {
+            showAlert(loginData.detail, 'error');
+          }
+        } else {
+          showAlert(data.detail, 'error');
+        }
+      } catch (err) {
+        showAlert('OTP Login error: ' + err, 'error');
+      }
+    }
+
+    /* Submit Registration with OTP */
+    async function handleRegistrationSubmit(e) {
+      e.preventDefault();
+      const otpCode = document.getElementById('regOtpInput').value.trim();
+      if (!otpCode) {
+        showAlert('Please enter the 6-digit OTP received on your email or phone', 'error');
+        return;
+      }
+
+      const payload = {
+        name: document.getElementById('regName').value.trim(),
+        email: document.getElementById('regEmail').value.trim(),
+        phone: document.getElementById('regPhone').value.trim(),
+        student_id: document.getElementById('regId').value.trim(),
+        username: document.getElementById('regUsername').value.trim(),
+        password: document.getElementById('regPassword').value,
+        otp: otpCode,
+        domain_passkey: document.getElementById('regPasskey').value.trim(),
+        campus_id: 1 // Default HIET Campus
+      };
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok) {
+          currentUser = data.user;
+          localStorage.setItem('msot_token', data.access_token);
+          localStorage.setItem('msot_user', JSON.stringify(currentUser));
+          updateAuthStateUI();
+          closeAuthModal();
+          showAlert(data.message, 'success');
+          loadClubs();
+          if (currentUser.is_domain_authorized) {
+            switchTab('authority');
+          }
+        } else {
+          showAlert(data.detail, 'error');
+        }
+      } catch (err) {
+        showAlert('Registration error: ' + err, 'error');
+      }
+    }
+
+    /* Standard Login */
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('loginIdentifier').value.trim();
+      const pwd = document.getElementById('loginPassword').value;
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: id, password: pwd })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          currentUser = data.user;
+          localStorage.setItem('msot_token', data.access_token);
+          localStorage.setItem('msot_user', JSON.stringify(currentUser));
+          updateAuthStateUI();
+          closeAuthModal();
+          showAlert(`Welcome back, ${currentUser.name}!`);
+          loadClubs();
+        } else {
+          showAlert(data.detail, 'error');
+        }
+      } catch (err) {
+        showAlert('Login failed: ' + err, 'error');
+      }
+    }
+
+    /* Fast Demo Role Switcher */
+    async function switchDemoUser(username) {
+      if (!username) return;
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: username, password: 'password123' })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          currentUser = data.user;
+          localStorage.setItem('msot_token', data.access_token);
+          localStorage.setItem('msot_user', JSON.stringify(currentUser));
+          updateAuthStateUI();
+          showAlert(`Switched demo account: ${currentUser.name} (${currentUser.role})`);
+          loadClubs();
+          if (currentUser.is_domain_authorized) {
+            switchTab('authority');
+          } else {
+            switchTab('explore');
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function logout() {
+      currentUser = null;
+      localStorage.removeItem('msot_token');
+      localStorage.removeItem('msot_user');
+      updateAuthStateUI();
+      showAlert('Logged out successfully.');
+      switchTab('explore');
+    }
+
+    function getApiHeaders() {
+      const h = { 'Content-Type': 'application/json' };
+      if (currentUser && currentUser.id) {
+        h['x-user-id'] = currentUser.id.toString();
+      }
+      return h;
+    }
+
+    /* ==========================================
+       6. NAVIGATION & TABS
+       ========================================== */
+    function switchTab(tabId) {
+      document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.style.backgroundColor = 'transparent';
+        b.style.color = 'var(--text-muted)';
+      });
+
+      const activeSection = document.getElementById(`view-${tabId}`);
+      if (activeSection) activeSection.classList.remove('hidden');
+
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      if (activeBtn) {
+        activeBtn.style.backgroundColor = 'var(--bg-surface-elevated)';
+        activeBtn.style.color = 'var(--text-primary)';
+      }
+
+      if (tabId === 'explore') loadClubs();
+      else if (tabId === 'events') loadEvents();
+      else if (tabId === 'student') loadStudentPortfolio();
+      else if (tabId === 'authority') loadClubMembersForAuthority();
+      else if (tabId === 'budget') loadBudgets();
+
+      const sidebar = document.getElementById('appSidebar');
+      if (window.innerWidth < 1024) {
+        sidebar.classList.add('-translate-x-full');
+      }
+    }
+
+    function filterByCampus(campusId) {
+      document.getElementById('campusFilter').value = campusId;
+      loadClubs();
+    }
+
+    /* ==========================================
+       7. CLUBS CATALOG & ENROLMENT
+       ========================================== */
+    async function loadClubs() {
+      try {
+        const campusId = document.getElementById('campusFilter').value;
+        const res = await fetch(`/api/clubs${campusId ? '?campus_id=' + campusId : ''}`, { headers: getApiHeaders() });
+        const clubs = await res.json();
+
+        const grid = document.getElementById('clubsGrid');
+        grid.innerHTML = '';
+
+        const select = document.getElementById('authorityClubSelect');
+        if (select) select.innerHTML = '';
+
+        clubs.forEach(c => {
+          if (select) {
+            const opt = document.createElement('option');
+            opt.value = c.id;
+            opt.innerText = `${c.name} (${c.campus_name || 'HIET'})`;
+            select.appendChild(opt);
+          }
+
+          const card = document.createElement('div');
+          card.className = 'card-3d rounded-3xl border border-theme p-6 flex flex-col justify-between space-y-4';
+          card.innerHTML = `
+            <div class="space-y-3.5">
+              <div class="flex items-start justify-between">
+                <div>
+                  <span class="text-[10px] font-mono text-[#788BFF] uppercase font-bold tracking-wider">${c.campus_name || 'HIET Campus'}</span>
+                  <h3 class="text-lg font-black text-theme-primary leading-tight">${c.name}</h3>
+                </div>
+                ${c.is_recruiting 
+                  ? `<span class="bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-500/30">Recruiting Open</span>`
+                  : `<span class="border border-theme text-theme-muted font-mono text-[10px] font-bold px-2.5 py-0.5 rounded-full btn-mirror">Recruiting Closed</span>`}
+              </div>
+              <p class="text-theme-muted text-xs leading-relaxed line-clamp-2">${c.description || 'Mirai Recognized Club'}</p>
+
+              <div class="p-3.5 rounded-2xl border border-theme text-xs space-y-1.5 text-theme-primary btn-mirror" style="background-color: var(--bg-surface-elevated);">
+                <div>👨‍🏫 <strong>Advisor:</strong> ${c.faculty_advisor_name || 'Dr. Rajiv Menon'}</div>
+                <div>👑 <strong>President:</strong> ${c.posts?.president ? c.posts.president.name : 'Unassigned'}</div>
+                <div>💰 <strong>Finance Pres:</strong> ${c.posts?.finance_president ? c.posts.finance_president.name : 'Unassigned'}</div>
+                <div>👥 <strong>Capacity:</strong> ${c.member_count} / ${c.capacity} Members</div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-theme flex items-center justify-between">
+              <span class="text-[10px] font-mono text-theme-muted">${c.meeting_rules || 'Every Saturday'}</span>
+              <button onclick="guardAction(() => joinClub(${c.id}))" class="btn-mirror text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow" style="background: rgba(84, 101, 255, 0.45);">
+                Join Club
+              </button>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+        attachCursorHover();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function joinClub(clubId) {
+      try {
+        const res = await fetch(`/api/clubs/${clubId}/join`, {
+          method: 'POST',
+          headers: getApiHeaders()
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showAlert(data.message);
+          loadClubs();
+        } else {
+          showAlert(data.detail, 'error');
+        }
+      } catch (err) {
+        showAlert('Join failed: ' + err, 'error');
+      }
+    }
+
+    /* ==========================================
+       8. AUTHORITY CONSOLE: REASSIGN ALL POSTS
+       ========================================== */
+    async function loadClubMembersForAuthority() {
+      const select = document.getElementById('authorityClubSelect');
+      const clubId = select ? select.value || 1 : 1;
+      try {
+        const res = await fetch(`/api/clubs/${clubId}/members`, { headers: getApiHeaders() });
+        const members = await res.json();
+        const tbody = document.getElementById('authorityMembersTable');
+        tbody.innerHTML = '';
+
+        if (!members.length) {
+          tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-theme-muted">No members enrolled in this club yet.</td></tr>';
+          return;
+        }
+
+        members.forEach(m => {
+          const row = document.createElement('tr');
+          row.className = 'hover:bg-[#5465FF]/5 transition';
+          row.innerHTML = `
+            <td class="p-3 font-semibold text-theme-primary">${m.user_name}</td>
+            <td class="p-3 font-mono text-theme-muted">${m.roll_no || 'N/A'}</td>
+            <td class="p-3">
+              <span class="font-mono font-bold text-[11px] px-2.5 py-0.5 rounded-full ${m.post === 'PRESIDENT' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' : (m.post === 'FINANCE_PRESIDENT' ? 'bg-emerald-500/20 text-emerald-400' : 'border border-theme text-theme-muted')}">
+                ${m.post}
+              </span>
+            </td>
+            <td class="p-3 font-mono text-theme-muted">${new Date(m.joined_at).toLocaleDateString()}</td>
+            <td class="p-3 text-right">
+              <button onclick="reassignMemberPostPrompt(${clubId}, ${m.user_id}, '${m.user_name}', '${m.post}')" class="btn-mirror bg-amber-500/30 text-amber-300 font-black px-3 py-1 rounded-xl text-[11px] transition shadow">
+                Change Post
+              </button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+        attachCursorHover();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function reassignMemberPostPrompt(clubId, userId, name, currentPost) {
+      const posts = ["PRESIDENT", "VICE_PRESIDENT", "FINANCE_PRESIDENT", "MEDIA_PRESIDENT", "MEMBER"];
+      const newPost = prompt(`Reassign position for ${name} (Currently: ${currentPost}).\nOptions: ${posts.join(', ')}`, currentPost);
+      if (!newPost || !posts.includes(newPost.trim().toUpperCase())) {
+        showAlert('Invalid position selected. Please choose from: ' + posts.join(', '), 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/clubs/${clubId}/assign-post?target_user_id=${userId}&post=${newPost.trim().toUpperCase()}`, {
+          method: 'PUT',
+          headers: getApiHeaders()
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showAlert(`Position updated for ${name} to ${newPost.toUpperCase()}!`);
+          loadClubMembersForAuthority();
+          loadClubs();
+        } else {
+          showAlert(data.detail, 'error');
+        }
+      } catch (err) {
+        showAlert('Update error: ' + err, 'error');
+      }
+    }
+
+    /* ==========================================
+       9. UPCOMING EVENTS & CALENDAR
+       ========================================== */
+    async function loadEvents() {
+      try {
+        const res = await fetch('/api/events', { headers: getApiHeaders() });
+        const events = await res.json();
+        const list = document.getElementById('eventsList');
+        list.innerHTML = '';
+
+        if (!events.length) {
+          list.innerHTML = '<div class="text-xs text-theme-muted p-4">No events scheduled.</div>';
+          return;
+        }
+
+        events.forEach(e => {
+          const item = document.createElement('div');
+          item.className = 'card-3d rounded-3xl border border-theme p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4';
+          item.innerHTML = `
+            <div class="space-y-1.5">
+              <div class="flex items-center space-x-2">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border border-theme btn-mirror" style="color: var(--text-primary);">
+                  ${e.visibility}
+                </span>
+                <span class="text-xs text-theme-muted font-mono">${new Date(e.date).toLocaleDateString()}</span>
+                <span class="text-xs text-theme-muted">•</span>
+                <span class="text-xs font-bold text-theme-primary">${e.club_name || 'Mirai Campus Wide'}</span>
+              </div>
+              <h4 class="text-base font-extrabold text-theme-primary">${e.title}</h4>
+              <p class="text-xs text-theme-muted">${e.description || ''}</p>
+              <div class="text-xs text-theme-muted font-mono">📍 ${e.venue}</div>
+            </div>
+
+            <div class="flex items-center space-x-2 shrink-0">
+              ${e.has_active_session ? `
+                <button onclick="guardAction(openCheckInScanner)" class="btn-mirror bg-emerald-600/30 text-emerald-300 font-bold text-xs px-4 py-2.5 rounded-xl flex items-center space-x-1.5 shadow">
+                  <i data-lucide="check-circle" class="w-4 h-4"></i>
+                  <span>Live QR Check-In</span>
+                </button>
+              ` : `
+                <span class="btn-mirror px-3 py-1.5 rounded-xl text-xs text-theme-muted font-mono">Scheduled</span>
+              `}
+            </div>
+          `;
+          list.appendChild(item);
+        });
+        lucide.createIcons();
+        attachCursorHover();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function openScheduleEventModal() {
+      const title = prompt('Event Title:');
+      if (!title) return;
+      const desc = prompt('Event Description / Agenda:');
+      const venue = prompt('Venue:', 'HIET CS Lab / Auditorium');
+
+      try {
+        const res = await fetch('/api/events', {
+          method: 'POST',
+          headers: getApiHeaders(),
+          body: JSON.stringify({
+            club_id: 1,
+            title: title,
+            description: desc,
+            event_type: 'CLUB_DAY',
+            visibility: 'CAMPUS_STUDENTS',
+            date: new Date(Date.now() + 86400000 * 3).toISOString(),
+            venue: venue
+          })
+        });
+        const d = await res.json();
+        if (res.ok) {
+          showAlert('Event scheduled successfully!');
+          loadEvents();
+        } else {
+          showAlert(d.detail, 'error');
+        }
+      } catch (err) {
+        showAlert('Event creation error: ' + err, 'error');
+      }
+    }
+
+    /* ==========================================
+       10. STUDENT PORTFOLIO & TRANSCRIPT
+       ========================================== */
+    async function loadStudentPortfolio() {
+      if (!currentUser) return;
+
+      try {
+        const attRes = await fetch('/api/attendance/my-attendance', { headers: getApiHeaders() });
+        const attData = await attRes.json();
+        
+        document.getElementById('statEnrolledClubs').innerText = `${attData.clubs?.length || 0} / 2`;
+        const avgRate = attData.clubs?.length 
+          ? (attData.clubs.reduce((acc, c) => acc + c.attendance_rate, 0) / attData.clubs.length).toFixed(1)
+          : '100.0';
+        document.getElementById('statAttendanceRate').innerText = `${avgRate}%`;
+
+        // Certificates
+        const transRes = await fetch('/api/certificates/my-transcript', { headers: getApiHeaders() });
+        const trans = await transRes.json();
+        document.getElementById('statCertsCount').innerText = trans.certificates?.length || 0;
+
+        const certList = document.getElementById('studentCertificatesList');
+        certList.innerHTML = '';
+        if (!trans.certificates?.length) {
+          certList.innerHTML = '<div class="text-xs text-theme-muted">No certificates issued yet. Complete Saturday sessions to earn verifiable credentials.</div>';
+        } else {
+          trans.certificates.forEach(c => {
+            const row = document.createElement('div');
+            row.className = 'p-4 rounded-2xl border border-theme flex items-center justify-between text-xs btn-mirror';
+            row.innerHTML = `
+              <div>
+                <div class="font-bold text-theme-primary text-sm">${c.title}</div>
+                <div class="text-theme-muted font-mono">No: ${c.cert_number} • Issued: ${c.issue_date}</div>
+              </div>
+              <div class="flex items-center space-x-2">
+                <a href="${c.verification_url}" target="_blank" class="btn-mirror px-3 py-1.5 rounded-xl font-mono font-bold text-[#788BFF]">
+                  Verify Record &rarr;
+                </a>
+              </div>
+            `;
+            certList.appendChild(row);
+          });
+        }
+        attachCursorHover();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function downloadOfficialTranscript() {
+      if (!currentUser) return;
+      const res = await fetch('/api/certificates/my-transcript', { headers: getApiHeaders() });
+      const d = await res.json();
+      const jsonStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(d, null, 2));
+      const a = document.createElement('a');
+      a.setAttribute("href", jsonStr);
+      a.setAttribute("download", `Mirai_Transcript_${currentUser.username || 'Record'}.json`);
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showAlert('Official Co-Curricular Transcript Downloaded!');
+    }
+
+    /* ==========================================
+       11. DYNAMIC ROTATING QR LAUNCHER & SCANNER
+       ========================================== */
+    async function launchQRSessionModal() {
+      document.getElementById('qrProjectorModal').classList.remove('hidden');
+      updateLiveQRToken();
+      if (qrTimer) clearInterval(qrTimer);
+      qrTimer = setInterval(updateLiveQRToken, 1000);
+    }
+
+    function closeQRSessionModal() {
+      document.getElementById('qrProjectorModal').classList.add('hidden');
+      if (qrTimer) clearInterval(qrTimer);
+    }
+
+    async function updateLiveQRToken() {
+      try {
+        const res = await fetch('/api/attendance/qr-token/1', { headers: getApiHeaders() });
+        if (!res.ok) return;
+        const data = await res.json();
+
+        document.getElementById('projectorToken').innerText = data.current_token;
+        document.getElementById('projectorCountdown').innerText = `${data.seconds_remaining}s`;
+
+        const container = document.getElementById('qrcodeCanvas');
+        container.innerHTML = '';
+        new QRCode(container, {
+          text: data.qr_payload,
+          width: 180,
+          height: 180,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function openCheckInScanner() {
+      document.getElementById('scannerModal').classList.remove('hidden');
+      try {
+        html5QrScanner = new Html5Qrcode("qrReaderBox");
+        html5QrScanner.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: { width: 200, height: 200 } },
+          (decodedText) => {
+            html5QrScanner.stop();
+            performCheckIn(decodedText);
+          },
+          (err) => {}
+        ).catch(e => {
+          document.getElementById('qrReaderBox').innerHTML = '<div class="p-6 text-center text-xs text-theme-muted">Camera preview inactive. Enter 6-digit OTP code below to confirm.</div>';
+        });
+      } catch (e) {}
+    }
+
+    function closeCheckInScanner() {
+      document.getElementById('scannerModal').classList.add('hidden');
+      if (html5QrScanner) {
+        try { html5QrScanner.stop(); } catch (e) {}
+      }
+    }
+
+    async function submitManualCheckIn() {
+      const code = document.getElementById('manualOtpInput').value.trim();
+      if (!code || code.length !== 6) {
+        showAlert('Please enter a valid 6-digit OTP code', 'error');
+        return;
+      }
+      performCheckIn(`MSOT_ATTEND:1:${code}`);
+    }
+
+    async function performCheckIn(payload) {
+      if (!currentUser) {
+        showAlert('Please sign in to check in!', 'error');
+        closeCheckInScanner();
+        openAuthModal('login');
+        return;
+      }
+      try {
+        const res = await fetch('/api/attendance/check-in', {
+          method: 'POST',
+          headers: getApiHeaders(),
+          body: JSON.stringify({ session_id: 1, token: payload })
+        });
+        const d = await res.json();
+        if (res.ok) {
+          showAlert(d.message);
+          closeCheckInScanner();
+        } else {
+          showAlert(d.detail, 'error');
+        }
+      } catch (err) {
+        showAlert('Check-in error: ' + err, 'error');
+      }
+    }
+
+    async function openAttendanceOverrideModal() {
+      const studentId = prompt('Enter Student ID to manually override:');
+      if (!studentId) return;
+      const reason = prompt('Mandatory Written Audit Reason (minimum 5 characters):');
+      if (!reason || reason.length < 5) {
+        showAlert('Detailed reason required for audit trail!', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/attendance/override', {
+          method: 'POST',
+          headers: getApiHeaders(),
+          body: JSON.stringify({
+            session_id: 1,
+            student_id: parseInt(studentId),
+            reason: reason
+          })
+        });
+        const d = await res.json();
+        if (res.ok) {
+          showAlert(d.message);
+        } else {
+          showAlert(d.detail, 'error');
+        }
+      } catch (err) {
+        showAlert('Override failed: ' + err, 'error');
+      }
+    }
+
+    /* ==========================================
+       12. BUDGET PROPOSALS
+       ========================================== */
+    async function loadBudgets() {
+      try {
+        const res = await fetch('/api/budgets?club_id=1', { headers: getApiHeaders() });
+        const budgets = await res.json();
+        const container = document.getElementById('budgetProposalsTable');
+        container.innerHTML = '';
+
+        if (!budgets.length) {
+          container.innerHTML = '<div class="p-6 text-center text-xs text-theme-muted">No budget proposals submitted yet.</div>';
+          return;
+        }
+
+        budgets.forEach(b => {
+          const item = document.createElement('div');
+          item.className = 'p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-[#5465FF]/5 transition';
+          item.innerHTML = `
+            <div class="space-y-1">
+              <div class="flex items-center space-x-2">
+                <span class="font-mono text-xs font-bold text-theme-primary">₹${b.amount.toLocaleString()}</span>
+                <span class="text-xs text-theme-muted">•</span>
+                <span class="text-xs font-bold text-[#788BFF]">${b.category}</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${b.status === 'APPROVED' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}">
+                  ${b.status}
+                </span>
+              </div>
+              <h4 class="text-sm font-bold text-theme-primary">${b.title}</h4>
+              <p class="text-xs text-theme-muted">${b.purpose}</p>
+            </div>
+            <div class="text-right text-[11px] font-mono text-theme-muted">
+              <div>Scale: ${b.scale}</div>
+              <div>Submitted: ${new Date(b.created_at).toLocaleDateString()}</div>
+            </div>
+          `;
+          container.appendChild(item);
+        });
+        attachCursorHover();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function openSubmitBudgetModal() {
+      const title = prompt('Budget Proposal Title:');
+      if (!title) return;
+      const amount = prompt('Requested Amount (INR):', '15000');
+      const purpose = prompt('Project Purpose & Scale:', 'Cloud GPU cluster for hackathon participants');
+
+      try {
+        const res = await fetch('/api/budgets', {
+          method: 'POST',
+          headers: getApiHeaders(),
+          body: JSON.stringify({
+            club_id: 1,
+            title: title,
+            amount: parseFloat(amount),
+            category: 'Event & Infrastructure',
+            purpose: purpose,
+            scale: 'Flagship Event'
+          })
+        });
+        const d = await res.json();
+        if (res.ok) {
+          showAlert('Budget proposal submitted for Campus Manager review!');
+          loadBudgets();
+        } else {
+          showAlert(d.detail, 'error');
+        }
+      } catch (err) {
+        showAlert('Budget submission error: ' + err, 'error');
+      }
+    }
+
+    /* Initialize Application */
+    document.addEventListener('DOMContentLoaded', () => {
+      applyTheme(currentTheme);
+      init3DEnvironment();
+      lucide.createIcons();
+
+      const stored = localStorage.getItem('msot_user');
+      if (stored) {
+        try { currentUser = JSON.parse(stored); } catch (e) {}
+      }
+      updateAuthStateUI();
+      loadClubs();
+      attachCursorHover();
+    });
+  </script>
+</body>
+</html>
