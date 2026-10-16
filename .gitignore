@@ -60,8 +60,9 @@ Icon
 *.db-shm
 *.db-wal
 
-# Editor / IDE settings
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
+# Node / Frontend
+node_modules/
+dist/
+auth-bento-app/node_modules/
+auth-bento-app/dist/
+

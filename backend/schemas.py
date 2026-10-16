@@ -147,6 +147,7 @@ class EventCreate(BaseModel):
     date: datetime
     venue: str = "Campus Auditorium / Lab"
     deliverable_info: Optional[str] = None
+    is_important: bool = False
 
 class EventOut(BaseModel):
     id: int
@@ -160,7 +161,10 @@ class EventOut(BaseModel):
     venue: str
     deliverable_info: Optional[str] = None
     status: str
+    is_important: bool = False
     has_active_session: bool = False
+    created_by_name: Optional[str] = None
+    created_by_post: Optional[str] = None
     class Config:
         from_attributes = True
 

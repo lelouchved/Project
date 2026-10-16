@@ -116,10 +116,12 @@ class Event(Base):
     venue = Column(String(150), default="Campus Auditorium / Lab")
     deliverable_info = Column(String(255), nullable=True)
     status = Column(String(50), default="SCHEDULED")  # SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED
+    is_important = Column(Boolean, default=False)
     created_by_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
     club = relationship("Club", back_populates="events")
+    created_by = relationship("User", foreign_keys=[created_by_id])
     attendance_session = relationship("AttendanceSession", back_populates="event", uselist=False, cascade="all, delete-orphan")
     assignments = relationship("AssignmentProject", back_populates="event", cascade="all, delete-orphan")
 
