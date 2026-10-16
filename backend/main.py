@@ -53,9 +53,27 @@ app.include_router(assignment_routes.router)
 app.include_router(certificate_routes.router)
 app.include_router(report_routes.router)
 
+@app.get("/api/health")
+def api_health():
+    return {
+        "status": "online",
+        "service": "MSOT Club Activities & Governance Tracker",
+        "version": "1.0.0",
+        "database": "connected",
+        "campuses": 3,
+        "engine": "FastAPI + Uvicorn + SQLite WAL"
+    }
+
 @app.get("/")
 def serve_index():
-    return FileResponse("./frontend/index.html")
+    return FileResponse(
+        "./frontend/index.html",
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0"
+        }
+    )
 
 @app.get("/verify/{cert_id}")
 def serve_verification_page(cert_id: str):

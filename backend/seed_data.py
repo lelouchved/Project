@@ -76,14 +76,14 @@ def seed_database():
     # 4. Create Clubs - Strictly 4 Clubs in HIET (Nextcell, Kaizen, Malhar, Sports Club)
     club_nextcell = Club(
         name="Nextcell Club",
-        category="Technical & AI",
-        description="The flagship software development, artificial intelligence systems, and competitive algorithms club of Mirai HIET.",
+        category="Entrepreneurship & E-Cell",
+        description="The flagship student entrepreneurship cell (E-Cell) and startup incubation society of Mirai HIET. Empowering student founders to build commercial MVPs, pitch to angel investors, secure seed venture capital, and scale innovative tech startups.",
         campus_id=c_hiet.id,
         faculty_advisor_id=advisor_tech.id,
         capacity=65,
         is_recruiting=True,
         recruitment_deadline=datetime.datetime.utcnow() + datetime.timedelta(days=7),
-        meeting_rules="Every Saturday 10:00 AM - 1:00 PM, CS Lab 3"
+        meeting_rules="Every Saturday 10:00 AM - 1:00 PM, Venture & Incubation Lab"
     )
 
     club_kaizen = Club(
@@ -125,32 +125,31 @@ def seed_database():
     db.add_all([club_nextcell, club_kaizen, club_malhar, club_sports])
     db.commit()
 
-    # 5. Memberships with Leadership Posts
+    # 5. Memberships (Stock Web State - All posts vacant until appointed by Domain Keyholder)
     m_nextcell = [
-        ClubMembership(user_id=aarav_pres.id, club_id=club_nextcell.id, post="PRESIDENT", status="ACTIVE"),
-        ClubMembership(user_id=rohan_vp.id, club_id=club_nextcell.id, post="VICE_PRESIDENT", status="ACTIVE"),
-        ClubMembership(user_id=priya_fin.id, club_id=club_nextcell.id, post="FINANCE_PRESIDENT", status="ACTIVE"),
-        ClubMembership(user_id=neha_media.id, club_id=club_nextcell.id, post="MEDIA_PRESIDENT", status="ACTIVE"),
+        ClubMembership(user_id=aarav_pres.id, club_id=club_nextcell.id, post="MEMBER", status="ACTIVE"),
+        ClubMembership(user_id=rohan_vp.id, club_id=club_nextcell.id, post="MEMBER", status="ACTIVE"),
+        ClubMembership(user_id=priya_fin.id, club_id=club_nextcell.id, post="MEMBER", status="ACTIVE"),
+        ClubMembership(user_id=neha_media.id, club_id=club_nextcell.id, post="MEMBER", status="ACTIVE"),
         ClubMembership(user_id=gen_students[0].id, club_id=club_nextcell.id, post="MEMBER", status="ACTIVE"),
         ClubMembership(user_id=gen_students[1].id, club_id=club_nextcell.id, post="MEMBER", status="ACTIVE"),
         ClubMembership(user_id=gen_students[2].id, club_id=club_nextcell.id, post="MEMBER", status="ACTIVE"),
     ]
 
     m_kaizen = [
-        ClubMembership(user_id=tanvi_pres.id, club_id=club_kaizen.id, post="PRESIDENT", status="ACTIVE"),
-        ClubMembership(user_id=karan_fin.id, club_id=club_kaizen.id, post="FINANCE_PRESIDENT", status="ACTIVE"),
-        # Student 1 joins Kaizen as second club (2 clubs limit verification)
+        ClubMembership(user_id=tanvi_pres.id, club_id=club_kaizen.id, post="MEMBER", status="ACTIVE"),
+        ClubMembership(user_id=karan_fin.id, club_id=club_kaizen.id, post="MEMBER", status="ACTIVE"),
         ClubMembership(user_id=gen_students[0].id, club_id=club_kaizen.id, post="MEMBER", status="ACTIVE"),
         ClubMembership(user_id=gen_students[3].id, club_id=club_kaizen.id, post="MEMBER", status="ACTIVE"),
     ]
 
     m_malhar = [
-        ClubMembership(user_id=aditi_pres.id, club_id=club_malhar.id, post="PRESIDENT", status="ACTIVE"),
+        ClubMembership(user_id=aditi_pres.id, club_id=club_malhar.id, post="MEMBER", status="ACTIVE"),
         ClubMembership(user_id=gen_students[1].id, club_id=club_malhar.id, post="MEMBER", status="ACTIVE"),
     ]
 
     m_sports = [
-        ClubMembership(user_id=kabir_pres.id, club_id=club_sports.id, post="PRESIDENT", status="ACTIVE"),
+        ClubMembership(user_id=kabir_pres.id, club_id=club_sports.id, post="MEMBER", status="ACTIVE"),
         ClubMembership(user_id=gen_students[4].id, club_id=club_sports.id, post="MEMBER", status="ACTIVE"),
     ]
 
@@ -228,13 +227,13 @@ def seed_database():
     # Tier 3: Internal Club Day Event (Nextcell)
     e_coding_session = Event(
         club_id=club_nextcell.id,
-        title="Club Day #4: Microservices Architecture & Redis Caching Hands-on",
-        description="Deep dive into containerized service mesh and Redis distributed locks. Session includes PPT and live coding.",
+        title="Club Day #4: AI Startup Pitch Deck & MVP Commercialization Sprint",
+        description="Hands-on venture pitch validation, business model canvas, and customer discovery metrics for student startup teams.",
         event_type="CLUB_DAY",
         visibility="CLUB_ONLY",
         date=now - datetime.timedelta(hours=2),
-        venue="Lab 301, Systems Complex",
-        deliverable_info="Repository link + Architecture diagram PDF",
+        venue="Venture & Incubation Lab, Room 301",
+        deliverable_info="Pitch Deck PDF + MVP Demo URL",
         status="IN_PROGRESS"
     )
 

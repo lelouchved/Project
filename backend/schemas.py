@@ -262,3 +262,7 @@ class CertificateOut(BaseModel):
     pdf_url: Optional[str] = None
     class Config:
         from_attributes = True
+
+class ResetPasswordRequest(BaseModel):
+    email: str
+    new_password: Optional[str] = None

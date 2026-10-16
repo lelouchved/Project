@@ -55,7 +55,14 @@ def test_02_dynamic_qr_checkin_and_anti_spoofing():
     fake_stud = get_user("student_5")
 
     # 1. Start or fetch active session
-    res = client.get("/api/attendance/qr-token/1", headers={"x-user-id": str(pres.id)})
+    start_res = client.post("/api/attendance/start-session", headers={"x-user-id": str(pres.id)}, json={
+        "event_id": 1,
+        "duration_minutes": 60
+    })
+    assert start_res.status_code == 200
+    active_session_id = start_res.json()["session_id"]
+
+    res = client.get(f"/api/attendance/qr-token/{active_session_id}", headers={"x-user-id": str(pres.id)})
     assert res.status_code == 200
     token_data = res.json()
     live_token = token_data["current_token"]
@@ -63,7 +70,7 @@ def test_02_dynamic_qr_checkin_and_anti_spoofing():
     # 2. Student Candidate checks in with live valid token
     headers_student = {"x-user-id": str(stud.id)}
     checkin_res = client.post("/api/attendance/check-in", headers=headers_student, json={
-        "session_id": 1,
+        "session_id": active_session_id,
         "token": live_token
     })
     assert checkin_res.status_code == 200
@@ -71,7 +78,7 @@ def test_02_dynamic_qr_checkin_and_anti_spoofing():
 
     # 3. ANTI-SPOOFING: Expired or fake screenshot code
     fake_res = client.post("/api/attendance/check-in", headers={"x-user-id": str(fake_stud.id)}, json={
-        "session_id": 1,
+        "session_id": active_session_id,
         "token": "000000" # Invalid expired token
     })
     assert fake_res.status_code == 400
@@ -85,6 +92,15 @@ def test_03_attendance_manual_override_with_audit_trail():
     """
     pres = get_user("aarav_lead")
     stud = get_user("student_5")
+
+    # Temporarily assign leadership post for test verification
+    db_setup = SessionLocal()
+    m_setup = db_setup.query(ClubMembership).filter(ClubMembership.club_id == 1, ClubMembership.user_id == pres.id).first()
+    if m_setup:
+        m_setup.post = "PRESIDENT"
+        db_setup.commit()
+    db_setup.close()
+
     headers_pres = {"x-user-id": str(pres.id)}
     reason = "Student phone battery died during presentation, verified in person by coordinator."
     
@@ -96,7 +112,7 @@ def test_03_attendance_manual_override_with_audit_trail():
     assert res.status_code == 200
     assert res.json()["status"] == "MANUAL_OVERRIDE"
 
-    # Verify audit log
+    # Verify audit log and reset back to stock MEMBER state
     db = SessionLocal()
     audit = db.query(AuditLog).filter(
         AuditLog.action == "ATTENDANCE_MANUAL_OVERRIDE",
@@ -104,6 +120,12 @@ def test_03_attendance_manual_override_with_audit_trail():
     ).first()
     assert audit is not None
     assert reason in audit.details
+
+    # Revert to vacant/stock post state
+    m_revert = db.query(ClubMembership).filter(ClubMembership.club_id == 1, ClubMembership.user_id == pres.id).first()
+    if m_revert:
+        m_revert.post = "MEMBER"
+        db.commit()
     db.close()
 
 def test_04_deliverable_submission_and_3_part_rubric():
@@ -200,6 +222,14 @@ def test_06_finance_president_budget_workflow():
     priya = get_user("priya_fin")
     cm = get_user("cm_sunita")
 
+    # Temporarily assign leadership post for test verification
+    db_setup = SessionLocal()
+    m_setup = db_setup.query(ClubMembership).filter(ClubMembership.club_id == 1, ClubMembership.user_id == priya.id).first()
+    if m_setup:
+        m_setup.post = "FINANCE_PRESIDENT"
+        db_setup.commit()
+    db_setup.close()
+
     # 1. Finance President Priya Patel submits request
     budget_res = client.post("/api/budgets", headers={"x-user-id": str(priya.id)}, json={
         "club_id": 1,
@@ -220,6 +250,14 @@ def test_06_finance_president_budget_workflow():
     })
     assert approve_res.status_code == 200
     assert approve_res.json()["status"] == "APPROVED"
+
+    # Revert to vacant/stock post state
+    db_cleanup = SessionLocal()
+    m_revert = db_cleanup.query(ClubMembership).filter(ClubMembership.club_id == 1, ClubMembership.user_id == priya.id).first()
+    if m_revert:
+        m_revert.post = "MEMBER"
+        db_cleanup.commit()
+    db_cleanup.close()
 
 def test_07_monthly_academic_csv_export():
     """

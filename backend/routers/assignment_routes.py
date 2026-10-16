@@ -12,7 +12,7 @@ from backend.models import (
 from backend.schemas import (
     AssignmentCreate, AssignmentOut, SubmissionCreate, SubmissionOut, EvaluationCreate
 )
-from backend.auth import get_current_user
+from backend.auth import get_current_user, get_optional_user
 
 router = APIRouter(prefix="/api/assignments", tags=["Assignments, Projects & Evaluation"])
 
@@ -211,6 +211,158 @@ def submit_assignment(
         evaluation=None
     )
 
+@router.get("/deadlines")
+def get_deadlines_and_status(
+    current_user: Optional[User] = Depends(get_optional_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Returns upcoming deadlines (<= 48 hours alert) and project completion status.
+    Strictly gated by role eligibility:
+    - Guests: only public dates.
+    - Students: enrolled club assignments and personal submission statuses.
+    - Presidents: only submissions and member progress for their own club.
+    - Domain Authority: ecosystem-wide overview.
+    """
+    now = datetime.utcnow()
+    notifications = []
+
+    if not current_user:
+        clubs = db.query(Club).filter(Club.is_recruiting == True).all()
+        for c in clubs:
+            if c.recruitment_deadline and c.recruitment_deadline > now:
+                diff = c.recruitment_deadline - now
+                hours = int(diff.total_seconds() // 3600)
+                if hours <= 48:
+                    notifications.append({
+                        "id": f"rec_{c.id}",
+                        "type": "RECRUITMENT",
+                        "urgency": "CRITICAL",
+                        "title": f"Recruitment Closing: {c.name}",
+                        "club_name": c.name,
+                        "club_id": c.id,
+                        "deadline": c.recruitment_deadline.isoformat(),
+                        "hours_remaining": hours,
+                        "message": f"⚠️ Enrolment for {c.name} closes in {hours} hours!"
+                    })
+        return {
+            "eligible": False,
+            "role": "GUEST",
+            "notifications": notifications,
+            "project_overview": {
+                "total_projects": 0,
+                "submitted_projects": 0,
+                "pending_projects": 0,
+                "all_submitted": False,
+                "message": "Sign in to view your enrolled club assignments and submission status."
+            }
+        }
+
+    is_domain_auth = getattr(current_user, "is_domain_authorized", False) or current_user.role in ["ADMIN", "CAMPUS_MANAGER"]
+
+    my_memberships = db.query(ClubMembership).filter(
+        ClubMembership.user_id == current_user.id,
+        ClubMembership.status == "ACTIVE"
+    ).all()
+    my_club_ids = [m.club_id for m in my_memberships]
+    pres_club_ids = [m.club_id for m in my_memberships if m.post in ["PRESIDENT", "VICE_PRESIDENT"]]
+
+    query = db.query(AssignmentProject)
+    if not is_domain_auth:
+        if pres_club_ids:
+            query = query.filter(AssignmentProject.club_id.in_(pres_club_ids))
+        else:
+            query = query.filter(AssignmentProject.club_id.in_(my_club_ids))
+
+    assignments = query.order_by(AssignmentProject.due_date.asc()).all()
+    total_projects = len(assignments)
+    submitted_count = 0
+    project_details = []
+
+    for a in assignments:
+        diff = a.due_date - now
+        hours = int(diff.total_seconds() // 3600) if a.due_date > now else 0
+        is_urgent = 0 <= hours <= 48
+
+        my_sub = db.query(Submission).filter(
+            Submission.assignment_id == a.id,
+            Submission.student_id == current_user.id
+        ).first()
+
+        sub_status = "SUBMITTED" if my_sub else "PENDING"
+        if my_sub:
+            submitted_count += 1
+
+        club_stats = None
+        if a.club_id in pres_club_ids or is_domain_auth:
+            total_members = db.query(ClubMembership).filter(ClubMembership.club_id == a.club_id, ClubMembership.status == "ACTIVE").count()
+            total_subs = db.query(Submission).filter(Submission.assignment_id == a.id).count()
+            club_stats = f"{total_subs}/{total_members} members submitted"
+
+        project_details.append({
+            "assignment_id": a.id,
+            "title": a.title,
+            "club_id": a.club_id,
+            "club_name": a.club.name,
+            "due_date": a.due_date.isoformat(),
+            "hours_remaining": hours,
+            "status": sub_status,
+            "score": my_sub.evaluation.total_score if (my_sub and my_sub.evaluation) else None,
+            "club_stats": club_stats
+        })
+
+        if is_urgent:
+            msg = f"⚠️ Project Due in {hours}h: '{a.title}' ({a.club.name})!"
+            if sub_status == "SUBMITTED":
+                msg = f"✓ Project Delivered: You submitted '{a.title}' for {a.club.name}."
+            notifications.append({
+                "id": f"assign_{a.id}",
+                "type": "PROJECT_DEADLINE",
+                "urgency": "CRITICAL" if sub_status == "PENDING" else "INFO",
+                "title": a.title,
+                "club_name": a.club.name,
+                "club_id": a.club_id,
+                "due_date": a.due_date.isoformat(),
+                "hours_remaining": hours,
+                "user_submission_status": sub_status,
+                "club_stats": club_stats,
+                "message": msg
+            })
+
+    # Club recruitment notices
+    for m in my_memberships:
+        club = m.club
+        if club and club.recruitment_deadline and club.recruitment_deadline > now:
+            diff = club.recruitment_deadline - now
+            hours = int(diff.total_seconds() // 3600)
+            if hours <= 48:
+                notifications.append({
+                    "id": f"club_rec_{club.id}",
+                    "type": "RECRUITMENT",
+                    "urgency": "WARNING",
+                    "title": f"Recruitment Window Closing: {club.name}",
+                    "club_name": club.name,
+                    "club_id": club.id,
+                    "due_date": club.recruitment_deadline.isoformat(),
+                    "hours_remaining": hours,
+                    "message": f"📢 Enrolment for {club.name} closes in {hours} hours!"
+                })
+
+    return {
+        "eligible": True,
+        "role": current_user.role,
+        "is_domain_authorized": is_domain_auth,
+        "is_president_of": pres_club_ids,
+        "notifications": notifications,
+        "project_overview": {
+            "total_projects": total_projects,
+            "submitted_projects": submitted_count,
+            "pending_projects": total_projects - submitted_count,
+            "all_submitted": (submitted_count == total_projects and total_projects > 0),
+            "projects": project_details
+        }
+    }
+
 @router.get("/submissions/{assignment_id}", response_model=List[SubmissionOut])
 def list_submissions(
     assignment_id: int,
@@ -221,7 +373,22 @@ def list_submissions(
     if not assignment:
         raise HTTPException(status_code=404, detail="Assignment not found")
 
-    submissions = db.query(Submission).filter(Submission.assignment_id == assignment_id).all()
+    is_domain_auth = getattr(current_user, "is_domain_authorized", False) or current_user.role in ["ADMIN", "CAMPUS_MANAGER"]
+    
+    my_m = db.query(ClubMembership).filter(
+        ClubMembership.club_id == assignment.club_id,
+        ClubMembership.user_id == current_user.id
+    ).first()
+    is_this_club_lead = (my_m and my_m.post in ["PRESIDENT", "VICE_PRESIDENT", "FINANCE_PRESIDENT", "MEDIA_PRESIDENT"]) or (current_user.id == assignment.club.faculty_advisor_id)
+
+    if is_domain_auth or is_this_club_lead:
+        submissions = db.query(Submission).filter(Submission.assignment_id == assignment_id).all()
+    else:
+        submissions = db.query(Submission).filter(
+            Submission.assignment_id == assignment_id,
+            Submission.student_id == current_user.id
+        ).all()
+
     results = []
     for s in submissions:
         eval_dict = None

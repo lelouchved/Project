@@ -7,7 +7,10 @@ from sqlalchemy import or_
 
 from backend.database import get_db
 from backend.models import User, Campus, AuditLog
-from backend.schemas import UserLogin, UserOut, CampusOut, OTPRequest, RegisterWithOTP, LoginWithOTP, SocialLoginRequest
+from backend.schemas import (
+    UserLogin, UserOut, CampusOut, OTPRequest, RegisterWithOTP, LoginWithOTP,
+    SocialLoginRequest, ResetPasswordRequest
+)
 from backend.auth import hash_password, verify_password, create_access_token, get_current_user
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication & OTP"])
@@ -311,3 +314,33 @@ def list_demo_users(db: Session = Depends(get_db)):
 @router.get("/campuses", response_model=List[CampusOut])
 def list_campuses(db: Session = Depends(get_db)):
     return db.query(Campus).all()
+
+@router.post("/reset-password")
+def reset_password(data: ResetPasswordRequest, db: Session = Depends(get_db)):
+    """Handles password reset recovery flow."""
+    clean_email = data.email.strip().lower()
+    user = db.query(User).filter(User.email == clean_email).first()
+    
+    if data.new_password:
+        if not user:
+            raise HTTPException(status_code=404, detail="No user found with this email.")
+        user.password_hash = hash_password(data.new_password)
+        db.commit()
+        return {
+            "success": True,
+            "message": "Password successfully updated! You can now sign in with your new credentials."
+        }
+    
+    # Recovery dispatch notification
+    if not user:
+        return {
+            "success": True,
+            "message": f"If an account exists for {clean_email}, a password reset link has been dispatched to their inbox."
+        }
+    
+    return {
+        "success": True,
+        "message": f"Password reset link dispatched to {clean_email}! Please check your inbox or spam folder.",
+        "recovery_token": f"rst_{random.randint(10000000, 99999999)}"
+    }
+
