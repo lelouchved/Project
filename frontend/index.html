@@ -476,6 +476,11 @@
         <span>Finances & Budgets</span>
       </button>
 
+      <button onclick="switchTab('analytics')" id="tab-analytics" class="tab-btn w-full px-3.5 py-2.5 rounded-xl flex items-center space-x-3 text-left transition btn-mirror text-theme-muted hover:text-theme-primary">
+        <i data-lucide="trophy" class="w-4 h-4 text-amber-500"></i>
+        <span>Club Analytics & League</span>
+      </button>
+
       <!-- Authority Console Tab (Unlocked via 'Yuzuru') -->
       <button onclick="switchTab('authority')" id="tab-authority" class="hidden tab-btn w-full px-3.5 py-2.5 rounded-xl flex items-center space-x-3 text-left transition btn-mirror text-amber-400 hover:text-amber-300 border border-amber-500/40 glow-yuzuru">
         <i data-lucide="shield-alert" class="w-4 h-4 text-amber-400"></i>
@@ -2004,6 +2009,204 @@
         </div>
       </section>
 
+      <!-- ========================================== -->
+      <!-- 6. CLUB ANALYTICS & INTER-CAMPUS CHAMPIONSHIP LEAGUE -->
+      <!-- ========================================== -->
+      <section id="view-analytics" class="space-y-6 hidden">
+        <!-- Top Hero Card with Dual Mode Toggle -->
+        <div class="card-3d rounded-3xl border border-theme p-6 space-y-5">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center space-x-2">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center space-x-1">
+                  <i data-lucide="trophy" class="w-3 h-3 text-amber-500"></i>
+                  <span>Mirai Institutional League</span>
+                </span>
+                <span class="text-xs text-theme-muted font-mono">• 4 Performance Pillars & Inter-Campus Cup</span>
+              </div>
+              <h2 class="text-2xl font-black text-theme-primary mt-1">Club Performance & Inter-Campus Championship</h2>
+              <p class="text-theme-muted text-xs sm:text-sm">
+                Track clubs across Project Completion, Hackathon Podiums, Event Execution, and Budget Governance.
+              </p>
+            </div>
+
+            <!-- View Mode Switcher -->
+            <div class="inline-flex p-1.5 rounded-2xl border border-theme bg-theme-elevated self-start lg:self-center">
+              <button id="analyticsModeBtnCampus" onclick="switchAnalyticsMode('campus')" class="px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center space-x-2 text-theme-primary bg-theme-surface border border-theme shadow-sm">
+                <i data-lucide="trophy" class="w-3.5 h-3.5 text-amber-500"></i>
+                <span>Inter-Campus League</span>
+                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-amber-500/15 text-amber-500 font-bold">HIET Joint</span>
+              </button>
+              <button id="analyticsModeBtnClubs" onclick="switchAnalyticsMode('clubs')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 text-theme-muted hover:text-theme-primary">
+                <i data-lucide="bar-chart-3" class="w-3.5 h-3.5 text-blue-500"></i>
+                <span>HIET Clubs Tracker</span>
+                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-blue-500/10 text-blue-500">Advisor Audit</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Advisor Management Action Callout -->
+          <div id="analyticsAdvisorCallout" class="p-4 rounded-2xl border border-amber-500/30 bg-amber-500/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+              <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold">
+                <i data-lucide="award" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-theme-primary flex items-center space-x-2">
+                  <span id="analyticsAdvisorTitle">Club Advisor Governance Hub</span>
+                  <span id="analyticsAdvisorBadge" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/15 text-amber-500 border border-amber-500/30">Faculty Audit</span>
+                </div>
+                <div id="analyticsAdvisorDesc" class="text-[11px] text-theme-muted">
+                  Respective Club Advisors manage hackathon rankings, project audits, and activity execution ratings for their club.
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2 flex-wrap" id="analyticsAdvisorActions">
+              <button onclick="guardAction(openRecordHackathonModal)" id="recordHackathonBtn" class="btn-mirror px-3.5 py-2 rounded-xl text-xs font-black text-amber-500 bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 flex items-center space-x-1.5 shadow-sm">
+                <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                <span>Record Hackathon Rank</span>
+              </button>
+              <button onclick="guardAction(openAdvisorAuditModal)" id="openAuditBtn" class="btn-mirror px-3.5 py-2 rounded-xl text-xs font-black text-white bg-blue-600 hover:bg-blue-500 shadow flex items-center space-x-1.5">
+                <i data-lucide="clipboard-check" class="w-3.5 h-3.5"></i>
+                <span>Update Advisor Audit</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- VIEW 1: INTER-CAMPUS CHAMPIONSHIP LEAGUE (HIET Joint 4-Clubs Coalition vs RIT vs JU) -->
+        <!-- ============================================== -->
+        <div id="analyticsCampusView" class="space-y-6">
+          <!-- HIET 4-Clubs Coalition Pride Card -->
+          <div class="card-3d rounded-3xl border border-amber-500/30 p-6 bg-gradient-to-r from-amber-500/10 via-blue-600/5 to-purple-600/5 space-y-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div class="flex items-center space-x-4">
+                <div class="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-500 flex items-center justify-center font-black text-2xl border border-amber-500/30 shadow-inner">
+                  🏆
+                </div>
+                <div>
+                  <div class="flex items-center space-x-2">
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-amber-500/20 text-amber-500 border border-amber-500/40">
+                      HIET JOINT 4-CLUBS COALITION
+                    </span>
+                    <span class="text-xs font-mono text-theme-muted">Inter-Campus Championship</span>
+                  </div>
+                  <h3 class="text-xl font-black text-theme-primary mt-0.5">United HIET Campus Team</h3>
+                  <p class="text-xs text-theme-muted leading-relaxed">
+                    All 4 HIET clubs (Nextcell, Kaizen, Malhar, and Sports) combine their student project completions, hackathon podiums, and attendance records into a single joint campus score competing directly against RIT and JU!
+                  </p>
+                </div>
+              </div>
+
+              <!-- Live Joint Points Banner -->
+              <div class="card-3d p-4 rounded-2xl border border-theme bg-theme-surface flex flex-col items-center justify-center text-center shrink-0 min-w-[160px]">
+                <span class="text-[10px] font-mono text-theme-muted uppercase tracking-wider">HIET Joint Points</span>
+                <span id="hietJointPointsDisplay" class="text-3xl font-black text-amber-500 mt-0.5">--</span>
+                <span id="hietLeagueRankDisplay" class="text-[11px] font-mono font-bold text-emerald-500 mt-1">Ranking: Calculating...</span>
+              </div>
+            </div>
+
+            <!-- 4 Clubs Contribution Pills -->
+            <div class="pt-3 border-t border-theme/60 space-y-2">
+              <span class="text-[11px] font-mono font-bold text-theme-muted uppercase tracking-wider block">
+                HIET Club Contributions to Campus Pride Score:
+              </span>
+              <div id="hietClubsContributionGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <!-- Dynamically populated with Nextcell, Kaizen, Malhar, Sports contributions -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Grand Championship Podium Cards (1st, 2nd, 3rd) -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="championshipPodiumCards">
+            <!-- Dynamically populated with 1st, 2nd, 3rd podium cards -->
+          </div>
+
+          <!-- Comprehensive Inter-Campus Comparison Matrix -->
+          <div class="card-3d rounded-3xl border border-theme p-6 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-theme pb-3">
+              <div>
+                <h3 class="text-lg font-black text-theme-primary flex items-center space-x-2">
+                  <i data-lucide="layers" class="w-5 h-5 text-blue-500"></i>
+                  <span>Inter-Campus Championship Standings Matrix</span>
+                </h3>
+                <p class="text-xs text-theme-muted">Benchmarked across Enrolled Students, Completed Projects, Hackathon Podiums, and Budget Governance.</p>
+              </div>
+              <span class="text-[11px] font-mono text-theme-muted px-3 py-1 rounded-full border border-theme bg-theme-elevated">
+                Season 2026 Live
+              </span>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="border-b border-theme text-theme-muted font-mono uppercase text-[10px] bg-theme-elevated/40">
+                    <th class="p-3">Rank & Campus</th>
+                    <th class="p-3">Coalition Format</th>
+                    <th class="p-3">Projects Done</th>
+                    <th class="p-3">Hackathon Podiums</th>
+                    <th class="p-3">Activity & Attn</th>
+                    <th class="p-3">Budget Index</th>
+                    <th class="p-3">Total Points</th>
+                    <th class="p-3">Status</th>
+                  </tr>
+                </thead>
+                <tbody id="interCampusMatrixTable" class="divide-y border-theme">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- VIEW 2: HIET CLUBS PERFORMANCE TRACKER & ADVISOR AUDIT -->
+        <!-- ============================================== -->
+        <div id="analyticsClubsView" class="space-y-6 hidden">
+          <!-- 4 Core Pillars Overview KPIs -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="card-3d p-5 rounded-2xl border border-theme">
+              <div class="flex items-center justify-between text-xs text-theme-muted font-mono">
+                <span>Pillar 1: Student Projects</span>
+                <i data-lucide="check-circle" class="w-4 h-4 text-blue-500"></i>
+              </div>
+              <div id="statTotalProjectsCompleted" class="text-2xl font-black text-theme-primary mt-1">--</div>
+              <div class="text-[11px] text-blue-600 font-medium mt-1">Evaluated Deliverables</div>
+            </div>
+            <div class="card-3d p-5 rounded-2xl border border-theme">
+              <div class="flex items-center justify-between text-xs text-theme-muted font-mono">
+                <span>Pillar 2: Hackathon Podiums</span>
+                <i data-lucide="trophy" class="w-4 h-4 text-amber-500"></i>
+              </div>
+              <div id="statTotalHackathonWins" class="text-2xl font-black text-amber-500 mt-1">--</div>
+              <div class="text-[11px] text-theme-muted mt-1">National & Campus Finishes</div>
+            </div>
+            <div class="card-3d p-5 rounded-2xl border border-theme">
+              <div class="flex items-center justify-between text-xs text-theme-muted font-mono">
+                <span>Pillar 3: Activity & Event Rating</span>
+                <i data-lucide="activity" class="w-4 h-4 text-emerald-500"></i>
+              </div>
+              <div id="statAvgActivityScore" class="text-2xl font-black text-emerald-500 mt-1">--%</div>
+              <div class="text-[11px] text-theme-muted mt-1">Saturday Club Day Audits</div>
+            </div>
+            <div class="card-3d p-5 rounded-2xl border border-theme">
+              <div class="flex items-center justify-between text-xs text-theme-muted font-mono">
+                <span>Pillar 4: Budget Governance</span>
+                <i data-lucide="shield-check" class="w-4 h-4 text-purple-500"></i>
+              </div>
+              <div id="statAvgBudgetScore" class="text-2xl font-black text-purple-500 mt-1">--%</div>
+              <div class="text-[11px] text-theme-muted mt-1">Audited Zero-Deficit Index</div>
+            </div>
+          </div>
+
+          <!-- Clubs Detailed Performance Cards Grid -->
+          <div id="analyticsClubsGrid" class="space-y-5">
+            <!-- Dynamically populated with cards for Nextcell, Kaizen, Malhar, and Sports -->
+          </div>
+        </div>
+      </section>
+
     </main>
 
     <!-- FOOTER -->
@@ -2680,6 +2883,161 @@
   </div>
 
   <!-- ======================================================== -->
+  <!-- 10. RECORD HACKATHON ACHIEVEMENT MODAL (Advisor Only) -->
+  <!-- ======================================================== -->
+  <div id="recordHackathonModal" class="fixed inset-0 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" style="background-color: rgba(0, 0, 0, 0.82);" onclick="if(event.target === this) closeRecordHackathonModal()">
+    <div class="card-3d max-w-lg w-full rounded-3xl p-6 border border-amber-500/40 shadow-2xl space-y-4" style="background-color: var(--bg-surface);">
+      <div class="flex items-center justify-between border-b border-theme pb-3">
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center font-bold">
+            <i data-lucide="trophy" class="w-5 h-5 text-amber-500"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-black text-theme-primary">Record Hackathon Achievement</h3>
+            <p class="text-xs text-amber-500 font-medium">Faculty Advisor Authority • Adds points to HIET Coalition</p>
+          </div>
+        </div>
+        <button onclick="closeRecordHackathonModal()" class="btn-mirror p-1.5 rounded-xl text-theme-muted hover:text-theme-primary">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form id="recordHackathonForm" onsubmit="handleRecordHackathon(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-mono text-theme-muted mb-1 font-bold">Your Advised Club *</label>
+          <select id="hackathonClubSelect" required class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-primary font-semibold focus:outline-none">
+            <!-- Populated dynamically with authorized club(s) -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block font-mono text-theme-muted mb-1 font-bold">Hackathon / Competition Name *</label>
+          <input type="text" id="hackathonTitle" required placeholder="e.g. Smart India Hackathon 2026 / Mirai AI Challenge" class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-primary focus:outline-none" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-mono text-theme-muted mb-1 font-bold">Rank / Position Won *</label>
+            <select id="hackathonRank" required class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-primary focus:outline-none font-semibold">
+              <option value="1st Place (Winner / Champion)">🏆 1st Place (Winner / Champion)</option>
+              <option value="2nd Place (Runner-Up)">🥈 2nd Place (Runner-Up)</option>
+              <option value="3rd Place (2nd Runner-Up)">🥉 3rd Place (2nd Runner-Up)</option>
+              <option value="Top 5 Finalist">🎖️ Top 5 Finalist</option>
+              <option value="Special Innovation Award">⭐ Special Innovation Award</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-mono text-theme-muted mb-1 font-bold">Competition Level *</label>
+            <select id="hackathonLevel" required class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-primary focus:outline-none font-semibold">
+              <option value="National">National Level</option>
+              <option value="International">International</option>
+              <option value="Inter-Campus">Inter-Campus League</option>
+              <option value="State / Regional">State / Regional</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-mono text-theme-muted mb-1 font-bold">Team Name *</label>
+            <input type="text" id="hackathonTeamName" required placeholder="e.g. Nextcell Alpha / Kaizen Forge" class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-primary focus:outline-none" />
+          </div>
+          <div>
+            <label class="block font-mono text-theme-muted mb-1 font-bold">Points Awarded (50 - 200) *</label>
+            <input type="number" id="hackathonPoints" min="20" max="300" value="100" required class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-primary focus:outline-none font-mono" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-mono text-theme-muted mb-1 font-bold">Participating Student Members (Names & Roll Nos) *</label>
+          <input type="text" id="hackathonTeamMembers" required placeholder="e.g. Aarav Sharma (MSOT24CS01), Rohan Gupta (MSOT24CS02)" class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-primary focus:outline-none" />
+        </div>
+
+        <div>
+          <label class="block font-mono text-theme-muted mb-1 font-bold">Advisor Audit Verification Notes</label>
+          <textarea id="hackathonNotes" rows="2" placeholder="Audit details, jury recognition, cash prize or project URL..." class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-primary focus:outline-none"></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end space-x-2">
+          <button type="button" onclick="closeRecordHackathonModal()" class="btn-mirror px-4 py-2 rounded-xl text-theme-muted hover:text-theme-primary font-bold">
+            Cancel
+          </button>
+          <button type="submit" id="submitHackathonBtn" class="btn-mirror px-5 py-2 rounded-xl text-black font-black bg-amber-400 hover:bg-amber-300 shadow-lg">
+            🏆 Save Hackathon Win
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- 11. UPDATE ADVISOR PERFORMANCE AUDIT MODAL (Advisor Only) -->
+  <!-- ======================================================== -->
+  <div id="advisorAuditModal" class="fixed inset-0 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" style="background-color: rgba(0, 0, 0, 0.82);" onclick="if(event.target === this) closeAdvisorAuditModal()">
+    <div class="card-3d max-w-lg w-full rounded-3xl p-6 border border-blue-500/40 shadow-2xl space-y-4" style="background-color: var(--bg-surface);">
+      <div class="flex items-center justify-between border-b border-theme pb-3">
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-500 flex items-center justify-center font-bold">
+            <i data-lucide="clipboard-check" class="w-5 h-5 text-blue-500"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-black text-theme-primary">Club Advisor Performance Audit</h3>
+            <p class="text-xs text-blue-500 font-medium">Audit Saturday sessions, budget compliance, and project quality</p>
+          </div>
+        </div>
+        <button onclick="closeAdvisorAuditModal()" class="btn-mirror p-1.5 rounded-xl text-theme-muted hover:text-theme-primary">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form id="advisorAuditForm" onsubmit="handleAdvisorAudit(event)" class="space-y-3.5 text-xs">
+        <div>
+          <label class="block font-mono text-theme-muted mb-1 font-bold">Select Club To Audit *</label>
+          <select id="auditClubSelect" onchange="onAuditClubChange()" required class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-primary font-semibold focus:outline-none">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <div class="p-3 rounded-2xl border border-theme bg-theme-elevated/40 space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="font-mono text-theme-primary font-bold">Pillar 3: Activity & Event Execution Score (0 - 100)</label>
+            <span id="auditActivityScoreVal" class="text-xs font-mono font-bold text-emerald-500">88%</span>
+          </div>
+          <input type="range" id="auditActivityScore" min="50" max="100" value="88" oninput="document.getElementById('auditActivityScoreVal').innerText = this.value + '%'" class="w-full accent-emerald-500" />
+          <textarea id="auditActivityFeedback" rows="1.5" placeholder="Feedback on Saturday Club Day attendance, workshop execution..." class="w-full p-2 rounded-xl border border-theme bg-theme-elevated text-theme-primary focus:outline-none text-[11px]"></textarea>
+        </div>
+
+        <div class="p-3 rounded-2xl border border-theme bg-theme-elevated/40 space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="font-mono text-theme-primary font-bold">Pillar 4: Budget Governance Score (0 - 100)</label>
+            <span id="auditBudgetScoreVal" class="text-xs font-mono font-bold text-purple-500">92%</span>
+          </div>
+          <input type="range" id="auditBudgetScore" min="50" max="100" value="92" oninput="document.getElementById('auditBudgetScoreVal').innerText = this.value + '%'" class="w-full accent-purple-500" />
+          <textarea id="auditBudgetNotes" rows="1.5" placeholder="Audit notes on voucher verification, zero deficit compliance..." class="w-full p-2 rounded-xl border border-theme bg-theme-elevated text-theme-primary focus:outline-none text-[11px]"></textarea>
+        </div>
+
+        <div class="p-3 rounded-2xl border border-theme bg-theme-elevated/40 space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="font-mono text-theme-primary font-bold">Pillar 1: Project Quality & Rubric Score (0 - 100)</label>
+            <span id="auditProjectScoreVal" class="text-xs font-mono font-bold text-blue-500">90%</span>
+          </div>
+          <input type="range" id="auditProjectScore" min="50" max="100" value="90" oninput="document.getElementById('auditProjectScoreVal').innerText = this.value + '%'" class="w-full accent-blue-500" />
+          <textarea id="auditProjectNotes" rows="1.5" placeholder="Advisor assessment of completed prototypes and code deliverables..." class="w-full p-2 rounded-xl border border-theme bg-theme-elevated text-theme-primary focus:outline-none text-[11px]"></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end space-x-2">
+          <button type="button" onclick="closeAdvisorAuditModal()" class="btn-mirror px-4 py-2 rounded-xl text-theme-muted hover:text-theme-primary font-bold">
+            Cancel
+          </button>
+          <button type="submit" id="submitAdvisorAuditBtn" class="btn-mirror px-5 py-2 rounded-xl text-white font-black bg-blue-600 hover:bg-blue-500 shadow-lg">
+            Save Advisor Audit &rarr;
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
   <!-- JAVASCRIPT: THREE.JS, CURSOR, AUTH & APPLICATION LOGIC -->
   <!-- ======================================================== -->
   <script>
@@ -3312,6 +3670,9 @@
       if (typeof checkDeadlinesAndAlerts === 'function') {
         checkDeadlinesAndAlerts();
       }
+      if (typeof updateAdvisorCalloutUI === 'function') {
+        updateAdvisorCalloutUI();
+      }
       attachCursorHover();
     }
 
@@ -3599,6 +3960,7 @@
       else if (tabId === 'student') loadStudentPortfolio();
       else if (tabId === 'authority') loadClubMembersForAuthority();
       else if (tabId === 'budget') loadBudgets();
+      else if (tabId === 'analytics') loadAnalytics();
 
       const sidebar = document.getElementById('appSidebar');
       if (window.innerWidth < 1024) {
@@ -5010,6 +5372,26 @@
           badge: 'Domain Authority',
           actionText: 'Open Authority Console',
           action: () => navigateFromSearch('authority', 'view-authority')
+        },
+        {
+          id: 'analytics_league',
+          icon: '🏆',
+          title: 'Inter-Campus Championship League (HIET Joint 4-Clubs Coalition)',
+          keywords: ['league', 'championship', 'inter-campus', 'campuses', 'hiet', 'rit', 'ju', 'joint', 'compete', 'ranking', 'trophy', 'coalition', 'points'],
+          description: 'Watch HIET\'s 4 clubs (Nextcell, Kaizen, Malhar, Sports) unite into a joint coalition competing with RIT and JU based on projects, hackathon podiums, and attendance.',
+          badge: 'Inter-Campus Cup',
+          actionText: 'View Inter-Campus League Standings',
+          action: () => { switchAnalyticsMode('campus'); navigateFromSearch('analytics', 'view-analytics'); }
+        },
+        {
+          id: 'advisor_audit',
+          icon: '📊',
+          title: 'Club Performance Tracker & Respective Advisor Audits',
+          keywords: ['track', 'tracking', 'performance', 'hackathon', 'rank', 'project pure kare', 'budget manage', 'advisor', 'audits', 'rubric'],
+          description: 'Track how many students completed projects, hackathon rankings won, Saturday activity execution, and budget governance managed by respective club advisors.',
+          badge: 'Advisor Governance',
+          actionText: 'Open Performance Tracker & Audits',
+          action: () => { switchAnalyticsMode('clubs'); navigateFromSearch('analytics', 'view-analytics'); }
         }
       ];
 
@@ -5295,6 +5677,588 @@
       }
     }
 
+    /* ==========================================
+       16. CLUB PERFORMANCE TRACKER & INTER-CAMPUS CHAMPIONSHIP LEAGUE
+       ========================================== */
+    let currentAnalyticsMode = 'campus';
+    let currentAnalyticsClubsData = [];
+
+    function switchAnalyticsMode(mode) {
+      currentAnalyticsMode = mode;
+      const campusBtn = document.getElementById('analyticsModeBtnCampus');
+      const clubsBtn = document.getElementById('analyticsModeBtnClubs');
+      const campusView = document.getElementById('analyticsCampusView');
+      const clubsView = document.getElementById('analyticsClubsView');
+
+      if (!campusBtn || !clubsBtn || !campusView || !clubsView) return;
+
+      if (mode === 'campus') {
+        campusBtn.className = 'px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center space-x-2 text-theme-primary bg-theme-surface border border-theme shadow-sm';
+        clubsBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 text-theme-muted hover:text-theme-primary';
+        campusView.classList.remove('hidden');
+        clubsView.classList.add('hidden');
+        loadInterCampusChampionship();
+      } else {
+        clubsBtn.className = 'px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center space-x-2 text-theme-primary bg-theme-surface border border-theme shadow-sm';
+        campusBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 text-theme-muted hover:text-theme-primary';
+        campusView.classList.add('hidden');
+        clubsView.classList.remove('hidden');
+        loadClubPerformanceTracker();
+      }
+    }
+
+    async function loadAnalytics() {
+      updateAdvisorCalloutUI();
+      if (currentAnalyticsMode === 'campus') {
+        await loadInterCampusChampionship();
+      } else {
+        await loadClubPerformanceTracker();
+      }
+    }
+
+    function updateAdvisorCalloutUI() {
+      const callout = document.getElementById('analyticsAdvisorCallout');
+      const desc = document.getElementById('analyticsAdvisorDesc');
+      const actions = document.getElementById('analyticsAdvisorActions');
+      if (!callout) return;
+
+      const isAdvisor = currentUser && (
+        currentUser.role === 'FACULTY' || 
+        currentUser.role === 'ADMIN' || 
+        currentUser.role === 'CAMPUS_MANAGER'
+      );
+
+      if (isAdvisor) {
+        callout.classList.remove('hidden');
+        if (desc) {
+          if (currentUser.role === 'FACULTY') {
+            desc.innerHTML = `<span class="font-bold text-amber-500">Welcome, ${currentUser.name}!</span> You have verified faculty advisor authority to log hackathon wins and submit performance audits for your advised club.`;
+          } else {
+            desc.innerHTML = `<span class="font-bold text-amber-500">Super Admin Mode:</span> You have institutional jurisdiction across all HIET club audits and records.`;
+          }
+        }
+      } else {
+        if (desc) {
+          desc.innerHTML = `Track live institutional benchmarks across all campuses. Respective Faculty Advisors sign and audit official records.`;
+        }
+      }
+    }
+
+    async function loadInterCampusChampionship() {
+      try {
+        const res = await fetch('/api/analytics/inter-campus-championship', { headers: getApiHeaders() });
+        if (!res.ok) return;
+        const data = await res.json();
+        const leaderboard = data.leaderboard || [];
+
+        // HIET home campus entry
+        const hietEntry = leaderboard.find(e => e.is_home_campus) || leaderboard[0];
+        if (hietEntry) {
+          const pointsEl = document.getElementById('hietJointPointsDisplay');
+          const rankEl = document.getElementById('hietLeagueRankDisplay');
+          if (pointsEl) pointsEl.innerText = Number(hietEntry.championship_points).toLocaleString() + ' pts';
+          if (rankEl) {
+            rankEl.innerText = `Rank #${hietEntry.rank} in Mirai League • ${hietEntry.trophy_status}`;
+          }
+
+          // HIET 4 clubs contribution grid
+          const grid = document.getElementById('hietClubsContributionGrid');
+          if (grid && hietEntry.clubs_contribution) {
+            grid.innerHTML = hietEntry.clubs_contribution.map(c => `
+              <div class="p-3 rounded-2xl border border-theme bg-theme-surface/70 space-y-1.5">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-xs text-theme-primary truncate">${c.club_name}</span>
+                  <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/15 text-amber-500">${c.percentage_of_hiet_total}%</span>
+                </div>
+                <div class="text-[10px] text-theme-muted font-mono">${c.category}</div>
+                <div class="flex items-center justify-between text-[11px] pt-1 border-t border-theme/40">
+                  <span class="font-mono text-amber-500 font-bold">${c.score} pts</span>
+                  <span class="text-theme-muted font-mono text-[10px]">🏆 ${c.hackathon_wins} wins • 📋 ${c.projects_completed} prj</span>
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+
+        // Top 3 Podium Cards
+        const podiumCards = document.getElementById('championshipPodiumCards');
+        if (podiumCards) {
+          const medals = ['🥇', '🥈', '🥉'];
+          const borderColors = ['border-amber-500/50', 'border-blue-500/40', 'border-zinc-500/30'];
+          const bgGradients = [
+            'bg-gradient-to-b from-amber-500/15 to-transparent',
+            'bg-gradient-to-b from-blue-500/10 to-transparent',
+            'bg-gradient-to-b from-purple-500/10 to-transparent'
+          ];
+
+          podiumCards.innerHTML = leaderboard.slice(0, 3).map((item, idx) => `
+            <div class="card-3d p-5 rounded-3xl border ${borderColors[idx] || 'border-theme'} ${bgGradients[idx] || ''} space-y-3 relative overflow-hidden">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl">${medals[idx] || '🎖️'}</span>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold ${item.is_home_campus ? 'bg-amber-500/20 text-amber-500 border border-amber-500/40' : 'bg-theme-elevated text-theme-muted'}">
+                  ${item.is_home_campus ? '★ HIET HOME COALITION' : item.campus_code}
+                </span>
+              </div>
+              <div>
+                <div class="text-[10px] font-mono uppercase tracking-wider text-theme-muted">${item.joint_coalition_title}</div>
+                <h4 class="text-base font-black text-theme-primary">${item.campus_name}</h4>
+              </div>
+              <div class="pt-2 border-t border-theme/60 flex items-center justify-between">
+                <span class="text-xs text-theme-muted font-mono">League Total:</span>
+                <span class="text-xl font-black ${idx === 0 ? 'text-amber-500' : 'text-theme-primary'} font-mono">${Number(item.championship_points).toLocaleString()} pts</span>
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-[11px] font-mono pt-1 text-theme-muted">
+                <div class="p-2 rounded-xl bg-theme-elevated/40">
+                  <span class="block text-[10px] uppercase">Projects:</span>
+                  <span class="font-bold text-theme-primary">${item.projects_completed_count} (${item.project_completion_rate_pct}%)</span>
+                </div>
+                <div class="p-2 rounded-xl bg-theme-elevated/40">
+                  <span class="block text-[10px] uppercase">Hackathons:</span>
+                  <span class="font-bold text-amber-500">${item.hackathon_podiums_count} podiums</span>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        // Standings Matrix Table
+        const tableBody = document.getElementById('interCampusMatrixTable');
+        if (tableBody) {
+          tableBody.innerHTML = leaderboard.map(item => `
+            <tr class="hover:bg-theme-elevated/30 transition font-mono ${item.is_home_campus ? 'bg-amber-500/5' : ''}">
+              <td class="p-3">
+                <div class="flex items-center space-x-2">
+                  <span class="font-bold text-sm ${item.rank === 1 ? 'text-amber-500' : 'text-theme-primary'}">#${item.rank}</span>
+                  <div>
+                    <span class="font-bold text-theme-primary block">${item.campus_name}</span>
+                    <span class="text-[10px] text-theme-muted">${item.campus_code}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="p-3 text-theme-muted">
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${item.is_home_campus ? 'bg-amber-500/20 text-amber-500' : 'bg-theme-elevated text-theme-muted'}">
+                  ${item.joint_coalition_title}
+                </span>
+              </td>
+              <td class="p-3 text-theme-primary">
+                <div class="font-bold">${item.projects_completed_count} done</div>
+                <div class="text-[10px] text-blue-500">${item.project_completion_rate_pct}% of total</div>
+              </td>
+              <td class="p-3 text-amber-500">
+                <div class="font-bold">🏆 ${item.hackathon_podiums_count} Podiums</div>
+                <div class="text-[10px] text-theme-muted">(${item.hackathon_first_places} 1st Places)</div>
+              </td>
+              <td class="p-3 text-emerald-500 font-bold">
+                ${item.activity_execution_score}%
+              </td>
+              <td class="p-3 text-purple-500 font-bold">
+                ${item.budget_governance_score}%
+              </td>
+              <td class="p-3">
+                <span class="text-sm font-black ${item.rank === 1 ? 'text-amber-500' : 'text-theme-primary'}">${Number(item.championship_points).toLocaleString()}</span>
+              </td>
+              <td class="p-3">
+                <span class="text-[11px] font-bold ${item.is_home_campus ? 'text-amber-500' : 'text-theme-muted'}">${item.trophy_status}</span>
+              </td>
+            </tr>
+          `).join('');
+        }
+
+        lucide.createIcons();
+      } catch (err) {
+        console.error('Error loading inter-campus championship:', err);
+      }
+    }
+
+    async function loadClubPerformanceTracker() {
+      try {
+        const res = await fetch('/api/analytics/club-performance-tracker', { headers: getApiHeaders() });
+        if (!res.ok) return;
+        const data = await res.json();
+        const clubs = data.clubs || [];
+        currentAnalyticsClubsData = clubs;
+
+        // Top Overview KPIs
+        const totalProjects = clubs.reduce((acc, c) => acc + (c.project_metrics.distinct_completed || 0), 0);
+        const totalHackathons = clubs.reduce((acc, c) => acc + (c.hackathon_metrics.total_achievements || 0), 0);
+        const avgActivity = (clubs.reduce((acc, c) => acc + (c.activity_metrics.activity_execution_score || 0), 0) / (clubs.length || 1)).toFixed(1);
+        const avgBudget = (clubs.reduce((acc, c) => acc + (c.budget_metrics.budget_governance_score || 0), 0) / (clubs.length || 1)).toFixed(1);
+
+        const prjEl = document.getElementById('statTotalProjectsCompleted');
+        const hckEl = document.getElementById('statTotalHackathonWins');
+        const actEl = document.getElementById('statAvgActivityScore');
+        const bdgEl = document.getElementById('statAvgBudgetScore');
+
+        if (prjEl) prjEl.innerText = `${totalProjects} Completed`;
+        if (hckEl) hckEl.innerText = `${totalHackathons} Podiums`;
+        if (actEl) actEl.innerText = `${avgActivity}%`;
+        if (bdgEl) bdgEl.innerText = `${avgBudget}%`;
+
+        // Populate Clubs Detailed Grid
+        const grid = document.getElementById('analyticsClubsGrid');
+        if (grid) {
+          grid.innerHTML = clubs.map(club => `
+            <div class="card-3d rounded-3xl border border-theme p-6 space-y-5" id="clubTrackerCard-${club.club_id}">
+              <!-- Header: Name, Advisor, Composite Score, Actions -->
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-theme">
+                <div>
+                  <div class="flex items-center space-x-2">
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-theme-elevated text-theme-muted border border-theme">
+                      Club #${club.club_id} • ${club.category}
+                    </span>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/10 text-amber-500 border border-amber-500/30">
+                      ${club.tier_badge}
+                    </span>
+                  </div>
+                  <h3 class="text-xl font-black text-theme-primary mt-1 flex items-center space-x-2">
+                    <span>${club.club_name}</span>
+                    <span class="text-xs font-normal text-theme-muted">(${club.campus_name})</span>
+                  </h3>
+                  <div class="text-xs text-theme-muted mt-0.5 flex items-center space-x-2">
+                    <span class="font-medium">Faculty Advisor: <strong class="text-theme-primary">${club.faculty_advisor_name}</strong></span>
+                    ${club.can_manage ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">✓ Respective Advisor Authority</span>' : ''}
+                  </div>
+                </div>
+
+                <div class="flex items-center space-x-3 shrink-0">
+                  <div class="text-right">
+                    <span class="text-[10px] font-mono uppercase text-theme-muted block">Composite Score</span>
+                    <span class="text-2xl font-black text-amber-500 font-mono">${club.composite_score} <span class="text-xs text-theme-muted">/ 1000</span></span>
+                  </div>
+                  ${club.can_manage ? `
+                    <div class="flex items-center space-x-1.5">
+                      <button onclick="openRecordHackathonModal(${club.club_id})" title="Record Hackathon Rank" class="btn-mirror px-3 py-2 rounded-xl text-xs font-bold text-amber-500 bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 flex items-center space-x-1">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                        <span>Add Win</span>
+                      </button>
+                      <button onclick="openAdvisorAuditModal(${club.club_id})" title="Audit Performance" class="btn-mirror px-3 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 shadow flex items-center space-x-1">
+                        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                        <span>Audit</span>
+                      </button>
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+
+              <!-- 4 Pillars Detailed Metric Panels -->
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                <!-- Pillar 1: Projects Completion -->
+                <div class="p-4 rounded-2xl border border-theme bg-theme-elevated/40 space-y-2">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="font-bold text-theme-primary flex items-center space-x-1">
+                      <span>📋</span>
+                      <span>Projects Complete</span>
+                    </span>
+                    <span class="font-mono font-bold text-blue-500">${club.project_metrics.completion_rate_pct}%</span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-theme-surface overflow-hidden border border-theme/40">
+                    <div class="h-full bg-blue-500 transition-all rounded-full" style="width: ${Math.min(100, club.project_metrics.completion_rate_pct)}%"></div>
+                  </div>
+                  <div class="text-[11px] text-theme-muted space-y-0.5 font-mono">
+                    <div>• Completed: <strong class="text-theme-primary">${club.project_metrics.distinct_completed}</strong> / ${club.project_metrics.total_members} students</div>
+                    <div>• Pending: <strong class="text-amber-500">${club.project_metrics.pending_students}</strong> students</div>
+                    <div>• Rubric Quality: <strong class="text-theme-primary">${club.project_metrics.project_quality_score}%</strong></div>
+                  </div>
+                </div>
+
+                <!-- Pillar 2: Hackathon Achievements -->
+                <div class="p-4 rounded-2xl border border-theme bg-theme-elevated/40 space-y-2">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="font-bold text-theme-primary flex items-center space-x-1">
+                      <span>🏆</span>
+                      <span>Hackathon Wins</span>
+                    </span>
+                    <span class="font-mono font-bold text-amber-500">${club.hackathon_metrics.total_hackathon_points} pts</span>
+                  </div>
+                  <div class="text-[11px] text-theme-muted space-y-0.5 font-mono">
+                    <div>• Total Podiums: <strong class="text-amber-500">${club.hackathon_metrics.total_achievements}</strong></div>
+                    <div>• 1st Place Wins: <strong class="text-emerald-500">${club.hackathon_metrics.first_place_count}</strong></div>
+                    <div>• Contribution: <strong class="text-theme-primary">${club.hackathon_metrics.pillar_points} pts</strong></div>
+                  </div>
+                </div>
+
+                <!-- Pillar 3: Saturday Club Day Activity & Events -->
+                <div class="p-4 rounded-2xl border border-theme bg-theme-elevated/40 space-y-2">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="font-bold text-theme-primary flex items-center space-x-1">
+                      <span>⚡</span>
+                      <span>Activity Rating</span>
+                    </span>
+                    <span class="font-mono font-bold text-emerald-500">${club.activity_metrics.activity_execution_score}%</span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-theme-surface overflow-hidden border border-theme/40">
+                    <div class="h-full bg-emerald-500 transition-all rounded-full" style="width: ${Math.min(100, club.activity_metrics.activity_execution_score)}%"></div>
+                  </div>
+                  <div class="text-[11px] text-theme-muted space-y-0.5 font-mono">
+                    <div>• Attendance Rate: <strong class="text-theme-primary">${club.activity_metrics.attendance_rate_pct}%</strong></div>
+                    <div>• Events Held: <strong class="text-theme-primary">${club.activity_metrics.events_conducted}</strong></div>
+                    <div class="truncate text-[10px] text-theme-muted" title="${club.activity_metrics.advisor_feedback}">
+                      "${club.activity_metrics.advisor_feedback}"
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Pillar 4: Budget Governance -->
+                <div class="p-4 rounded-2xl border border-theme bg-theme-elevated/40 space-y-2">
+                  <div class="flex items-center justify-between text-xs">
+                    <span class="font-bold text-theme-primary flex items-center space-x-1">
+                      <span>💰</span>
+                      <span>Budget Governance</span>
+                    </span>
+                    <span class="font-mono font-bold text-purple-500">${club.budget_metrics.budget_governance_score}%</span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-theme-surface overflow-hidden border border-theme/40">
+                    <div class="h-full bg-purple-500 transition-all rounded-full" style="width: ${Math.min(100, club.budget_metrics.budget_governance_score)}%"></div>
+                  </div>
+                  <div class="text-[11px] text-theme-muted space-y-0.5 font-mono">
+                    <div>• Requested: ₹${club.budget_metrics.total_requested.toLocaleString()}</div>
+                    <div>• Approved: ₹${club.budget_metrics.approved_budget.toLocaleString()}</div>
+                    <div class="text-[10px] text-emerald-500 font-bold">✓ Zero-Deficit Compliant</div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Recorded Hackathon Achievements List for this Club -->
+              ${club.hackathon_metrics.achievements_list && club.hackathon_metrics.achievements_list.length > 0 ? `
+                <div class="pt-3 border-t border-theme/60 space-y-2">
+                  <span class="text-[11px] font-mono font-bold text-theme-muted uppercase tracking-wider block">
+                    Verified Hackathon Podiums & Competition Records (${club.hackathon_metrics.achievements_list.length}):
+                  </span>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                    ${club.hackathon_metrics.achievements_list.map(ach => `
+                      <div class="p-3 rounded-xl border border-theme bg-theme-surface flex items-start justify-between gap-3 text-xs">
+                        <div class="space-y-1">
+                          <div class="flex items-center space-x-2">
+                            <span class="font-bold text-theme-primary">${ach.title}</span>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/15 text-amber-500 border border-amber-500/30">${ach.rank_position}</span>
+                          </div>
+                          <div class="text-[11px] text-theme-muted font-mono">
+                            Team: <strong class="text-theme-primary">${ach.team_name}</strong> • Level: <strong>${ach.level}</strong> • Points: <strong class="text-amber-500">+${ach.points_awarded}</strong>
+                          </div>
+                          <div class="text-[10px] text-theme-muted">
+                            Members: ${ach.team_members}
+                          </div>
+                          <div class="text-[10px] text-zinc-400 italic">
+                            Verified by ${ach.advisor_verified_by_name} on ${ach.achievement_date}: "${ach.advisor_notes || 'Verified'}"
+                          </div>
+                        </div>
+                        ${club.can_manage ? `
+                          <button onclick="handleDeleteHackathon(${ach.id})" title="Delete Achievement" class="btn-mirror p-1.5 rounded-lg text-theme-muted hover:text-rose-500">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                          </button>
+                        ` : ''}
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : `
+                <div class="pt-2 text-xs text-theme-muted italic">
+                  No hackathon achievements recorded yet. ${club.can_manage ? 'Click "Add Win" above to log podium rankings.' : ''}
+                </div>
+              `}
+            </div>
+          `).join('');
+        }
+
+        lucide.createIcons();
+      } catch (err) {
+        console.error('Error loading club performance tracker:', err);
+      }
+    }
+
+    function openRecordHackathonModal(preselectClubId) {
+      if (!currentUser) {
+        showAlert('Please sign in to record hackathon achievements.', 'error');
+        openAuthModal('signin');
+        return;
+      }
+      const select = document.getElementById('hackathonClubSelect');
+      if (select && currentAnalyticsClubsData.length > 0) {
+        const isSuperAdmin = currentUser.role === 'ADMIN' || currentUser.role === 'CAMPUS_MANAGER';
+        const eligibleClubs = isSuperAdmin 
+          ? currentAnalyticsClubsData 
+          : currentAnalyticsClubsData.filter(c => c.can_manage);
+
+        if (eligibleClubs.length === 0) {
+          showAlert('You do not have Faculty Advisor management authority for any club.', 'error');
+          return;
+        }
+
+        select.innerHTML = eligibleClubs.map(c => `
+          <option value="${c.club_id}" ${preselectClubId === c.club_id ? 'selected' : ''}>
+            ${c.club_name} (${c.campus_code}) - Advised by ${c.faculty_advisor_name}
+          </option>
+        `).join('');
+      }
+
+      document.getElementById('recordHackathonModal').classList.remove('hidden');
+    }
+
+    function closeRecordHackathonModal() {
+      document.getElementById('recordHackathonModal').classList.add('hidden');
+    }
+
+    async function handleRecordHackathon(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitHackathonBtn');
+      btn.disabled = true;
+      btn.innerText = 'Recording Win...';
+
+      const payload = {
+        club_id: parseInt(document.getElementById('hackathonClubSelect').value),
+        title: document.getElementById('hackathonTitle').value.trim(),
+        rank_position: document.getElementById('hackathonRank').value,
+        level: document.getElementById('hackathonLevel').value,
+        team_name: document.getElementById('hackathonTeamName').value.trim(),
+        team_members: document.getElementById('hackathonTeamMembers').value.trim(),
+        points_awarded: parseInt(document.getElementById('hackathonPoints').value) || 100,
+        advisor_notes: document.getElementById('hackathonNotes').value.trim()
+      };
+
+      try {
+        const res = await fetch('/api/analytics/hackathon-achievement', {
+          method: 'POST',
+          headers: getApiHeaders(),
+          body: JSON.stringify(payload)
+        });
+        const d = await res.json();
+        btn.disabled = false;
+        btn.innerText = '🏆 Save Hackathon Win';
+
+        if (res.ok) {
+          showAlert(`✓ Hackathon achievement recorded! +${payload.points_awarded} pts added.`);
+          closeRecordHackathonModal();
+          document.getElementById('recordHackathonForm').reset();
+          await loadAnalytics();
+        } else {
+          showAlert(d.detail || 'Failed to record hackathon achievement.', 'error');
+        }
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerText = '🏆 Save Hackathon Win';
+        showAlert('Network error recording hackathon: ' + err, 'error');
+      }
+    }
+
+    function openAdvisorAuditModal(preselectClubId) {
+      if (!currentUser) {
+        showAlert('Please sign in to update advisor audits.', 'error');
+        openAuthModal('signin');
+        return;
+      }
+      const select = document.getElementById('auditClubSelect');
+      if (select && currentAnalyticsClubsData.length > 0) {
+        const isSuperAdmin = currentUser.role === 'ADMIN' || currentUser.role === 'CAMPUS_MANAGER';
+        const eligibleClubs = isSuperAdmin 
+          ? currentAnalyticsClubsData 
+          : currentAnalyticsClubsData.filter(c => c.can_manage);
+
+        if (eligibleClubs.length === 0) {
+          showAlert('You do not have Faculty Advisor management authority for any club.', 'error');
+          return;
+        }
+
+        select.innerHTML = eligibleClubs.map(c => `
+          <option value="${c.club_id}" ${preselectClubId === c.club_id ? 'selected' : ''}>
+            ${c.club_name} (${c.campus_code})
+          </option>
+        `).join('');
+
+        onAuditClubChange();
+      }
+
+      document.getElementById('advisorAuditModal').classList.remove('hidden');
+    }
+
+    function closeAdvisorAuditModal() {
+      document.getElementById('advisorAuditModal').classList.add('hidden');
+    }
+
+    function onAuditClubChange() {
+      const select = document.getElementById('auditClubSelect');
+      if (!select || !currentAnalyticsClubsData.length) return;
+      const clubId = parseInt(select.value);
+      const chosenClub = currentAnalyticsClubsData.find(c => c.club_id === clubId);
+      if (chosenClub) {
+        const actScore = chosenClub.activity_metrics.activity_execution_score || 88;
+        const bdgScore = chosenClub.budget_metrics.budget_governance_score || 92;
+        const prjScore = chosenClub.project_metrics.project_quality_score || 87;
+
+        document.getElementById('auditActivityScore').value = actScore;
+        document.getElementById('auditActivityScoreVal').innerText = actScore + '%';
+        document.getElementById('auditActivityFeedback').value = chosenClub.activity_metrics.advisor_feedback || '';
+
+        document.getElementById('auditBudgetScore').value = bdgScore;
+        document.getElementById('auditBudgetScoreVal').innerText = bdgScore + '%';
+        document.getElementById('auditBudgetNotes').value = chosenClub.budget_metrics.budget_audit_notes || '';
+
+        document.getElementById('auditProjectScore').value = prjScore;
+        document.getElementById('auditProjectScoreVal').innerText = prjScore + '%';
+        document.getElementById('auditProjectNotes').value = chosenClub.project_metrics.advisor_notes || '';
+      }
+    }
+
+    async function handleAdvisorAudit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submitAdvisorAuditBtn');
+      btn.disabled = true;
+      btn.innerText = 'Saving Audit...';
+
+      const clubId = parseInt(document.getElementById('auditClubSelect').value);
+      const payload = {
+        activity_execution_score: parseFloat(document.getElementById('auditActivityScore').value),
+        activity_feedback: document.getElementById('auditActivityFeedback').value.trim(),
+        budget_governance_score: parseFloat(document.getElementById('auditBudgetScore').value),
+        budget_audit_notes: document.getElementById('auditBudgetNotes').value.trim(),
+        project_quality_score: parseFloat(document.getElementById('auditProjectScore').value),
+        project_audit_notes: document.getElementById('auditProjectNotes').value.trim()
+      };
+
+      try {
+        const res = await fetch(`/api/analytics/club/${clubId}/advisor-audit`, {
+          method: 'PUT',
+          headers: getApiHeaders(),
+          body: JSON.stringify(payload)
+        });
+        const d = await res.json();
+        btn.disabled = false;
+        btn.innerText = 'Save Advisor Audit →';
+
+        if (res.ok) {
+          showAlert(`✓ Faculty Advisor audit updated successfully for ${d.club_name}!`);
+          closeAdvisorAuditModal();
+          await loadAnalytics();
+        } else {
+          showAlert(d.detail || 'Failed to update advisor audit.', 'error');
+        }
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerText = 'Save Advisor Audit →';
+        showAlert('Network error saving audit: ' + err, 'error');
+      }
+    }
+
+    async function handleDeleteHackathon(achievementId) {
+      if (!confirm('Are you sure you want to remove this hackathon achievement? Points will be deducted from the championship coalition.')) return;
+      try {
+        const res = await fetch(`/api/analytics/hackathon-achievement/${achievementId}`, {
+          method: 'DELETE',
+          headers: getApiHeaders()
+        });
+        const d = await res.json();
+        if (res.ok) {
+          showAlert('✓ Achievement removed.');
+          await loadAnalytics();
+        } else {
+          showAlert(d.detail || 'Could not delete achievement.', 'error');
+        }
+      } catch (err) {
+        showAlert('Network error deleting achievement: ' + err, 'error');
+      }
+    }
+
     // Keyboard Shortcuts (Cmd+K / Ctrl+K & Escape)
     document.addEventListener('keydown', (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
@@ -5305,6 +6269,8 @@
         closePortalSearchModal();
         closeDeadlineNotificationModal();
         closeSubmitProjectModal();
+        closeRecordHackathonModal();
+        closeAdvisorAuditModal();
       }
     });
 

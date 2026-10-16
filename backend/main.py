@@ -8,7 +8,8 @@ from contextlib import asynccontextmanager
 from backend.database import engine, Base
 from backend.routers import (
     auth_routes, club_routes, budget_routes, event_routes,
-    attendance_routes, assignment_routes, certificate_routes, report_routes
+    attendance_routes, assignment_routes, certificate_routes, report_routes,
+    analytics_routes
 )
 
 @asynccontextmanager
@@ -52,6 +53,7 @@ app.include_router(attendance_routes.router)
 app.include_router(assignment_routes.router)
 app.include_router(certificate_routes.router)
 app.include_router(report_routes.router)
+app.include_router(analytics_routes.router)
 
 @app.get("/api/health")
 def api_health():

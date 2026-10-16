@@ -65,6 +65,8 @@ class Club(Base):
     budgets = relationship("ClubBudget", back_populates="club", cascade="all, delete-orphan")
     assignments = relationship("AssignmentProject", back_populates="club", cascade="all, delete-orphan")
     resources = relationship("ClubResource", back_populates="club", cascade="all, delete-orphan")
+    hackathon_achievements = relationship("HackathonAchievement", back_populates="club", cascade="all, delete-orphan")
+    advisor_audit = relationship("ClubAdvisorAudit", back_populates="club", uselist=False, cascade="all, delete-orphan")
 
 
 class ClubMembership(Base):
@@ -255,3 +257,43 @@ class AuditLog(Base):
     target_id = Column(String(50), nullable=True)
     details = Column(Text, nullable=True)
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class HackathonAchievement(Base):
+    __tablename__ = "hackathon_achievements"
+
+    id = Column(Integer, primary_key=True, index=True)
+    club_id = Column(Integer, ForeignKey("clubs.id"), nullable=False)
+    title = Column(String(200), nullable=False)
+    rank_position = Column(String(100), nullable=False) # e.g. "1st Place (Winner)", "2nd Place (Runner Up)", "3rd Place", "Top 5 Finalist"
+    level = Column(String(50), default="National")      # National, State, Inter-Campus, Global
+    team_name = Column(String(150), nullable=False)
+    team_members = Column(Text, nullable=False)
+    points_awarded = Column(Integer, default=100)
+    certificate_link = Column(String(255), nullable=True)
+    achievement_date = Column(DateTime, default=datetime.datetime.utcnow)
+    advisor_verified_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    advisor_notes = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+    club = relationship("Club", back_populates="hackathon_achievements")
+    advisor_verified_by = relationship("User", foreign_keys=[advisor_verified_by_id])
+
+
+class ClubAdvisorAudit(Base):
+    __tablename__ = "club_advisor_audits"
+
+    id = Column(Integer, primary_key=True, index=True)
+    club_id = Column(Integer, ForeignKey("clubs.id"), unique=True, nullable=False)
+    advisor_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    activity_execution_score = Column(Float, default=85.0) # 0 to 100
+    activity_feedback = Column(Text, nullable=True)
+    budget_governance_score = Column(Float, default=90.0)  # 0 to 100
+    budget_audit_notes = Column(Text, nullable=True)
+    project_quality_score = Column(Float, default=88.0)    # 0 to 100
+    project_audit_notes = Column(Text, nullable=True)
+    last_reviewed_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+    club = relationship("Club", back_populates="advisor_audit")
+    advisor = relationship("User", foreign_keys=[advisor_id])
+

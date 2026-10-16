@@ -270,3 +270,43 @@ class CertificateOut(BaseModel):
 class ResetPasswordRequest(BaseModel):
     email: str
     new_password: Optional[str] = None
+
+# Analytics & Hackathon Achievements
+class HackathonAchievementCreate(BaseModel):
+    club_id: int
+    title: str
+    rank_position: str
+    level: Optional[str] = "National"
+    team_name: str
+    team_members: str
+    points_awarded: Optional[int] = 100
+    certificate_link: Optional[str] = None
+    achievement_date: Optional[datetime] = None
+    advisor_notes: Optional[str] = None
+
+class HackathonAchievementOut(BaseModel):
+    id: int
+    club_id: int
+    club_name: Optional[str] = None
+    title: str
+    rank_position: str
+    level: str
+    team_name: str
+    team_members: str
+    points_awarded: int
+    certificate_link: Optional[str] = None
+    achievement_date: datetime
+    advisor_verified_by_name: Optional[str] = None
+    advisor_notes: Optional[str] = None
+    created_at: datetime
+    class Config:
+        from_attributes = True
+
+class ClubAdvisorAuditUpdate(BaseModel):
+    activity_execution_score: Optional[float] = None
+    activity_feedback: Optional[str] = None
+    budget_governance_score: Optional[float] = None
+    budget_audit_notes: Optional[str] = None
+    project_quality_score: Optional[float] = None
+    project_audit_notes: Optional[str] = None
+
