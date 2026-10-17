@@ -24,19 +24,25 @@
     /* ========================================================
        CROSS-PLATFORM ENGINE (ANDROID • IOS • WINDOWS)
        ======================================================== */
-    html {
+    html, body {
+      height: 100%;
+      height: 100dvh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
       -webkit-text-size-adjust: 100%;
       -webkit-tap-highlight-color: transparent;
     }
 
     /* Windows 10/11 & macOS: Sub-pixel antialiasing & ClearType typography */
     body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-page);
+      color: var(--text-primary);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       text-rendering: optimizeLegibility;
-      overflow-x: clip;
-      min-height: 100vh;
-      min-height: 100dvh;
+      cursor: default;
     }
 
     /* Fast touch response: eliminates 300ms delay on clickable controls */
@@ -149,23 +155,6 @@
     * {
       box-sizing: border-box;
       transition: background-color 0.25s ease, border-color 0.25s ease;
-    }
-
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      background-color: var(--bg-page);
-      color: var(--text-primary);
-      overflow-x: hidden;
-      margin: 0;
-      padding: 0;
-      padding-top: env(safe-area-inset-top);
-      padding-bottom: env(safe-area-inset-bottom);
-      padding-left: env(safe-area-inset-left);
-      padding-right: env(safe-area-inset-right);
-      cursor: default;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      -webkit-overflow-scrolling: touch;
     }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
 
@@ -577,8 +566,7 @@
       contain: paint;
     }
   </style>
-</head>
-<body class="min-h-screen relative selection:bg-[#5465FF] selection:text-white">
+<body class="h-full w-full relative selection:bg-[#5465FF] selection:text-white overflow-hidden">
 
   <!-- 3D INTERACTIVE THREE.JS CANVAS -->
   <canvas id="threeCanvas"></canvas>
@@ -605,7 +593,7 @@
   <!-- ======================================================== -->
   <!-- LEFT VERTICAL SIDEBAR NAVIGATION (FIXED) -->
   <!-- ======================================================== -->
-  <aside id="appSidebar" class="w-64 fixed left-0 top-0 bottom-0 z-40 border-r border-theme flex flex-col justify-between backdrop-blur-xl transition-transform duration-300 -translate-x-full lg:translate-x-0" style="background-color: var(--sidebar-bg); padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);">
+  <aside id="appSidebar" class="w-64 fixed left-0 top-0 bottom-0 z-40 border-r border-theme flex flex-col backdrop-blur-xl transition-transform duration-300 -translate-x-full lg:translate-x-0 overflow-y-auto overflow-x-hidden" style="background-color: var(--sidebar-bg); overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);">
     
     <!-- Top Brand & Hierarchy -->
     <div class="p-5 border-b border-theme space-y-4">
@@ -643,7 +631,7 @@
     </div>
 
     <!-- Vertical Navigation Links -->
-    <nav class="p-4 space-y-1.5 overflow-y-auto flex-1 text-xs font-bold" id="sidebarNav">
+    <nav class="p-4 space-y-1.5 flex-1 text-xs font-bold shrink-0" id="sidebarNav">
       <button onclick="switchTab('explore')" id="tab-explore" class="tab-btn w-full px-3.5 py-2.5 rounded-xl flex items-center space-x-3 text-left transition btn-mirror border border-theme" style="background-color: var(--bg-surface-elevated); color: var(--text-primary);">
         <i data-lucide="layers" class="w-4 h-4 text-[#788BFF]"></i>
         <span>Campuses & Clubs</span>
@@ -776,7 +764,7 @@
   <!-- ======================================================== -->
   <!-- MAIN CONTENT AREA (OFFSET BY LEFT SIDEBAR) -->
   <!-- ======================================================== -->
-  <div class="lg:ml-64 flex-1 flex flex-col min-h-screen relative z-10 pb-20 lg:pb-0">
+  <div id="mainScrollArea" class="lg:ml-64 flex-1 h-full overflow-y-auto overflow-x-hidden flex flex-col relative z-10 pb-20 lg:pb-0" style="overscroll-behavior: contain; -webkit-overflow-scrolling: touch;">
     
     <!-- TOP MOBILE BAR (Visible on mobile: Android & iOS) -->
     <header class="lg:hidden border-b border-theme py-2 px-3 sticky top-0 z-30 backdrop-blur-xl flex items-center justify-between" style="background-color: var(--header-bg); padding-top: max(0.5rem, env(safe-area-inset-top, 0px)); padding-left: max(0.75rem, env(safe-area-inset-left, 0px)); padding-right: max(0.75rem, env(safe-area-inset-right, 0px));">
@@ -4804,7 +4792,12 @@
         if (sidebar) sidebar.classList.add('-translate-x-full');
         if (backdrop) backdrop.classList.add('hidden');
       }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const mainScroller = document.getElementById('mainScrollArea');
+      if (mainScroller) {
+        mainScroller.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
 
     function filterByCampus(campusId) {
