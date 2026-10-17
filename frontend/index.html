@@ -1716,13 +1716,86 @@
           </div>
         </div>
 
+        <!-- INTERACTIVE MONTHLY CALENDAR GRID -->
+        <div id="interactiveCalendarGridCard" class="card-3d rounded-3xl border border-theme p-6 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-theme pb-4">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-2xl bg-blue-600/15 text-blue-600 flex items-center justify-center font-bold text-lg">
+                <i data-lucide="calendar" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="flex items-center space-x-2">
+                  <h3 id="calGridMonthYearTitle" class="text-xl font-black text-theme-primary">October 2026</h3>
+                  <span id="calGridModeBadge" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-blue-500/10 text-blue-600 border border-blue-500/30">Common Events</span>
+                </div>
+                <p id="calGridSubtitle" class="text-xs text-theme-muted">Click any day cell to filter events and deliverables occurring on that date.</p>
+              </div>
+            </div>
+
+            <div class="flex items-center space-x-2">
+              <button onclick="prevCalendarMonth()" class="btn-mirror p-2 rounded-xl border border-theme text-theme-primary hover:bg-theme-elevated transition" title="Previous Month">
+                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+              </button>
+              <button onclick="jumpToTodayCalendar()" class="btn-mirror px-3 py-1.5 rounded-xl text-xs font-bold border border-theme text-theme-primary hover:bg-theme-elevated transition">
+                Today
+              </button>
+              <button onclick="nextCalendarMonth()" class="btn-mirror p-2 rounded-xl border border-theme text-theme-primary hover:bg-theme-elevated transition" title="Next Month">
+                <i data-lucide="chevron-right" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Color Legends & Active Filter Badge -->
+          <div class="flex flex-wrap items-center justify-between gap-3 text-[11px] font-mono pt-1 text-theme-muted">
+            <div class="flex flex-wrap items-center gap-3">
+              <div class="flex items-center space-x-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                <span>⭐ Important (President/Advisor)</span>
+              </div>
+              <div class="flex items-center space-x-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                <span>Project Deliverable</span>
+              </div>
+              <div class="flex items-center space-x-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                <span>Saturday Club Day</span>
+              </div>
+              <div class="flex items-center space-x-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                <span>Public Summit / Hackathon</span>
+              </div>
+            </div>
+            <div id="calActiveDateFilterBadge" class="hidden flex items-center space-x-2 bg-blue-500/10 text-blue-600 border border-blue-500/30 px-3 py-1 rounded-xl text-xs font-bold">
+              <span>Filtered:</span>
+              <span id="calActiveDateFilterText">Oct 17, 2026</span>
+              <button onclick="clearCalendarDateFilter()" class="hover:text-rose-500 ml-1 font-black" title="Clear filter">✕</button>
+            </div>
+          </div>
+
+          <!-- Weekday Headers -->
+          <div class="grid grid-cols-7 gap-1 sm:gap-2 text-center text-[11px] font-mono font-bold text-theme-muted uppercase tracking-wider py-1 border-b border-theme/60">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+
+          <!-- 7-Column Days Grid -->
+          <div id="calendarMonthDaysGrid" class="grid grid-cols-7 gap-1 sm:gap-2">
+            <!-- Dynamically populated with day cells -->
+          </div>
+        </div>
+
         <!-- Mode 1: COMMON CALENDAR CONTAINER -->
         <div id="commonCalendarView" class="space-y-4">
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-1">
             <div>
               <h3 class="text-lg font-black text-theme-primary flex items-center space-x-2">
                 <i data-lucide="globe" class="w-5 h-5 text-blue-600"></i>
-                <span>Mirai Common Calendar (Public Campus Events)</span>
+                <span>Mirai Common Calendar (Upcoming Campus Events)</span>
               </h3>
               <p class="text-xs text-theme-muted">All upcoming public summits, hackathons, Saturday Club Days, and orientations across all campuses.</p>
             </div>
@@ -1738,6 +1811,33 @@
 
         <!-- Mode 2: PERSONAL CALENDAR CONTAINER (Gated by ID) -->
         <div id="personalCalendarView" class="space-y-4 hidden">
+          <!-- Member ID Selector Bar: Calendar for Every Particular ID -->
+          <div class="card-3d rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+              <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-bold shrink-0">
+                <i data-lucide="user-check" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="text-xs font-bold text-theme-primary flex items-center space-x-2">
+                  <span>Calendar for Every Particular ID</span>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">User-Specific Ledger</span>
+                </div>
+                <div class="text-[11px] text-theme-muted">
+                  View and verify important dates, deliverables, and sessions for any student or advisor ID.
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2 flex-wrap">
+              <span class="text-xs font-mono text-theme-muted font-bold">Select ID:</span>
+              <select id="personalCalendarUserIdSelect" onchange="onSelectPersonalUserId(this.value)" class="text-xs p-2 rounded-xl border border-theme bg-theme-surface text-theme-primary font-bold focus:outline-none">
+                <!-- Dynamically populated with all users -->
+              </select>
+              <button onclick="resetPersonalCalendarToCurrentUser()" class="btn-mirror px-3 py-1.5 rounded-xl text-xs font-bold border border-theme text-theme-muted hover:text-theme-primary">
+                My Session
+              </button>
+            </div>
+          </div>
+
           <!-- Personalized Member Banner -->
           <div class="card-3d rounded-3xl border border-theme p-6 space-y-4 bg-gradient-to-r from-blue-600/5 via-indigo-600/5 to-purple-600/5">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -4165,11 +4265,12 @@
 
     /* ==========================================
        9. INSTITUTIONAL CALENDARS & SCHEDULE HUB
-       - Mode 1: Mirai Common Calendar (Public Campus Events)
+       - Mode 1: Mirai Common Calendar (Upcoming Public Campus Events)
          * Only Club Presidents, Club Advisors & Domain Authority can schedule/update
-       - Mode 2: Personal Calendar (Personalized to user ID)
+       - Mode 2: Personal Calendar (Personalized to Every Particular User ID)
          * Shows user's assignments, Saturday club sessions, and recruitment
          * Restricted: Only Club President and Club Advisor can push important events to members!
+       - Interactive Monthly Calendar Grid with Day Selector & Color Indicators
        ========================================== */
     let currentCalendarMode = 'common';
     let cachedCommonEvents = [];
@@ -4178,8 +4279,172 @@
     let commonAuthorizedClubs = [];
     let userHasCalendarAuthority = false;
 
+    // Monthly Calendar Grid State
+    let calCurrentYear = 2026;
+    let calCurrentMonth = 9; // 0-indexed: 9 = October
+    let calSelectedDateStr = null; // null or 'YYYY-MM-DD'
+    let selectedPersonalUserId = null;
+
+    function changeCalendarMonth(delta) {
+      calCurrentMonth += delta;
+      if (calCurrentMonth > 11) {
+        calCurrentMonth = 0;
+        calCurrentYear++;
+      } else if (calCurrentMonth < 0) {
+        calCurrentMonth = 11;
+        calCurrentYear--;
+      }
+      renderCalendarMonthGrid();
+    }
+
+    function prevCalendarMonth() {
+      changeCalendarMonth(-1);
+    }
+
+    function nextCalendarMonth() {
+      changeCalendarMonth(1);
+    }
+
+    function jumpToTodayCalendar() {
+      calCurrentYear = 2026;
+      calCurrentMonth = 9; // October 2026
+      calSelectedDateStr = null;
+      renderCalendarMonthGrid();
+      if (currentCalendarMode === 'common') {
+        renderCommonEventsList();
+      } else {
+        renderPersonalCalendarItems();
+      }
+    }
+
+    function selectCalendarDay(dateKey) {
+      if (calSelectedDateStr === dateKey) {
+        calSelectedDateStr = null; // toggle off
+      } else {
+        calSelectedDateStr = dateKey;
+      }
+      renderCalendarMonthGrid();
+      if (currentCalendarMode === 'common') {
+        renderCommonEventsList();
+      } else {
+        renderPersonalCalendarItems();
+      }
+    }
+
+    function clearCalendarDateFilter() {
+      calSelectedDateStr = null;
+      renderCalendarMonthGrid();
+      if (currentCalendarMode === 'common') {
+        renderCommonEventsList();
+      } else {
+        renderPersonalCalendarItems();
+      }
+    }
+
+    function renderCalendarMonthGrid() {
+      const container = document.getElementById('calendarMonthDaysGrid');
+      const title = document.getElementById('calGridMonthYearTitle');
+      const badge = document.getElementById('calGridModeBadge');
+      const filterBadge = document.getElementById('calActiveDateFilterBadge');
+      const filterText = document.getElementById('calActiveDateFilterText');
+      if (!container) return;
+
+      const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+      ];
+
+      if (title) title.innerText = `${monthNames[calCurrentMonth]} ${calCurrentYear}`;
+      if (badge) {
+        if (currentCalendarMode === 'common') {
+          badge.innerText = 'Common Events';
+          badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-blue-500/10 text-blue-600 border border-blue-500/30';
+        } else {
+          const activeId = cachedPersonalCalendar?.user_id || currentUser?.id || '--';
+          badge.innerText = `Personal Schedule (ID #${activeId})`;
+          badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30';
+        }
+      }
+
+      if (filterBadge && filterText) {
+        if (calSelectedDateStr) {
+          filterBadge.classList.remove('hidden');
+          const parts = calSelectedDateStr.split('-');
+          const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+          filterText.innerText = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+        } else {
+          filterBadge.classList.add('hidden');
+        }
+      }
+
+      // Group active events by YYYY-MM-DD
+      const eventsByDate = {};
+      const activeList = (currentCalendarMode === 'common')
+        ? (cachedCommonEvents || [])
+        : (cachedPersonalCalendar?.items || []);
+
+      activeList.forEach(item => {
+        if (!item.date) return;
+        const d = new Date(item.date);
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        if (!eventsByDate[key]) eventsByDate[key] = [];
+        eventsByDate[key].push(item);
+      });
+
+      const firstDay = new Date(calCurrentYear, calCurrentMonth, 1).getDay();
+      const totalDays = new Date(calCurrentYear, calCurrentMonth + 1, 0).getDate();
+
+      let html = '';
+
+      // Blank offset days for previous month
+      for (let i = 0; i < firstDay; i++) {
+        html += `<div class="p-1 sm:p-2 min-h-[58px] sm:min-h-[70px] rounded-2xl border border-transparent opacity-20 bg-theme-elevated/20"></div>`;
+      }
+
+      // Days of current month
+      for (let day = 1; day <= totalDays; day++) {
+        const dateKey = `${calCurrentYear}-${String(calCurrentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayEvents = eventsByDate[dateKey] || [];
+        const isToday = (calCurrentYear === 2026 && calCurrentMonth === 9 && day === 17); // Oct 17, 2026
+        const isSelected = (calSelectedDateStr === dateKey);
+
+        let cellBorder = 'border-theme bg-theme-surface hover:bg-theme-elevated';
+        if (isSelected) {
+          cellBorder = 'border-blue-500 bg-blue-500/15 shadow-md shadow-blue-500/20 ring-2 ring-blue-500';
+        } else if (isToday) {
+          cellBorder = 'border-emerald-500/60 bg-emerald-500/5 ring-1 ring-emerald-500/40';
+        } else if (dayEvents.length > 0) {
+          cellBorder = 'border-theme bg-theme-surface hover:border-blue-500/40';
+        }
+
+        const hasImportant = dayEvents.some(e => e.is_important || e.category === 'CLUB_IMPORTANT_EVENT');
+        const hasAssignment = dayEvents.some(e => e.category === 'ASSIGNMENT_DEADLINE');
+        const hasSession = dayEvents.some(e => e.category === 'SESSION_EVENT' || e.event_type === 'CLUB_DAY');
+        const hasPublic = dayEvents.some(e => e.category === 'PUBLIC_EVENT' || e.visibility === 'PUBLIC');
+
+        html += `
+          <div onclick="selectCalendarDay('${dateKey}')" class="p-1.5 sm:p-2 min-h-[58px] sm:min-h-[70px] rounded-2xl border ${cellBorder} cursor-pointer transition flex flex-col justify-between text-left group">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black ${isSelected ? 'text-blue-500 font-mono' : (isToday ? 'text-emerald-500 font-mono' : 'text-theme-primary font-mono')}">${day}</span>
+              ${isToday ? '<span class="text-[8px] font-mono font-black uppercase text-emerald-500 hidden sm:inline">Today</span>' : ''}
+              ${dayEvents.length > 0 ? `<span class="text-[9px] font-mono font-bold px-1 rounded ${hasImportant ? 'bg-amber-500/20 text-amber-500' : 'bg-theme-elevated text-theme-muted'}">${dayEvents.length}</span>` : ''}
+            </div>
+            <div class="flex items-center gap-1 flex-wrap mt-1">
+              ${hasImportant ? '<span class="w-2 h-2 rounded-full bg-amber-500 shadow-sm" title="Important Event"></span>' : ''}
+              ${hasAssignment ? '<span class="w-2 h-2 rounded-full bg-blue-500 shadow-sm" title="Deliverable Deadline"></span>' : ''}
+              ${hasSession ? '<span class="w-2 h-2 rounded-full bg-emerald-500 shadow-sm" title="Saturday Club Day"></span>' : ''}
+              ${hasPublic && !hasImportant && !hasAssignment && !hasSession ? '<span class="w-2 h-2 rounded-full bg-purple-500 shadow-sm" title="Campus Event"></span>' : ''}
+            </div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = html;
+    }
+
     function switchCalendarMode(mode) {
       currentCalendarMode = mode || 'common';
+      calSelectedDateStr = null; // reset day filter on tab switch
 
       const btnCommon = document.getElementById('calModeBtnCommon');
       const btnPersonal = document.getElementById('calModeBtnPersonal');
@@ -4284,111 +4549,140 @@
           }
         }
 
-        // Render Events List
-        const list = document.getElementById('commonEventsList');
-        if (!list) return;
-        list.innerHTML = '';
-
-        if (!cachedCommonEvents.length) {
-          list.innerHTML = `
-            <div class="card-3d p-8 rounded-3xl border border-theme text-center space-y-2">
-              <i data-lucide="calendar" class="w-8 h-8 text-theme-muted mx-auto"></i>
-              <div class="text-sm font-bold text-theme-primary">No upcoming public events scheduled yet.</div>
-              <div class="text-xs text-theme-muted">Club Presidents and Advisors will announce Saturday Club Days and Summits here.</div>
-            </div>
-          `;
-          lucide.createIcons();
-          return;
-        }
-
-        cachedCommonEvents.forEach(e => {
-          const item = document.createElement('div');
-          item.className = 'card-3d rounded-3xl border border-theme p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition hover:border-blue-500/40';
-          
-          const eventDate = new Date(e.date);
-          const dateStr = eventDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-          const timeStr = eventDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-
-          const isImportant = e.is_important;
-          const creatorAttribution = e.created_by_name ? ` • Scheduled by ${e.created_by_name} (${e.created_by_post || 'Leadership'})` : '';
-
-          item.innerHTML = `
-            <div class="space-y-2">
-              <div class="flex flex-wrap items-center gap-2">
-                ${isImportant ? `
-                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center space-x-1">
-                    <span>⭐</span>
-                    <span>IMPORTANT</span>
-                  </span>
-                ` : ''}
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border border-theme bg-theme-elevated text-theme-primary">
-                  ${e.event_type || 'CAMPUS_EVENT'}
-                </span>
-                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20">
-                  ${e.visibility === 'PUBLIC_CAMPUS' ? 'Public (All Campuses)' : 'Campus Students'}
-                </span>
-                <span class="text-xs text-theme-muted font-mono">${dateStr} at ${timeStr}</span>
-                <span class="text-xs text-theme-muted">•</span>
-                <span class="text-xs font-bold text-theme-primary">${e.club_name || 'Mirai Campus Wide'}</span>
-              </div>
-
-              <div>
-                <h4 class="text-base font-extrabold text-theme-primary">${e.title}</h4>
-                ${e.description ? `<p class="text-xs text-theme-muted mt-1 leading-relaxed">${e.description}</p>` : ''}
-              </div>
-
-              <div class="flex flex-wrap items-center gap-3 text-xs text-theme-muted font-mono pt-1">
-                <span>📍 Venue: <strong class="text-theme-primary">${e.venue}</strong></span>
-                ${e.deliverable ? `<span>📝 Deliverable: <strong class="text-blue-500">${e.deliverable}</strong></span>` : ''}
-                <span class="text-[11px] text-theme-muted">${creatorAttribution}</span>
-              </div>
-            </div>
-
-            <div class="flex items-center space-x-2 shrink-0">
-              ${e.has_active_session ? `
-                <button onclick="guardAction(openCheckInScanner)" class="btn-mirror bg-emerald-600 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center space-x-1.5 shadow-lg">
-                  <i data-lucide="check-circle" class="w-4 h-4"></i>
-                  <span>Live QR Check-In</span>
-                </button>
-              ` : `
-                <span class="btn-mirror px-3 py-1.5 rounded-xl text-xs text-theme-muted font-mono border border-theme">Scheduled</span>
-              `}
-            </div>
-          `;
-          list.appendChild(item);
-        });
-
-        lucide.createIcons();
-        attachCursorHover();
+        renderCalendarMonthGrid();
+        renderCommonEventsList();
       } catch (err) {
         console.error('Error loading common calendar:', err);
       }
     }
 
-    /* --- PERSONAL CALENDAR CONTROLLER (Gated by ID) --- */
-    async function loadPersonalCalendar() {
-      const list = document.getElementById('personalEventsList');
+    function renderCommonEventsList() {
+      const list = document.getElementById('commonEventsList');
       if (!list) return;
+      list.innerHTML = '';
 
-      if (!currentUser) {
+      let events = cachedCommonEvents || [];
+      if (calSelectedDateStr) {
+        events = events.filter(e => {
+          const d = new Date(e.date);
+          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          return key === calSelectedDateStr;
+        });
+      }
+
+      if (!events.length) {
         list.innerHTML = `
-          <div class="card-3d p-8 rounded-3xl border border-theme text-center space-y-3">
-            <i data-lucide="lock" class="w-8 h-8 text-theme-muted mx-auto"></i>
-            <div class="text-sm font-bold text-theme-primary">Personal Calendar Locked</div>
-            <div class="text-xs text-theme-muted">Please sign in or select a demo user above to access your personal deadlines, Saturday sessions, and President-pushed dates.</div>
-            <button onclick="openAuthModal('login')" class="btn-mirror px-4 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 shadow">
-              Sign In to View My Dates
-            </button>
+          <div class="card-3d p-8 rounded-3xl border border-theme text-center space-y-2">
+            <i data-lucide="calendar" class="w-8 h-8 text-theme-muted mx-auto"></i>
+            <div class="text-sm font-bold text-theme-primary">No upcoming public events scheduled for this date.</div>
+            <div class="text-xs text-theme-muted">
+              ${calSelectedDateStr ? '<button onclick="clearCalendarDateFilter()" class="text-blue-500 underline font-bold mt-1">Clear date filter to view all upcoming events</button>' : 'Club Presidents and Advisors will announce Saturday Club Days and Summits here.'}
+            </div>
           </div>
         `;
         lucide.createIcons();
         return;
       }
 
+      events.forEach(e => {
+        const item = document.createElement('div');
+        item.className = 'card-3d rounded-3xl border border-theme p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition hover:border-blue-500/40';
+        
+        const eventDate = new Date(e.date);
+        const dateStr = eventDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+        const timeStr = eventDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+
+        const isImportant = e.is_important;
+        const creatorAttribution = e.created_by_name ? ` • Scheduled by ${e.created_by_name} (${e.created_by_post || 'Leadership'})` : '';
+
+        item.innerHTML = `
+          <div class="space-y-2">
+            <div class="flex flex-wrap items-center gap-2">
+              ${isImportant ? `
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-amber-500/20 text-amber-400 border border-amber-500/40 flex items-center space-x-1">
+                  <span>⭐</span>
+                  <span>IMPORTANT</span>
+                </span>
+              ` : ''}
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border border-theme bg-theme-elevated text-theme-primary">
+                ${e.event_type || 'CAMPUS_EVENT'}
+              </span>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20">
+                ${e.visibility === 'PUBLIC_CAMPUS' ? 'Public (All Campuses)' : 'Campus Students'}
+              </span>
+              <span class="text-xs text-theme-muted font-mono">${dateStr} at ${timeStr}</span>
+              <span class="text-xs text-theme-muted">•</span>
+              <span class="text-xs font-bold text-theme-primary">${e.club_name || 'Mirai Campus Wide'}</span>
+            </div>
+
+            <div>
+              <h4 class="text-base font-extrabold text-theme-primary">${e.title}</h4>
+              ${e.description ? `<p class="text-xs text-theme-muted mt-1 leading-relaxed">${e.description}</p>` : ''}
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3 text-xs text-theme-muted font-mono pt-1">
+              <span>📍 Venue: <strong class="text-theme-primary">${e.venue}</strong></span>
+              ${e.deliverable ? `<span>📝 Deliverable: <strong class="text-blue-500">${e.deliverable}</strong></span>` : ''}
+              <span class="text-[11px] text-theme-muted">${creatorAttribution}</span>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-2 shrink-0">
+            ${e.has_active_session ? `
+              <button onclick="guardAction(openCheckInScanner)" class="btn-mirror bg-emerald-600 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center space-x-1.5 shadow-lg">
+                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                <span>Live QR Check-In</span>
+              </button>
+            ` : `
+              <span class="btn-mirror px-3 py-1.5 rounded-xl text-xs text-theme-muted font-mono border border-theme">Scheduled</span>
+            `}
+          </div>
+        `;
+        list.appendChild(item);
+      });
+
+      lucide.createIcons();
+      attachCursorHover();
+    }
+
+    /* --- PERSONAL CALENDAR CONTROLLER (Gated by ID) --- */
+    function onSelectPersonalUserId(val) {
+      selectedPersonalUserId = parseInt(val);
+      loadPersonalCalendar(selectedPersonalUserId);
+    }
+
+    function resetPersonalCalendarToCurrentUser() {
+      selectedPersonalUserId = currentUser ? currentUser.id : null;
+      const select = document.getElementById('personalCalendarUserIdSelect');
+      if (select && selectedPersonalUserId) {
+        select.value = selectedPersonalUserId;
+      }
+      loadPersonalCalendar(selectedPersonalUserId);
+    }
+
+    async function loadPersonalCalendar(targetUserId) {
+      const list = document.getElementById('personalEventsList');
+      if (!list) return;
+
+      const targetId = (targetUserId !== undefined && targetUserId !== null) 
+        ? targetUserId 
+        : (selectedPersonalUserId || (currentUser ? currentUser.id : 7)); // default to ID 7 demo if guest
+
       try {
-        const res = await fetch('/api/events/personal-calendar', { headers: getApiHeaders() });
+        const url = `/api/events/personal-calendar?user_id=${targetId}`;
+        const res = await fetch(url, { headers: getApiHeaders() });
         const data = await res.json();
         cachedPersonalCalendar = data;
+
+        // Populate Member ID Selector Directory
+        const userSelect = document.getElementById('personalCalendarUserIdSelect');
+        if (userSelect && data.users_directory) {
+          userSelect.innerHTML = data.users_directory.map(u => `
+            <option value="${u.id}" ${u.id === data.user_id ? 'selected' : ''}>
+              ID #${u.id}: ${u.name} (${u.role}${u.roll_no && u.roll_no !== 'N/A' ? ' • ' + u.roll_no : ''})
+            </option>
+          `).join('');
+        }
 
         // Update Personal Banner
         const idBadge = document.getElementById('personalUserIdBadge');
@@ -4398,24 +4692,26 @@
         const clubsTags = document.getElementById('personalEnrolledClubsTags');
         const headerIdBadge = document.getElementById('calPersonalIdBadge');
 
-        const activeId = data.user_id || currentUser.id;
+        const activeId = data.user_id;
         if (idBadge) idBadge.innerText = `User ID: #${activeId}`;
         if (headerIdBadge) headerIdBadge.innerText = `ID: #${activeId}`;
-        if (nameEl) nameEl.innerText = `${data.user_name || currentUser.name}'s Important Dates`;
-        if (roleBadge) roleBadge.innerText = data.role || currentUser.role || 'MEMBER';
+        if (nameEl) nameEl.innerText = `${data.user_name || 'Member'}'s Important Dates`;
+        if (roleBadge) roleBadge.innerText = data.user_role || 'MEMBER';
         if (rollEl) {
-          rollEl.innerText = `Roll: ${data.roll_no || currentUser.roll_no || 'N/A'} • Enrolled in ${data.enrolled_clubs?.length || 0} Club${data.enrolled_clubs?.length === 1 ? '' : 's'}`;
+          const count = (data.enrolled_club_names || []).length;
+          rollEl.innerText = `Roll: ${data.roll_no || 'N/A'} • Enrolled in ${count} Club${count === 1 ? '' : 's'}`;
         }
 
         if (clubsTags) {
           clubsTags.innerHTML = '';
-          if (!data.enrolled_clubs || data.enrolled_clubs.length === 0) {
+          const clubs = data.enrolled_club_names || [];
+          if (!clubs.length) {
             clubsTags.innerHTML = `<span class="text-theme-muted italic">Not enrolled in any club yet. Go to Campuses & Clubs to join up to 2 clubs.</span>`;
           } else {
-            data.enrolled_clubs.forEach(c => {
+            clubs.forEach(c => {
               const chip = document.createElement('span');
               chip.className = 'px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20';
-              chip.innerText = `${c.name} (${c.post})`;
+              chip.innerText = c;
               clubsTags.appendChild(chip);
             });
           }
@@ -4433,6 +4729,7 @@
         if (countAssignment) countAssignment.innerText = items.filter(i => i.category === 'ASSIGNMENT_DEADLINE').length;
         if (countSession) countSession.innerText = items.filter(i => i.category === 'SESSION_EVENT').length;
 
+        renderCalendarMonthGrid();
         renderPersonalCalendarItems();
       } catch (err) {
         console.error('Error loading personal calendar:', err);
@@ -4472,8 +4769,8 @@
         list.innerHTML = `
           <div class="card-3d p-8 rounded-3xl border border-theme text-center space-y-2">
             <i data-lucide="calendar-check-2" class="w-8 h-8 text-theme-muted mx-auto"></i>
-            <div class="text-sm font-bold text-theme-primary">No dates scheduled for your account.</div>
-            <div class="text-xs text-theme-muted">Once you enroll in clubs, your deadlines, Saturday sessions, and dates pushed by your Club President will appear here.</div>
+            <div class="text-sm font-bold text-theme-primary">No dates scheduled for this member account.</div>
+            <div class="text-xs text-theme-muted">Once this user enrolls in clubs, deadlines, Saturday sessions, and dates pushed by the Club President will appear here.</div>
           </div>
         `;
         lucide.createIcons();
@@ -4481,6 +4778,17 @@
       }
 
       let items = cachedPersonalCalendar.items;
+
+      // Filter by selected calendar month day if active
+      if (calSelectedDateStr) {
+        items = items.filter(i => {
+          const d = new Date(i.date);
+          const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          return key === calSelectedDateStr;
+        });
+      }
+
+      // Filter by category tab
       if (personalActiveFilter === 'important') {
         items = items.filter(i => i.is_important || i.category === 'CLUB_IMPORTANT_EVENT');
       } else if (personalActiveFilter === 'assignment') {
@@ -4491,8 +4799,9 @@
 
       if (!items.length) {
         list.innerHTML = `
-          <div class="card-3d p-6 rounded-2xl border border-theme text-center text-xs text-theme-muted">
-            No items found under the selected category filter.
+          <div class="card-3d p-6 rounded-2xl border border-theme text-center text-xs text-theme-muted space-y-2">
+            <div>No items found matching the current date and category filters.</div>
+            ${calSelectedDateStr ? '<button onclick="clearCalendarDateFilter()" class="text-blue-500 underline font-bold">Clear date filter to view all dates</button>' : ''}
           </div>
         `;
         return;
@@ -4524,7 +4833,7 @@
           categoryTag = `
             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-amber-500/20 text-amber-500 border border-amber-500/40 flex items-center space-x-1">
               <span>⭐</span>
-              <span>IMPORTANT: Added by ${item.created_by_name || 'Club Leadership'} (${item.created_by_post || 'President/Advisor'})</span>
+              <span>IMPORTANT: Added by ${item.created_by_name || 'Club Leadership'} (${item.creator_post || 'President/Advisor'})</span>
             </span>
           `;
         } else if (isAssignment) {
@@ -4558,13 +4867,13 @@
               </span>
             `;
           } else {
-            const daysLeft = item.days_remaining;
+            const hoursLeft = item.hours_remaining;
             let urgencyColor = 'bg-blue-500/15 text-blue-500 border-blue-500/30';
-            let urgencyText = `Due in ${daysLeft}d`;
-            if (daysLeft !== null && daysLeft <= 2 && daysLeft >= 0) {
+            let urgencyText = `Due in ${hoursLeft}h`;
+            if (hoursLeft !== null && hoursLeft <= 48 && hoursLeft >= 0) {
               urgencyColor = 'bg-amber-500/20 text-amber-500 border-amber-500/40 animate-pulse';
-              urgencyText = `⚠️ Due in ${daysLeft}d (Urgent)`;
-            } else if (daysLeft !== null && daysLeft < 0) {
+              urgencyText = `⚠️ Due in ${hoursLeft}h (Urgent)`;
+            } else if (hoursLeft !== null && hoursLeft <= 0) {
               urgencyColor = 'bg-rose-500/20 text-rose-500 border-rose-500/40';
               urgencyText = `🚨 Overdue`;
             }
@@ -4626,7 +4935,7 @@
 
               <div class="flex flex-wrap items-center gap-3 text-xs text-theme-muted font-mono pt-0.5">
                 ${item.venue ? `<span>📍 Venue: <strong class="text-theme-primary">${item.venue}</strong></span>` : ''}
-                ${item.deliverable ? `<span>📝 Action Required: <strong class="text-blue-500">${item.deliverable}</strong></span>` : ''}
+                ${item.deliverable_info ? `<span>📝 Action Required: <strong class="text-blue-500">${item.deliverable_info}</strong></span>` : ''}
               </div>
             </div>
           </div>

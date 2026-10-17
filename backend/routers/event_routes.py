@@ -1,6 +1,6 @@
 from typing import List, Optional
-from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException, status
+from datetime import datetime, timedelta
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -90,9 +90,12 @@ def get_common_calendar(
     Shows upcoming public & campus-wide events, hackathons, and Saturday Club Days.
     Includes authority metadata indicating if the user has permission to schedule/edit.
     """
+    now = datetime.utcnow()
+    cutoff = now - timedelta(hours=24)
     events = db.query(Event).filter(
-        (Event.visibility.in_(["PUBLIC", "CAMPUS_STUDENTS"])) | 
-        (Event.event_type.in_(["FLAGSHIP_EVENT", "CLUB_DAY", "RECRUITING", "IMPORTANT_DATE"]))
+        ((Event.visibility.in_(["PUBLIC", "CAMPUS_STUDENTS"])) | 
+        (Event.event_type.in_(["FLAGSHIP_EVENT", "CLUB_DAY", "RECRUITING", "IMPORTANT_DATE"]))),
+        Event.date >= cutoff
     ).order_by(Event.date.asc()).all()
 
     is_domain_auth = False
@@ -157,6 +160,7 @@ def get_common_calendar(
 
 @router.get("/personal-calendar")
 def get_personal_calendar(
+    user_id: Optional[int] = Query(None, description="Specific user ID to view personal calendar for"),
     current_user: Optional[User] = Depends(get_optional_user),
     db: Session = Depends(get_db)
 ):
@@ -169,7 +173,25 @@ def get_personal_calendar(
     4. Club recruitment closures.
     5. Public college summits.
     """
-    if not current_user:
+    # Build users directory for instant preview of any particular member ID
+    users_directory = [
+        {
+            "id": u.id,
+            "name": u.name,
+            "role": u.role,
+            "roll_no": u.roll_no or "N/A",
+            "enrolled_clubs": [m.club.name for m in u.memberships if m.club and m.status == "ACTIVE"]
+        }
+        for u in db.query(User).order_by(User.id.asc()).all()
+    ]
+
+    target_user = None
+    if user_id is not None:
+        target_user = db.query(User).filter(User.id == user_id).first()
+    if not target_user:
+        target_user = current_user
+
+    if not target_user:
         public_events = db.query(Event).filter(
             Event.visibility == "PUBLIC"
         ).order_by(Event.date.asc()).all()
@@ -197,21 +219,22 @@ def get_personal_calendar(
             "status": "success",
             "eligible": False,
             "role": "GUEST",
-            "message": "Sign in to view your personal calendar with your enrolled club milestones and president-assigned events.",
+            "message": "Sign in or select a member ID to view personal calendar with enrolled club milestones and president-assigned events.",
             "total_items": len(items),
-            "items": items
+            "items": items,
+            "users_directory": users_directory
         }
 
-    is_domain_auth = getattr(current_user, "is_domain_authorized", False) or current_user.role in ["ADMIN", "CAMPUS_MANAGER"]
+    is_domain_auth = getattr(target_user, "is_domain_authorized", False) or target_user.role in ["ADMIN", "CAMPUS_MANAGER"]
 
     my_memberships = db.query(ClubMembership).filter(
-        ClubMembership.user_id == current_user.id,
+        ClubMembership.user_id == target_user.id,
         ClubMembership.status == "ACTIVE"
     ).all()
     my_club_ids = [m.club_id for m in my_memberships]
     pres_club_ids = [m.club_id for m in my_memberships if m.post in ["PRESIDENT", "VICE_PRESIDENT"]]
 
-    advised_clubs = db.query(Club).filter(Club.faculty_advisor_id == current_user.id).all()
+    advised_clubs = db.query(Club).filter(Club.faculty_advisor_id == target_user.id).all()
     adv_club_ids = [c.id for c in advised_clubs]
 
     all_relevant_club_ids = list(set(my_club_ids + adv_club_ids))
@@ -271,7 +294,7 @@ def get_personal_calendar(
     for a in assignments:
         my_sub = db.query(Submission).filter(
             Submission.assignment_id == a.id,
-            Submission.student_id == current_user.id
+            Submission.student_id == target_user.id
         ).first()
 
         sub_status = "SUBMITTED" if my_sub else "PENDING"
@@ -330,17 +353,20 @@ def get_personal_calendar(
     return {
         "status": "success",
         "eligible": True,
-        "user_id": current_user.id,
-        "user_name": current_user.name,
-        "user_role": current_user.role,
+        "user_id": target_user.id,
+        "user_name": target_user.name,
+        "user_role": target_user.role,
+        "roll_no": target_user.roll_no or "N/A",
         "is_president": len(pres_club_ids) > 0,
-        "is_advisor": len(adv_club_ids) > 0 or current_user.role == "FACULTY_ADVISOR",
+        "is_advisor": len(adv_club_ids) > 0 or target_user.role == "FACULTY_ADVISOR",
         "is_domain_authorized": is_domain_auth,
         "president_of_clubs": pres_club_ids,
         "advised_club_ids": adv_club_ids,
         "enrolled_club_ids": my_club_ids,
+        "enrolled_club_names": [m.club.name for m in my_memberships if m.club],
         "total_items": len(items),
-        "items": items
+        "items": items,
+        "users_directory": users_directory
     }
 
 @router.post("/club-important-event")
