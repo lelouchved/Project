@@ -167,37 +167,69 @@
     .font-mono { font-family: 'JetBrains Mono', monospace; }
 
     /* ========================================================
-       CUSTOM 3D ANIMATED CURSOR & STARDUST TRAIL
+       PRECISION OPTICAL RETICLE CURSOR & SHARP STAR TRAIL
        ======================================================== */
     #cursor-dot {
       position: fixed;
       top: 0;
       left: 0;
-      width: 12px;
-      height: 12px;
-      background-color: #FFFFFF;
+      width: 8px;
+      height: 8px;
+      background: radial-gradient(circle, #FFFFFF 50%, rgba(255, 255, 255, 0.95) 100%);
       border-radius: 50%;
       pointer-events: none;
       z-index: 99999;
       transform: translate(-50%, -50%);
-      box-shadow: 0 0 18px #FFFFFF, 0 0 32px rgba(84, 101, 255, 1), 0 0 50px rgba(0, 240, 255, 0.85);
-      transition: width 0.2s, height 0.2s, background-color 0.2s;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.65), 0 0 10px #FFFFFF, 0 0 20px rgba(84, 101, 255, 0.95);
+      transition: width 0.18s cubic-bezier(0.16, 1, 0.3, 1), height 0.18s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.18s ease;
     }
+
     #cursor-ring {
       position: fixed;
       top: 0;
       left: 0;
-      width: 48px;
-      height: 48px;
-      border: 2px solid rgba(255, 255, 255, 0.90);
+      width: 42px;
+      height: 42px;
+      border: 1.5px solid rgba(255, 255, 255, 0.90);
       border-radius: 50%;
       pointer-events: none;
       z-index: 99998;
       transform: translate(-50%, -50%);
-      transition: width 0.25s ease-out, height 0.25s ease-out, border-color 0.25s ease-out, background-color 0.25s ease-out;
-      backdrop-filter: blur(2px);
-      box-shadow: 0 0 24px rgba(84, 101, 255, 0.55);
+      transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), height 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+      backdrop-filter: blur(1.5px);
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.40), 0 0 16px rgba(84, 101, 255, 0.40), inset 0 0 10px rgba(255, 255, 255, 0.08);
     }
+
+    /* Fine precision hairline crosshair ticks */
+    #cursor-ring::before,
+    #cursor-ring::after {
+      content: '';
+      position: absolute;
+      background: rgba(255, 255, 255, 0.90);
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    #cursor-ring::before {
+      top: 50%;
+      left: -5px;
+      right: -5px;
+      height: 1px;
+      transform: translateY(-50%);
+      opacity: 0.5;
+      mask-image: linear-gradient(to right, white, transparent 35%, transparent 65%, white);
+      -webkit-mask-image: linear-gradient(to right, white, transparent 35%, transparent 65%, white);
+    }
+    #cursor-ring::after {
+      left: 50%;
+      top: -5px;
+      bottom: -5px;
+      width: 1px;
+      transform: translateX(-50%);
+      opacity: 0.5;
+      mask-image: linear-gradient(to bottom, white, transparent 35%, transparent 65%, white);
+      -webkit-mask-image: linear-gradient(to bottom, white, transparent 35%, transparent 65%, white);
+    }
+
     #cursor-trail-canvas {
       position: fixed;
       top: 0;
@@ -207,18 +239,41 @@
       pointer-events: none;
       z-index: 99997;
     }
+
     .cursor-hover #cursor-ring {
-      width: 68px;
-      height: 68px;
+      width: 56px;
+      height: 56px;
       border-color: #FFFFFF;
-      background-color: rgba(255, 255, 255, 0.20);
-      box-shadow: 0 0 35px rgba(84, 101, 255, 0.75);
+      background-color: rgba(255, 255, 255, 0.10);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.60), 0 0 24px rgba(84, 101, 255, 0.70), inset 0 0 14px rgba(255, 255, 255, 0.15);
     }
     .cursor-hover #cursor-dot {
-      width: 16px;
-      height: 16px;
-      background-color: #FFFFFF;
-      box-shadow: 0 0 20px #FFFFFF, 0 0 35px #5465FF;
+      width: 5px;
+      height: 5px;
+      background-color: #00F0FF;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.8), 0 0 12px #00F0FF, 0 0 22px #5465FF;
+    }
+
+    /* Light Mode Contrast Calibration */
+    :root[data-theme="light"] #cursor-dot {
+      background: #09090B;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9), 0 0 8px rgba(37, 99, 235, 0.7);
+    }
+    :root[data-theme="light"] #cursor-ring {
+      border-color: rgba(15, 23, 42, 0.90);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9), 0 0 14px rgba(37, 99, 235, 0.30);
+    }
+    :root[data-theme="light"] #cursor-ring::before,
+    :root[data-theme="light"] #cursor-ring::after {
+      background: rgba(15, 23, 42, 0.80);
+    }
+    :root[data-theme="light"] .cursor-hover #cursor-dot {
+      background-color: #1D4ED8;
+      box-shadow: 0 0 10px #1D4ED8, 0 0 20px #2563EB;
+    }
+    :root[data-theme="light"] .cursor-hover #cursor-ring {
+      border-color: #1D4ED8;
+      background-color: rgba(29, 78, 216, 0.08);
     }
 
     /* 3D Canvas Background */
@@ -3657,6 +3712,8 @@
     const trailCanvas = document.getElementById('cursor-trail-canvas');
     const ctx = trailCanvas.getContext('2d');
 
+    const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
     let ringX = mouseX;
@@ -3665,11 +3722,39 @@
     let trailPoints = [];
 
     function resizeTrailCanvas() {
-      trailCanvas.width = window.innerWidth;
-      trailCanvas.height = window.innerHeight;
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      trailCanvas.width = Math.floor(w * dpr);
+      trailCanvas.height = Math.floor(h * dpr);
+      trailCanvas.style.width = `${w}px`;
+      trailCanvas.style.height = `${h}px`;
     }
     window.addEventListener('resize', resizeTrailCanvas);
     resizeTrailCanvas();
+
+    function drawSharpDiamondStar(targetCtx, x, y, size, alpha, color) {
+      targetCtx.save();
+      targetCtx.globalAlpha = Math.max(0, Math.min(1, alpha));
+      targetCtx.fillStyle = color;
+      targetCtx.shadowBlur = 8;
+      targetCtx.shadowColor = color;
+      targetCtx.beginPath();
+      // 4-pointed sharp diamond star
+      targetCtx.moveTo(x, y - size);
+      targetCtx.quadraticCurveTo(x, y, x + size, y);
+      targetCtx.quadraticCurveTo(x, y, x, y + size);
+      targetCtx.quadraticCurveTo(x, y, x - size, y);
+      targetCtx.quadraticCurveTo(x, y, x, y - size);
+      targetCtx.closePath();
+      targetCtx.fill();
+
+      // Ultra-crisp diamond pinpoint core
+      targetCtx.fillStyle = '#FFFFFF';
+      targetCtx.beginPath();
+      targetCtx.arc(x, y, Math.max(0.7, size * 0.20), 0, Math.PI * 2);
+      targetCtx.fill();
+      targetCtx.restore();
+    }
 
     document.addEventListener('mousemove', (e) => {
       mouseX = e.clientX;
@@ -3677,26 +3762,28 @@
       cursorDot.style.left = `${mouseX}px`;
       cursorDot.style.top = `${mouseY}px`;
 
-      // Track smooth trailing ribbon positions (longer tail history)
+      // Track smooth trailing ribbon positions
       trailPoints.push({ x: mouseX, y: mouseY, age: 0 });
-      if (trailPoints.length > 28) {
+      if (trailPoints.length > 26) {
         trailPoints.shift();
       }
 
-      // Spawn larger, vibrant radiant stardust particles (thoda or visible and bada)
+      // Spawn sharp, elegant diamond sparkle stars & precision sparks
       const colors = currentTheme === 'dark' 
-        ? ['#FFFFFF', '#5465FF', '#788BFF', '#9BB1FF', '#00F0FF', '#38BDF8', '#E2FDFF']
+        ? ['#FFFFFF', '#5465FF', '#788BFF', '#00F0FF', '#38BDF8', '#E2FDFF']
         : ['#1D4ED8', '#2563EB', '#3B82F6', '#0284C7', '#0F172A'];
+
       for (let k = 0; k < 3; k++) {
         particles.push({
-          x: mouseX + (Math.random() - 0.5) * 8,
-          y: mouseY + (Math.random() - 0.5) * 8,
-          vx: (Math.random() - 0.5) * 2.6,
-          vy: (Math.random() - 0.5) * 2.6 - 0.6,
-          size: Math.random() * 6 + 4.2, // 4.2px to 10.2px (visibly larger)
+          x: mouseX + (Math.random() - 0.5) * 6,
+          y: mouseY + (Math.random() - 0.5) * 6,
+          vx: (Math.random() - 0.5) * 2.2,
+          vy: (Math.random() - 0.5) * 2.2 - 0.5,
+          size: Math.random() * 5 + 3.8, // Elegant diamond star (3.8px to 8.8px)
           color: colors[Math.floor(Math.random() * colors.length)],
           alpha: 1.0,
-          decay: Math.random() * 0.018 + 0.012 // Lingers longer and remains luminous
+          decay: Math.random() * 0.022 + 0.014,
+          isStar: Math.random() < 0.70
         });
       }
     });
@@ -3709,21 +3796,24 @@
     }
 
     function renderCursor() {
-      ringX += (mouseX - ringX) * 0.18;
-      ringY += (mouseY - ringY) * 0.18;
+      ringX += (mouseX - ringX) * 0.16;
+      ringY += (mouseY - ringY) * 0.16;
       cursorRing.style.left = `${ringX}px`;
       cursorRing.style.top = `${ringY}px`;
 
-      ctx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+      ctx.save();
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-      // 1. Draw glowing, smooth trailing ribbon/comet tail connecting recent positions
+      // 1. DUAL-LAYER LASER COMET RIBBON (Crisp Outer Aura + Razor-Sharp Core)
       if (trailPoints.length > 2) {
+        // Layer A: Luminous Outer Aura
         for (let i = 1; i < trailPoints.length; i++) {
           const ptPrev = trailPoints[i - 1];
           const ptCurr = trailPoints[i];
           const progress = i / trailPoints.length;
-          const lineWidth = progress * 9.5; // Thicker visible ribbon
-          const alpha = progress * 0.88; // Highly visible glow
+          const lineWidth = progress * 7.5;
+          const alpha = progress * 0.65;
           
           ctx.save();
           ctx.beginPath();
@@ -3733,8 +3823,30 @@
           ctx.lineJoin = 'round';
           ctx.lineWidth = lineWidth;
           ctx.strokeStyle = currentTheme === 'dark' ? `rgba(84, 101, 255, ${alpha})` : `rgba(37, 99, 235, ${alpha})`;
-          ctx.shadowBlur = 22;
+          ctx.shadowBlur = 14;
           ctx.shadowColor = currentTheme === 'dark' ? '#00F0FF' : '#2563EB';
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // Layer B: Razor-Sharp Inner Laser Filament (Sub-pixel high definition)
+        for (let i = 1; i < trailPoints.length; i++) {
+          const ptPrev = trailPoints[i - 1];
+          const ptCurr = trailPoints[i];
+          const progress = i / trailPoints.length;
+          const lineWidth = Math.max(1, progress * 2.2);
+          const alpha = Math.min(1, progress * 0.95);
+          
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(ptPrev.x, ptPrev.y);
+          ctx.lineTo(ptCurr.x, ptCurr.y);
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          ctx.lineWidth = lineWidth;
+          ctx.strokeStyle = currentTheme === 'dark' ? `rgba(255, 255, 255, ${alpha})` : `rgba(15, 23, 42, ${alpha})`;
+          ctx.shadowBlur = 4;
+          ctx.shadowColor = '#FFFFFF';
           ctx.stroke();
           ctx.restore();
         }
@@ -3743,12 +3855,12 @@
       // Age and prune trailPoints smoothly if mouse pauses
       for (let i = trailPoints.length - 1; i >= 0; i--) {
         trailPoints[i].age += 1;
-        if (trailPoints[i].age > 22) {
+        if (trailPoints[i].age > 20) {
           trailPoints.splice(i, 1);
         }
       }
 
-      // 2. Draw Radiant Stardust Particles
+      // 2. Render Sharp Celestial Diamond Stars & Precision Glints
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
         p.x += p.vx;
@@ -3758,16 +3870,24 @@
           particles.splice(i, 1);
           continue;
         }
-        ctx.save();
-        ctx.globalAlpha = p.alpha;
-        ctx.fillStyle = p.color;
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = p.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
+
+        if (p.isStar) {
+          drawSharpDiamondStar(ctx, p.x, p.y, p.size, p.alpha, p.color);
+        } else {
+          // Sharp pinpoint micro-spark
+          ctx.save();
+          ctx.globalAlpha = p.alpha;
+          ctx.fillStyle = p.color;
+          ctx.shadowBlur = 5;
+          ctx.shadowColor = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * 0.35, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
       }
+
+      ctx.restore();
       requestAnimationFrame(renderCursor);
     }
     renderCursor();
