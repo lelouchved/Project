@@ -245,6 +245,16 @@
       box-shadow: 0 0 35px rgba(255, 255, 255, 0.09), 0 0 60px rgba(0, 163, 255, 0.18);
     }
 
+    /* Brand Gradient Text: Pure white to cyan in dark mode; Solid black to royal blue in light mode */
+    .brand-gradient-text {
+      background-image: linear-gradient(135deg, #FFFFFF 0%, #CFFAFE 50%, #38BDF8 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+      display: inline-block;
+    }
+
     /* ========================================================
        LIGHT MODE HIGH-CONTRAST OVERRIDES (APPLY ONLY IN LIGHT MODE)
        Ensures pure white canvas (#FFFFFF), solid black typography (#09090B),
@@ -258,6 +268,39 @@
     [data-theme="light"] body {
       background-color: #FFFFFF !important;
       color: #09090B !important;
+    }
+
+    /* Fix text gradients in light mode: replace white-to-cyan gradient with visible deep black to royal blue */
+    [data-theme="light"] .brand-gradient-text,
+    [data-theme="light"] .text-transparent.bg-clip-text,
+    [data-theme="light"] [class*="bg-clip-text"] {
+      background-image: linear-gradient(135deg, #09090B 0%, #1D4ED8 55%, #2563EB 100%) !important;
+      -webkit-background-clip: text !important;
+      background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      color: #1D4ED8 !important;
+    }
+
+    /* Neutralize heading white drop-shadows in light mode */
+    [data-theme="light"] h1,
+    [data-theme="light"] h2,
+    [data-theme="light"] h3,
+    [data-theme="light"] h4,
+    [data-theme="light"] [class*="drop-shadow"] {
+      filter: none !important;
+      text-shadow: none !important;
+    }
+
+    /* Maintain crisp white text on colored solid action buttons in light mode */
+    [data-theme="light"] .bg-blue-600,
+    [data-theme="light"] .bg-blue-700,
+    [data-theme="light"] .bg-blue-500,
+    [data-theme="light"] .bg-emerald-600,
+    [data-theme="light"] .bg-rose-600,
+    [data-theme="light"] .bg-purple-600,
+    [data-theme="light"] button.bg-blue-600,
+    [data-theme="light"] a.bg-blue-600 {
+      color: #FFFFFF !important;
     }
 
     /* Force pure black typography in light mode */
@@ -461,7 +504,7 @@
         <span>Common Calendar</span>
       </button>
 
-      <button onclick="guardAction(() => { switchTab('events'); switchCalendarMode('personal'); })" id="tab-personal-cal" class="tab-btn w-full px-3.5 py-2.5 rounded-xl flex items-center space-x-3 text-left transition btn-mirror text-theme-muted hover:text-theme-primary">
+      <button onclick="guardAction(() => { switchTab('events'); switchCalendarMode('personal'); })" id="tab-personal-cal" class="tab-btn w-full px-3.5 py-2.5 rounded-xl flex items-center space-x-3 text-left transition btn-mirror text-theme-muted hover:text-theme-primary hidden">
         <i data-lucide="calendar-check-2" class="w-4 h-4 text-emerald-500"></i>
         <span>Personal Calendar</span>
       </button>
@@ -727,7 +770,7 @@
 
             <!-- MANDATORY PROMPT TITLE (Complimented by brilliant pure white and cyan glow) -->
             <h1 class="text-3xl sm:text-6xl font-black tracking-tight leading-tight text-white drop-shadow-[0_2px_25px_rgba(255,255,255,0.25)]">
-              Welcome to <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-sky-400">Mirai Clubs</span>
+              Welcome to <span class="brand-gradient-text">Mirai Clubs</span>
             </h1>
 
             <p class="text-zinc-300 text-sm sm:text-base leading-relaxed">
@@ -975,7 +1018,7 @@
                 <span>Why Mirai School of Technology</span>
               </div>
               <h2 class="text-xl sm:text-3xl font-black text-white tracking-tight">
-                Your 4 Years Shouldn’t End with Just a Degree. <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-sky-400">They Should Build Your Future.</span>
+                Your 4 Years Shouldn’t End with Just a Degree. <span class="brand-gradient-text">They Should Build Your Future.</span>
               </h2>
               <p class="text-xs sm:text-sm text-zinc-300 max-w-3xl leading-relaxed">
                 At Mirai, students don’t wait until their final year to begin. They start building from week one, and by graduation, they carry an authentic, verified engineering portfolio.
@@ -1082,7 +1125,7 @@
                 <span>Curriculum & Progression</span>
               </div>
               <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">
-                Your Journey at Mirai: <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-sky-400">From Student to Engineer to Founder</span>
+                Your Journey at Mirai: <span class="brand-gradient-text">From Student to Engineer to Founder</span>
               </h2>
               <p class="text-xs text-zinc-400">
                 A 4-stage transformative engineering roadmap designed to take you from hello-world to scalable production systems.
@@ -1681,10 +1724,10 @@
                 <span>Common Calendar</span>
                 <span class="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-blue-500/10 text-blue-600">Public</span>
               </button>
-              <button id="calModeBtnPersonal" onclick="guardAction(() => switchCalendarMode('personal'))" class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 text-theme-muted hover:text-theme-primary">
+              <button id="calModeBtnPersonal" onclick="guardAction(() => switchCalendarMode('personal'))" class="px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 text-theme-muted hover:text-theme-primary hidden">
                 <i data-lucide="calendar-check-2" class="w-3.5 h-3.5 text-emerald-500"></i>
                 <span>Personal Calendar</span>
-                <span id="calPersonalIdBadge" class="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-500">My ID</span>
+                <span id="calPersonalIdBadge" class="text-[10px] font-mono px-1.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-500">My Schedule</span>
               </button>
             </div>
           </div>
@@ -1809,34 +1852,8 @@
           </div>
         </div>
 
-        <!-- Mode 2: PERSONAL CALENDAR CONTAINER (Gated by ID) -->
+        <!-- Mode 2: PERSONAL CALENDAR CONTAINER (Visible strictly after login) -->
         <div id="personalCalendarView" class="space-y-4 hidden">
-          <!-- Member ID Selector Bar: Calendar for Every Particular ID -->
-          <div class="card-3d rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
-            <div class="flex items-center space-x-3">
-              <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-bold shrink-0">
-                <i data-lucide="user-check" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <div class="text-xs font-bold text-theme-primary flex items-center space-x-2">
-                  <span>Calendar for Every Particular ID</span>
-                  <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30">User-Specific Ledger</span>
-                </div>
-                <div class="text-[11px] text-theme-muted">
-                  View and verify important dates, deliverables, and sessions for any student or advisor ID.
-                </div>
-              </div>
-            </div>
-            <div class="flex items-center space-x-2 flex-wrap">
-              <span class="text-xs font-mono text-theme-muted font-bold">Select ID:</span>
-              <select id="personalCalendarUserIdSelect" onchange="onSelectPersonalUserId(this.value)" class="text-xs p-2 rounded-xl border border-theme bg-theme-surface text-theme-primary font-bold focus:outline-none">
-                <!-- Dynamically populated with all users -->
-              </select>
-              <button onclick="resetPersonalCalendarToCurrentUser()" class="btn-mirror px-3 py-1.5 rounded-xl text-xs font-bold border border-theme text-theme-muted hover:text-theme-primary">
-                My Session
-              </button>
-            </div>
-          </div>
 
           <!-- Personalized Member Banner -->
           <div class="card-3d rounded-3xl border border-theme p-6 space-y-4 bg-gradient-to-r from-blue-600/5 via-indigo-600/5 to-purple-600/5">
@@ -3732,6 +3749,8 @@
       const userDisplay = document.getElementById('userDisplayName');
       const userCampus = document.getElementById('userCampusCode');
       const gatedBanner = document.getElementById('guestGatedBanner');
+      const tabPersonalCal = document.getElementById('tab-personal-cal');
+      const calModeBtnPersonal = document.getElementById('calModeBtnPersonal');
 
       if (!currentUser) {
         badge.innerText = 'Guest / Public';
@@ -3745,6 +3764,11 @@
         authTab.classList.add('hidden');
         if (addEventBtn) addEventBtn.classList.add('hidden');
         if (gatedBanner) gatedBanner.classList.remove('hidden');
+        if (tabPersonalCal) tabPersonalCal.classList.add('hidden');
+        if (calModeBtnPersonal) calModeBtnPersonal.classList.add('hidden');
+        if (typeof currentCalendarMode !== 'undefined' && currentCalendarMode === 'personal') {
+          switchCalendarMode('common');
+        }
       } else {
         loginBtn.classList.add('hidden');
         regBtn.classList.add('hidden');
@@ -3752,6 +3776,8 @@
         userDisplay.innerText = currentUser.name;
         userCampus.innerText = currentUser.campus_name || 'HIET Campus';
         if (gatedBanner) gatedBanner.classList.add('hidden');
+        if (tabPersonalCal) tabPersonalCal.classList.remove('hidden');
+        if (calModeBtnPersonal) calModeBtnPersonal.classList.remove('hidden');
 
         if (currentUser.is_domain_authorized || currentUser.role === 'ADMIN') {
           badge.innerText = `👑 Authorized Lead`;
@@ -4443,6 +4469,11 @@
     }
 
     function switchCalendarMode(mode) {
+      if (mode === 'personal' && !currentUser) {
+        showAlert('Personal Calendar is private: please sign in to view your schedule!', 'error');
+        openAuthModal('login');
+        return;
+      }
       currentCalendarMode = mode || 'common';
       calSelectedDateStr = null; // reset day filter on tab switch
 
@@ -4473,13 +4504,19 @@
           tabPersonal.style.color = 'var(--text-muted)';
         }
 
+        const gridBadge = document.getElementById('calGridModeBadge');
+        if (gridBadge) {
+          gridBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-blue-500/10 text-blue-600 border border-blue-500/30';
+          gridBadge.innerText = 'Common Events';
+        }
+
         loadCommonCalendar();
       } else {
         if (btnCommon) {
           btnCommon.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 text-theme-muted hover:text-theme-primary';
         }
         if (btnPersonal) {
-          btnPersonal.className = 'px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center space-x-2 text-theme-primary bg-theme-surface border border-theme shadow-sm';
+          btnPersonal.className = 'px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center space-x-2 text-emerald-500 bg-emerald-500/10 border border-emerald-500/30 shadow-sm';
         }
         if (viewCommon) viewCommon.classList.add('hidden');
         if (viewPersonal) viewPersonal.classList.remove('hidden');
@@ -4496,9 +4533,16 @@
           tabPersonal.style.color = 'var(--text-primary)';
         }
 
+        const gridBadge = document.getElementById('calGridModeBadge');
+        if (gridBadge) {
+          gridBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/30';
+          gridBadge.innerText = 'Personal Schedule';
+        }
+
         loadPersonalCalendar();
       }
       lucide.createIcons();
+      attachCursorHover();
     }
 
     // Legacy alias to maintain compatibility
@@ -4645,44 +4689,45 @@
       attachCursorHover();
     }
 
-    /* --- PERSONAL CALENDAR CONTROLLER (Gated by ID) --- */
-    function onSelectPersonalUserId(val) {
-      selectedPersonalUserId = parseInt(val);
-      loadPersonalCalendar(selectedPersonalUserId);
-    }
-
+    /* --- PERSONAL CALENDAR CONTROLLER (Strictly Gated by Login) --- */
     function resetPersonalCalendarToCurrentUser() {
-      selectedPersonalUserId = currentUser ? currentUser.id : null;
-      const select = document.getElementById('personalCalendarUserIdSelect');
-      if (select && selectedPersonalUserId) {
-        select.value = selectedPersonalUserId;
+      if (currentUser) {
+        loadPersonalCalendar(currentUser.id);
       }
-      loadPersonalCalendar(selectedPersonalUserId);
     }
 
     async function loadPersonalCalendar(targetUserId) {
       const list = document.getElementById('personalEventsList');
       if (!list) return;
 
-      const targetId = (targetUserId !== undefined && targetUserId !== null) 
-        ? targetUserId 
-        : (selectedPersonalUserId || (currentUser ? currentUser.id : 7)); // default to ID 7 demo if guest
+      if (!currentUser) {
+        cachedPersonalCalendar = null;
+        list.innerHTML = `
+          <div class="card-3d rounded-2xl border border-theme p-8 text-center space-y-4">
+            <div class="w-12 h-12 rounded-2xl bg-blue-600/10 text-blue-600 mx-auto flex items-center justify-center font-bold">
+              <i data-lucide="lock" class="w-6 h-6"></i>
+            </div>
+            <h4 class="text-base font-black text-theme-primary">Personal Calendar Locked</h4>
+            <p class="text-xs text-theme-muted max-w-md mx-auto">
+              Personal schedule is strictly private. Sign in with your student, advisor, or executive ID to access your personalized schedule, deliverables, and club milestones.
+            </p>
+            <button onclick="openAuthModal('login')" class="btn-mirror px-5 py-2.5 rounded-xl text-xs font-black text-white bg-blue-600 hover:bg-blue-500 shadow">
+              Sign In to View Schedule &rarr;
+            </button>
+          </div>
+        `;
+        lucide.createIcons();
+        attachCursorHover();
+        return;
+      }
+
+      const targetId = (targetUserId !== undefined && targetUserId !== null) ? targetUserId : currentUser.id;
 
       try {
         const url = `/api/events/personal-calendar?user_id=${targetId}`;
         const res = await fetch(url, { headers: getApiHeaders() });
         const data = await res.json();
         cachedPersonalCalendar = data;
-
-        // Populate Member ID Selector Directory
-        const userSelect = document.getElementById('personalCalendarUserIdSelect');
-        if (userSelect && data.users_directory) {
-          userSelect.innerHTML = data.users_directory.map(u => `
-            <option value="${u.id}" ${u.id === data.user_id ? 'selected' : ''}>
-              ID #${u.id}: ${u.name} (${u.role}${u.roll_no && u.roll_no !== 'N/A' ? ' • ' + u.roll_no : ''})
-            </option>
-          `).join('');
-        }
 
         // Update Personal Banner
         const idBadge = document.getElementById('personalUserIdBadge');
@@ -4692,14 +4737,14 @@
         const clubsTags = document.getElementById('personalEnrolledClubsTags');
         const headerIdBadge = document.getElementById('calPersonalIdBadge');
 
-        const activeId = data.user_id;
+        const activeId = data.user_id || currentUser.id;
         if (idBadge) idBadge.innerText = `User ID: #${activeId}`;
-        if (headerIdBadge) headerIdBadge.innerText = `ID: #${activeId}`;
-        if (nameEl) nameEl.innerText = `${data.user_name || 'Member'}'s Important Dates`;
-        if (roleBadge) roleBadge.innerText = data.user_role || 'MEMBER';
+        if (headerIdBadge) headerIdBadge.innerText = `My Schedule`;
+        if (nameEl) nameEl.innerText = `${data.user_name || currentUser.name || 'Member'}'s Important Dates`;
+        if (roleBadge) roleBadge.innerText = data.user_role || currentUser.role || 'MEMBER';
         if (rollEl) {
           const count = (data.enrolled_club_names || []).length;
-          rollEl.innerText = `Roll: ${data.roll_no || 'N/A'} • Enrolled in ${count} Club${count === 1 ? '' : 's'}`;
+          rollEl.innerText = `Roll: ${data.roll_no || currentUser.roll_no || 'N/A'} • Enrolled in ${count} Club${count === 1 ? '' : 's'}`;
         }
 
         if (clubsTags) {
