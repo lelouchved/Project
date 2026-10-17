@@ -165,61 +165,31 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 8px;
-      height: 8px;
-      background: radial-gradient(circle, #FFFFFF 50%, rgba(255, 255, 255, 0.95) 100%);
+      width: 5px;
+      height: 5px;
+      background: radial-gradient(circle, #FFFFFF 60%, rgba(255, 255, 255, 0.90) 100%);
       border-radius: 50%;
       pointer-events: none;
       z-index: 99999;
       transform: translate(-50%, -50%);
-      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.65), 0 0 10px #FFFFFF, 0 0 20px rgba(84, 101, 255, 0.95);
-      transition: width 0.18s cubic-bezier(0.16, 1, 0.3, 1), height 0.18s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.18s ease;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.75), 0 0 8px #FFFFFF, 0 0 14px rgba(84, 101, 255, 0.90);
+      transition: width 0.16s cubic-bezier(0.16, 1, 0.3, 1), height 0.16s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.16s ease;
     }
 
     #cursor-ring {
       position: fixed;
       top: 0;
       left: 0;
-      width: 42px;
-      height: 42px;
-      border: 1.5px solid rgba(255, 255, 255, 0.90);
+      width: 22px;
+      height: 22px;
+      border: 1.2px solid rgba(255, 255, 255, 0.70);
       border-radius: 50%;
       pointer-events: none;
       z-index: 99998;
       transform: translate(-50%, -50%);
-      transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), height 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
-      backdrop-filter: blur(1.5px);
-      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.40), 0 0 16px rgba(84, 101, 255, 0.40), inset 0 0 10px rgba(255, 255, 255, 0.08);
-    }
-
-    /* Fine precision hairline crosshair ticks */
-    #cursor-ring::before,
-    #cursor-ring::after {
-      content: '';
-      position: absolute;
-      background: rgba(255, 255, 255, 0.90);
-      pointer-events: none;
-      transition: opacity 0.2s ease;
-    }
-    #cursor-ring::before {
-      top: 50%;
-      left: -5px;
-      right: -5px;
-      height: 1px;
-      transform: translateY(-50%);
-      opacity: 0.5;
-      mask-image: linear-gradient(to right, white, transparent 35%, transparent 65%, white);
-      -webkit-mask-image: linear-gradient(to right, white, transparent 35%, transparent 65%, white);
-    }
-    #cursor-ring::after {
-      left: 50%;
-      top: -5px;
-      bottom: -5px;
-      width: 1px;
-      transform: translateX(-50%);
-      opacity: 0.5;
-      mask-image: linear-gradient(to bottom, white, transparent 35%, transparent 65%, white);
-      -webkit-mask-image: linear-gradient(to bottom, white, transparent 35%, transparent 65%, white);
+      transition: width 0.20s cubic-bezier(0.16, 1, 0.3, 1), height 0.20s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+      backdrop-filter: blur(1px);
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35), 0 0 10px rgba(84, 101, 255, 0.40), inset 0 0 6px rgba(255, 255, 255, 0.08);
     }
 
     #cursor-trail-canvas {
@@ -233,35 +203,31 @@
     }
 
     .cursor-hover #cursor-ring {
-      width: 56px;
-      height: 56px;
-      border-color: #FFFFFF;
-      background-color: rgba(255, 255, 255, 0.10);
-      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.60), 0 0 24px rgba(84, 101, 255, 0.70), inset 0 0 14px rgba(255, 255, 255, 0.15);
+      width: 32px;
+      height: 32px;
+      border-color: #00F0FF;
+      background-color: rgba(0, 240, 255, 0.08);
+      box-shadow: 0 0 0 1px rgba(0, 240, 255, 0.45), 0 0 16px rgba(84, 101, 255, 0.65), inset 0 0 8px rgba(0, 240, 255, 0.15);
     }
     .cursor-hover #cursor-dot {
-      width: 5px;
-      height: 5px;
+      width: 4px;
+      height: 4px;
       background-color: #00F0FF;
-      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.8), 0 0 12px #00F0FF, 0 0 22px #5465FF;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.8), 0 0 8px #00F0FF, 0 0 16px #5465FF;
     }
 
     /* Light Mode Contrast Calibration */
     :root[data-theme="light"] #cursor-dot {
       background: #09090B;
-      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9), 0 0 8px rgba(37, 99, 235, 0.7);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9), 0 0 6px rgba(37, 99, 235, 0.7);
     }
     :root[data-theme="light"] #cursor-ring {
-      border-color: rgba(15, 23, 42, 0.90);
-      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.9), 0 0 14px rgba(37, 99, 235, 0.30);
-    }
-    :root[data-theme="light"] #cursor-ring::before,
-    :root[data-theme="light"] #cursor-ring::after {
-      background: rgba(15, 23, 42, 0.80);
+      border-color: rgba(15, 23, 42, 0.65);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.8), 0 0 10px rgba(37, 99, 235, 0.25);
     }
     :root[data-theme="light"] .cursor-hover #cursor-dot {
       background-color: #1D4ED8;
-      box-shadow: 0 0 10px #1D4ED8, 0 0 20px #2563EB;
+      box-shadow: 0 0 8px #1D4ED8, 0 0 16px #2563EB;
     }
     :root[data-theme="light"] .cursor-hover #cursor-ring {
       border-color: #1D4ED8;
@@ -3854,8 +3820,8 @@
         return;
       }
 
-      ringX += (mouseX - ringX) * 0.16;
-      ringY += (mouseY - ringY) * 0.16;
+      ringX += (mouseX - ringX) * 0.18;
+      ringY += (mouseY - ringY) * 0.18;
       cursorRing.style.left = `${ringX}px`;
       cursorRing.style.top = `${ringY}px`;
 
