@@ -21,19 +21,44 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
     
-    /* Cross-platform Android, iOS & Windows base adjustments */
+    /* ========================================================
+       CROSS-PLATFORM ENGINE (ANDROID • IOS • WINDOWS)
+       ======================================================== */
     html {
       -webkit-text-size-adjust: 100%;
       -webkit-tap-highlight-color: transparent;
       scroll-behavior: smooth;
     }
 
-    /* Fast mobile touch response - eliminate 300ms tap delay on iOS/Android */
+    /* Windows 10/11 & macOS: Sub-pixel antialiasing & ClearType typography */
+    body {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      overflow-x: hidden;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    /* Fast touch response: eliminates 300ms delay on Android Chrome & iOS Safari */
     button, a, input, select, textarea, .btn-mirror, .tab-btn, .card-3d {
       touch-action: manipulation;
     }
 
-    /* Sleek custom scrollbars for Windows (Chromium & Firefox) */
+    /* iOS Safari Fix: Prevent auto-zoom on input focus by setting 16px minimum font-size on mobile screens */
+    @media screen and (max-width: 768px) {
+      input, select, textarea {
+        font-size: 16px !important;
+      }
+    }
+
+    /* Android & iOS: Contain modal overscroll to prevent rubber-band bounce on background */
+    .card-3d, [role="dialog"], #addPersonalNoteModal > div, #scheduleCommonEventModal > div, #pushClubEventModal > div, #authModal > div {
+      overscroll-behavior-y: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Sleek custom scrollbars for Windows (Chromium, Edge, & Firefox) */
     ::-webkit-scrollbar {
       width: 7px;
       height: 7px;
@@ -53,8 +78,8 @@
       scrollbar-color: rgba(160, 160, 160, 0.28) transparent;
     }
 
-    /* On touch devices (Android, iOS smartphones & tablets): disable custom desktop cursor */
-    @media (pointer: coarse), (hover: none) {
+    /* Pure mobile touchscreens (Android phones & iOS without mouse): disable custom cursor */
+    @media (hover: none) and (pointer: coarse) {
       #cursor-dot, #cursor-ring, #cursor-trail-canvas {
         display: none !important;
       }
@@ -148,30 +173,30 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 10px;
-      height: 10px;
+      width: 12px;
+      height: 12px;
       background-color: #FFFFFF;
       border-radius: 50%;
       pointer-events: none;
       z-index: 99999;
       transform: translate(-50%, -50%);
-      box-shadow: 0 0 16px #FFFFFF, 0 0 28px rgba(84, 101, 255, 0.95), 0 0 45px rgba(0, 240, 255, 0.70);
+      box-shadow: 0 0 18px #FFFFFF, 0 0 32px rgba(84, 101, 255, 1), 0 0 50px rgba(0, 240, 255, 0.85);
       transition: width 0.2s, height 0.2s, background-color 0.2s;
     }
     #cursor-ring {
       position: fixed;
       top: 0;
       left: 0;
-      width: 44px;
-      height: 44px;
-      border: 2px solid rgba(255, 255, 255, 0.85);
+      width: 48px;
+      height: 48px;
+      border: 2px solid rgba(255, 255, 255, 0.90);
       border-radius: 50%;
       pointer-events: none;
       z-index: 99998;
       transform: translate(-50%, -50%);
       transition: width 0.25s ease-out, height 0.25s ease-out, border-color 0.25s ease-out, background-color 0.25s ease-out;
       backdrop-filter: blur(2px);
-      box-shadow: 0 0 20px rgba(84, 101, 255, 0.45);
+      box-shadow: 0 0 24px rgba(84, 101, 255, 0.55);
     }
     #cursor-trail-canvas {
       position: fixed;
@@ -183,15 +208,15 @@
       z-index: 99997;
     }
     .cursor-hover #cursor-ring {
-      width: 62px;
-      height: 62px;
+      width: 68px;
+      height: 68px;
       border-color: #FFFFFF;
-      background-color: rgba(255, 255, 255, 0.16);
-      box-shadow: 0 0 30px rgba(84, 101, 255, 0.65);
+      background-color: rgba(255, 255, 255, 0.20);
+      box-shadow: 0 0 35px rgba(84, 101, 255, 0.75);
     }
     .cursor-hover #cursor-dot {
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
       background-color: #FFFFFF;
       box-shadow: 0 0 20px #FFFFFF, 0 0 35px #5465FF;
     }
@@ -512,9 +537,14 @@
   </div>
 
   <!-- ======================================================== -->
+  <!-- MOBILE SIDEBAR BACKDROP OVERLAY (ANDROID & IOS) -->
+  <!-- ======================================================== -->
+  <div id="sidebarMobileBackdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-35 lg:hidden hidden transition-opacity duration-300"></div>
+
+  <!-- ======================================================== -->
   <!-- LEFT VERTICAL SIDEBAR NAVIGATION (FIXED) -->
   <!-- ======================================================== -->
-  <aside id="appSidebar" class="w-64 fixed left-0 top-0 bottom-0 z-40 border-r border-theme flex flex-col justify-between backdrop-blur-xl transition-transform duration-300 -translate-x-full lg:translate-x-0" style="background-color: var(--sidebar-bg);">
+  <aside id="appSidebar" class="w-64 fixed left-0 top-0 bottom-0 z-40 border-r border-theme flex flex-col justify-between backdrop-blur-xl transition-transform duration-300 -translate-x-full lg:translate-x-0" style="background-color: var(--sidebar-bg); padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);">
     
     <!-- Top Brand & Hierarchy -->
     <div class="p-5 border-b border-theme space-y-4">
@@ -687,8 +717,8 @@
   <!-- ======================================================== -->
   <div class="flex-1 lg:ml-64 flex flex-col min-h-screen relative z-10">
     
-    <!-- TOP MOBILE BAR (Visible on mobile) -->
-    <header class="lg:hidden border-b border-theme py-2.5 px-3.5 sticky top-0 z-30 backdrop-blur-md flex items-center justify-between" style="background-color: var(--header-bg);">
+    <!-- TOP MOBILE BAR (Visible on mobile: Android & iOS) -->
+    <header class="lg:hidden border-b border-theme py-2.5 px-3.5 sticky top-0 z-30 backdrop-blur-md flex items-center justify-between" style="background-color: var(--header-bg); padding-top: max(0.625rem, env(safe-area-inset-top, 0px)); padding-left: max(0.875rem, env(safe-area-inset-left, 0px)); padding-right: max(0.875rem, env(safe-area-inset-right, 0px));">
       <div class="flex items-center space-x-2">
         <button onclick="toggleMobileSidebar()" class="btn-mirror p-2 rounded-xl text-theme-primary">
           <i data-lucide="menu" class="w-5 h-5"></i>
@@ -3607,7 +3637,16 @@
     /* Mobile Sidebar Toggle */
     function toggleMobileSidebar() {
       const sidebar = document.getElementById('appSidebar');
-      sidebar.classList.toggle('-translate-x-full');
+      const backdrop = document.getElementById('sidebarMobileBackdrop');
+      if (!sidebar) return;
+      const isClosed = sidebar.classList.contains('-translate-x-full');
+      if (isClosed) {
+        sidebar.classList.remove('-translate-x-full');
+        if (backdrop) backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        if (backdrop) backdrop.classList.add('hidden');
+      }
     }
 
     /* ==========================================
@@ -3638,26 +3677,26 @@
       cursorDot.style.left = `${mouseX}px`;
       cursorDot.style.top = `${mouseY}px`;
 
-      // Track smooth trailing ribbon positions
+      // Track smooth trailing ribbon positions (longer tail history)
       trailPoints.push({ x: mouseX, y: mouseY, age: 0 });
-      if (trailPoints.length > 22) {
+      if (trailPoints.length > 28) {
         trailPoints.shift();
       }
 
-      // Spawn larger, vibrant radiant stardust particles
+      // Spawn larger, vibrant radiant stardust particles (thoda or visible and bada)
       const colors = currentTheme === 'dark' 
-        ? ['#FFFFFF', '#5465FF', '#788BFF', '#9BB1FF', '#00F0FF', '#38BDF8']
-        : ['#4338CA', '#2563EB', '#1D4ED8', '#0284C7', '#0F172A'];
-      for (let k = 0; k < 2; k++) {
+        ? ['#FFFFFF', '#5465FF', '#788BFF', '#9BB1FF', '#00F0FF', '#38BDF8', '#E2FDFF']
+        : ['#1D4ED8', '#2563EB', '#3B82F6', '#0284C7', '#0F172A'];
+      for (let k = 0; k < 3; k++) {
         particles.push({
-          x: mouseX + (Math.random() - 0.5) * 6,
-          y: mouseY + (Math.random() - 0.5) * 6,
-          vx: (Math.random() - 0.5) * 2.2,
-          vy: (Math.random() - 0.5) * 2.2 - 0.5,
-          size: Math.random() * 5 + 3.2,
+          x: mouseX + (Math.random() - 0.5) * 8,
+          y: mouseY + (Math.random() - 0.5) * 8,
+          vx: (Math.random() - 0.5) * 2.6,
+          vy: (Math.random() - 0.5) * 2.6 - 0.6,
+          size: Math.random() * 6 + 4.2, // 4.2px to 10.2px (visibly larger)
           color: colors[Math.floor(Math.random() * colors.length)],
           alpha: 1.0,
-          decay: Math.random() * 0.02 + 0.014
+          decay: Math.random() * 0.018 + 0.012 // Lingers longer and remains luminous
         });
       }
     });
@@ -3683,8 +3722,8 @@
           const ptPrev = trailPoints[i - 1];
           const ptCurr = trailPoints[i];
           const progress = i / trailPoints.length;
-          const lineWidth = progress * 7.0;
-          const alpha = progress * 0.70;
+          const lineWidth = progress * 9.5; // Thicker visible ribbon
+          const alpha = progress * 0.88; // Highly visible glow
           
           ctx.save();
           ctx.beginPath();
@@ -3694,7 +3733,7 @@
           ctx.lineJoin = 'round';
           ctx.lineWidth = lineWidth;
           ctx.strokeStyle = currentTheme === 'dark' ? `rgba(84, 101, 255, ${alpha})` : `rgba(37, 99, 235, ${alpha})`;
-          ctx.shadowBlur = 16;
+          ctx.shadowBlur = 22;
           ctx.shadowColor = currentTheme === 'dark' ? '#00F0FF' : '#2563EB';
           ctx.stroke();
           ctx.restore();
@@ -3704,7 +3743,7 @@
       // Age and prune trailPoints smoothly if mouse pauses
       for (let i = trailPoints.length - 1; i >= 0; i--) {
         trailPoints[i].age += 1;
-        if (trailPoints[i].age > 18) {
+        if (trailPoints[i].age > 22) {
           trailPoints.splice(i, 1);
         }
       }
@@ -4279,6 +4318,19 @@
           if (addEventBtn) addEventBtn.classList.add('hidden');
         }
       }
+
+      const mobileAcc = document.getElementById('mobileAccountBtn');
+      if (mobileAcc) {
+        if (!currentUser) {
+          mobileAcc.innerText = 'Account';
+          mobileAcc.onclick = () => openAuthModal('login');
+        } else {
+          const shortName = (currentUser.name || 'Member').split(' ')[0];
+          mobileAcc.innerHTML = `<span>👤 ${shortName}</span>`;
+          mobileAcc.onclick = () => switchTab('settings');
+        }
+      }
+
       if (typeof checkDeadlinesAndAlerts === 'function') {
         checkDeadlinesAndAlerts();
       }
@@ -4576,8 +4628,10 @@
       else if (tabId === 'settings') loadSettingsView();
 
       const sidebar = document.getElementById('appSidebar');
+      const backdrop = document.getElementById('sidebarMobileBackdrop');
       if (window.innerWidth < 1024) {
-        sidebar.classList.add('-translate-x-full');
+        if (sidebar) sidebar.classList.add('-translate-x-full');
+        if (backdrop) backdrop.classList.add('hidden');
       }
     }
 
