@@ -4680,6 +4680,11 @@
             ` : `
               <span class="btn-mirror px-3 py-1.5 rounded-xl text-xs text-theme-muted font-mono border border-theme">Scheduled</span>
             `}
+            ${userHasCalendarAuthority ? `
+              <button onclick="deleteCalendarEvent(${e.id})" class="btn-mirror p-2 rounded-xl text-xs font-bold text-rose-500 hover:bg-rose-500/10 border border-rose-500/30 transition" title="Delete event">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            ` : ''}
           </div>
         `;
         list.appendChild(item);
@@ -4687,6 +4692,26 @@
 
       lucide.createIcons();
       attachCursorHover();
+    }
+
+    async function deleteCalendarEvent(eventId) {
+      if (!confirm('Are you sure you want to delete this event from the calendar?')) return;
+      try {
+        const res = await fetch(`/api/events/${eventId}`, {
+          method: 'DELETE',
+          headers: getApiHeaders()
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showAlert(data.message || 'Event deleted successfully!');
+          loadCommonCalendar();
+          if (currentUser) loadPersonalCalendar();
+        } else {
+          showAlert(data.detail || 'Failed to delete event', 'error');
+        }
+      } catch (err) {
+        showAlert('Network error deleting event: ' + err.message, 'error');
+      }
     }
 
     /* --- PERSONAL CALENDAR CONTROLLER (Strictly Gated by Login) --- */
@@ -4988,6 +5013,11 @@
           <div class="flex items-center space-x-3 shrink-0 self-end md:self-center">
             ${statusBadge}
             ${actionCta}
+            ${(item.event_id && userHasCalendarAuthority) ? `
+              <button onclick="deleteCalendarEvent(${item.event_id})" class="btn-mirror p-2 rounded-xl text-xs font-bold text-rose-500 hover:bg-rose-500/10 border border-rose-500/30 transition" title="Delete event">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            ` : ''}
           </div>
         `;
 

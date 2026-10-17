@@ -510,3 +510,35 @@ def create_event(
         has_active_session=False,
         created_by_name=current_user.name
     )
+
+@router.delete("/{event_id}")
+def delete_event(
+    event_id: int,
+    current_user: Optional[User] = Depends(get_optional_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Delete an event from the calendar.
+    Requires President, Advisor, Admin, or Creator.
+    """
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Authentication required to delete events")
+
+    event = db.query(Event).filter(Event.id == event_id).first()
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    is_domain_auth = getattr(current_user, "is_domain_authorized", False) or current_user.role in ["ADMIN", "CAMPUS_MANAGER"]
+    pres_clubs = [m.club_id for m in current_user.memberships if m.post in ["PRESIDENT", "VICE_PRESIDENT"]]
+    adv_clubs = [c.id for c in current_user.advised_clubs]
+
+    can_delete = is_domain_auth or (event.club_id in pres_clubs) or (event.club_id in adv_clubs) or (event.created_by_id == current_user.id)
+    if not can_delete:
+        raise HTTPException(status_code=403, detail="You do not have permission to delete this event.")
+
+    title = event.title
+    db.delete(event)
+    db.commit()
+
+    return {"status": "success", "message": f"Event '{title}' deleted successfully"}
+
