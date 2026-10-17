@@ -30,6 +30,7 @@ class User(Base):
     password_hash = Column(String(255), nullable=False)
     role = Column(String(50), nullable=False)  # ADMIN, CAMPUS_MANAGER, FACULTY_ADVISOR, STUDENT
     is_domain_authorized = Column(Boolean, default=False)  # Granted via passkey "Yuzuru"
+    avatar_url = Column(String(255), nullable=True)
     campus_id = Column(Integer, ForeignKey("campuses.id"), nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 

@@ -347,6 +347,32 @@ def get_personal_calendar(
                 "deliverable_info": "Recruitment window"
             })
 
+    # 4. Personal Reminders & Notes (Private to target_user only)
+    personal_notes = db.query(Event).filter(
+        Event.visibility == "PERSONAL",
+        Event.created_by_id == target_user.id
+    ).order_by(Event.date.asc()).all()
+
+    for pn in personal_notes:
+        items.append({
+            "id": f"personal_note_{pn.id}",
+            "event_id": pn.id,
+            "title": pn.title,
+            "description": pn.description,
+            "date": pn.date.isoformat(),
+            "time": pn.date.strftime("%I:%M %p"),
+            "venue": pn.venue or "Personal Note",
+            "category": "PERSONAL_NOTE",
+            "club_id": None,
+            "club_name": "Private Note",
+            "is_important": False,
+            "pushed_by_authority": False,
+            "is_personal": True,
+            "badge": "📝 Personal Note",
+            "badge_color": "emerald",
+            "deliverable_info": pn.deliverable_info
+        })
+
     # Sort all personal calendar items chronologically
     items.sort(key=lambda x: x["date"])
 
@@ -438,6 +464,50 @@ def add_important_club_event(
         "creator_role": creator_role
     }
 
+class PersonalNoteCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+    date: datetime
+    venue: Optional[str] = "Personal Note"
+    deliverable_info: Optional[str] = None
+
+@router.post("/personal-note")
+def add_personal_note(
+    data: PersonalNoteCreate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Personal Calendar Editing for Students & All Members:
+    Allows student candidates and all users to edit their calendar for themselves only.
+    Cannot publish or mark important events for others.
+    """
+    event = Event(
+        club_id=None,
+        title=data.title.strip(),
+        description=data.description.strip() if data.description else None,
+        event_type="PERSONAL_NOTE",
+        visibility="PERSONAL",
+        is_important=False,
+        date=data.date,
+        venue=data.venue or "Personal Note",
+        deliverable_info=data.deliverable_info,
+        status="SCHEDULED",
+        created_by_id=current_user.id
+    )
+    db.add(event)
+    db.commit()
+    db.refresh(event)
+
+    return {
+        "status": "success",
+        "message": "Personal reminder added to your private calendar!",
+        "event_id": event.id,
+        "title": event.title,
+        "date": event.date.isoformat(),
+        "is_personal": True
+    }
+
 @router.post("", response_model=EventOut)
 def create_event(
     event_in: EventCreate,
@@ -445,11 +515,67 @@ def create_event(
     db: Session = Depends(get_db)
 ):
     """
-    Common Calendar & Club Events Creator.
-    Only Club Presidents, Club Advisors (Faculty Advisors), Campus Managers, Admins, 
-    and Keyholders with Domain Authority have authority to schedule/publish.
+    Common Calendar & Club Events Creator:
+    - If visibility is PERSONAL: Any authenticated member / student candidate can create
+      private calendar notes for themselves (is_important forced to False).
+    - If visibility is PUBLIC, CAMPUS_STUDENTS, or CLUB_ONLY: Strictly requires Club President,
+      Club Faculty Advisor, Campus Manager, or Admin authority. Student candidates get 403 Forbidden.
     """
     is_domain_auth = getattr(current_user, "is_domain_authorized", False) or current_user.role in ["ADMIN", "CAMPUS_MANAGER"]
+
+    # Student personal note flow
+    if event_in.visibility == "PERSONAL":
+        # Force is_important to False for personal student notes
+        event = Event(
+            club_id=event_in.club_id,
+            title=event_in.title,
+            description=event_in.description,
+            event_type="PERSONAL_NOTE",
+            visibility="PERSONAL",
+            date=event_in.date,
+            venue=event_in.venue or "Personal Note",
+            deliverable_info=event_in.deliverable_info,
+            status="SCHEDULED",
+            is_important=False,
+            created_by_id=current_user.id
+        )
+        db.add(event)
+        db.commit()
+        db.refresh(event)
+
+        return EventOut(
+            id=event.id,
+            club_id=event.club_id,
+            club_name=event.club.name if event.club else "Personal Note",
+            title=event.title,
+            description=event.description,
+            event_type=event.event_type,
+            visibility=event.visibility,
+            date=event.date,
+            venue=event.venue,
+            deliverable_info=event.deliverable_info,
+            status=event.status,
+            is_important=False,
+            has_active_session=False,
+            created_by_name=current_user.name
+        )
+
+    # If publishing public/campus/club events, students are strictly forbidden
+    if event_in.is_important and not is_domain_auth:
+        # Check if user is president or advisor
+        if event_in.club_id:
+            membership = db.query(ClubMembership).filter(
+                ClubMembership.club_id == event_in.club_id,
+                ClubMembership.user_id == current_user.id
+            ).first()
+            is_pres = membership and membership.post in ["PRESIDENT", "VICE_PRESIDENT"]
+            club = db.query(Club).filter(Club.id == event_in.club_id).first()
+            is_advisor = club and current_user.id == club.faculty_advisor_id
+            if not (is_pres or is_advisor):
+                raise HTTPException(
+                    status_code=403,
+                    detail="Student candidates cannot publish or mark important events. You can only edit your own personal calendar by adding personal notes."
+                )
 
     if event_in.club_id:
         club = db.query(Club).filter(Club.id == event_in.club_id).first()
@@ -467,7 +593,7 @@ def create_event(
         if not (is_domain_auth or is_lead or is_faculty):
             raise HTTPException(
                 status_code=403,
-                detail="Only Club Presidents, Club Advisors, and Campus Leadership have authority to add or update events on the Common Calendar."
+                detail="Student candidates cannot publish or change club events. Only Club Presidents, Club Advisors, and Campus Leadership have authority to add or update events on the Common Calendar."
             )
     else:
         # College-wide event

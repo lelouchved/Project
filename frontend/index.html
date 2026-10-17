@@ -2,7 +2,11 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#000000" id="themeColorMeta">
+  <meta name="format-detection" content="telephone=no">
   <title>Welcome to Mirai Clubs | Governance & Activities Ecosystem</title>
   
   <!-- Tailwind CSS & Lucide Icons -->
@@ -16,6 +20,45 @@
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+    
+    /* Cross-platform Android, iOS & Windows base adjustments */
+    html {
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+      scroll-behavior: smooth;
+    }
+
+    /* Fast mobile touch response - eliminate 300ms tap delay on iOS/Android */
+    button, a, input, select, textarea, .btn-mirror, .tab-btn, .card-3d {
+      touch-action: manipulation;
+    }
+
+    /* Sleek custom scrollbars for Windows (Chromium & Firefox) */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(160, 160, 160, 0.28);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(160, 160, 160, 0.50);
+    }
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(160, 160, 160, 0.28) transparent;
+    }
+
+    /* On touch devices (Android, iOS smartphones & tablets): disable custom desktop cursor */
+    @media (pointer: coarse), (hover: none) {
+      #cursor-dot, #cursor-ring, #cursor-trail-canvas {
+        display: none !important;
+      }
+    }
     
     /* ========================================================
        THEME DESIGN TOKENS
@@ -87,7 +130,14 @@
       overflow-x: hidden;
       margin: 0;
       padding: 0;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
       cursor: default;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      -webkit-overflow-scrolling: touch;
     }
     .font-mono { font-family: 'JetBrains Mono', monospace; }
 
@@ -98,29 +148,30 @@
       position: fixed;
       top: 0;
       left: 0;
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       background-color: #FFFFFF;
       border-radius: 50%;
       pointer-events: none;
       z-index: 99999;
       transform: translate(-50%, -50%);
-      box-shadow: 0 0 14px #FFFFFF, 0 0 28px rgba(0, 163, 255, 0.85);
+      box-shadow: 0 0 16px #FFFFFF, 0 0 28px rgba(84, 101, 255, 0.95), 0 0 45px rgba(0, 240, 255, 0.70);
       transition: width 0.2s, height 0.2s, background-color 0.2s;
     }
     #cursor-ring {
       position: fixed;
       top: 0;
       left: 0;
-      width: 36px;
-      height: 36px;
-      border: 1.5px solid rgba(255, 255, 255, 0.75);
+      width: 44px;
+      height: 44px;
+      border: 2px solid rgba(255, 255, 255, 0.85);
       border-radius: 50%;
       pointer-events: none;
       z-index: 99998;
       transform: translate(-50%, -50%);
       transition: width 0.25s ease-out, height 0.25s ease-out, border-color 0.25s ease-out, background-color 0.25s ease-out;
       backdrop-filter: blur(2px);
+      box-shadow: 0 0 20px rgba(84, 101, 255, 0.45);
     }
     #cursor-trail-canvas {
       position: fixed;
@@ -132,17 +183,17 @@
       z-index: 99997;
     }
     .cursor-hover #cursor-ring {
-      width: 56px;
-      height: 56px;
+      width: 62px;
+      height: 62px;
       border-color: #FFFFFF;
-      background-color: rgba(255, 255, 255, 0.12);
-      box-shadow: 0 0 25px rgba(255, 255, 255, 0.45);
+      background-color: rgba(255, 255, 255, 0.16);
+      box-shadow: 0 0 30px rgba(84, 101, 255, 0.65);
     }
     .cursor-hover #cursor-dot {
-      width: 12px;
-      height: 12px;
+      width: 14px;
+      height: 14px;
       background-color: #FFFFFF;
-      box-shadow: 0 0 16px #FFFFFF;
+      box-shadow: 0 0 20px #FFFFFF, 0 0 35px #5465FF;
     }
 
     /* 3D Canvas Background */
@@ -480,15 +531,23 @@
       </div>
 
       <!-- User Status Card / Guest Indicator -->
-      <div id="userStatusCard" class="card-3d p-3 rounded-2xl border border-theme text-xs space-y-1.5" style="background-color: var(--bg-surface-elevated);">
-        <div class="flex items-center justify-between">
-          <span class="text-[10px] font-mono uppercase text-zinc-400 font-bold tracking-wider">Session</span>
-          <span id="roleBadge" class="px-2 py-0.5 rounded-full text-[10px] font-mono border border-white/20 bg-black/60 text-white font-semibold">
-            Guest / Public
-          </span>
+      <div id="userStatusCard" class="card-3d p-3 rounded-2xl border border-theme text-xs space-y-2 cursor-pointer hover:border-cyan-500/40 transition" onclick="switchTab('settings')" style="background-color: var(--bg-surface-elevated);" title="Click to open Settings & Profile">
+        <div class="flex items-center space-x-3">
+          <div id="userAvatarContainer" class="relative shrink-0">
+            <div id="userAvatarImg" class="w-10 h-10 rounded-full border border-theme bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 flex items-center justify-center font-bold text-xs text-theme-primary overflow-hidden shadow-sm">
+              <span id="userAvatarInitials">👤</span>
+            </div>
+          </div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center justify-between">
+              <span id="roleBadge" class="px-2 py-0.5 rounded-full text-[9px] font-mono border border-white/20 bg-black/60 text-white font-semibold">
+                Guest / Public
+              </span>
+            </div>
+            <div id="userDisplayName" class="font-bold text-sm text-theme-primary truncate mt-0.5">Welcome, Visitor</div>
+            <div id="userCampusCode" class="text-[10px] text-theme-muted font-mono truncate">HIET • RIT • JU</div>
+          </div>
         </div>
-        <div id="userDisplayName" class="font-bold text-sm text-white truncate">Welcome, Visitor</div>
-        <div id="userCampusCode" class="text-[11px] text-zinc-400 font-mono">HIET • RIT • JU</div>
       </div>
     </div>
 
@@ -528,6 +587,12 @@
       <button onclick="switchTab('authority')" id="tab-authority" class="hidden tab-btn w-full px-3.5 py-2.5 rounded-xl flex items-center space-x-3 text-left transition btn-mirror text-amber-400 hover:text-amber-300 border border-amber-500/40 glow-yuzuru">
         <i data-lucide="shield-alert" class="w-4 h-4 text-amber-400"></i>
         <span>Domain Authority</span>
+      </button>
+
+      <!-- Universal Settings Tab (Available for everyone) -->
+      <button onclick="switchTab('settings')" id="tab-settings" class="tab-btn w-full px-3.5 py-2.5 rounded-xl flex items-center space-x-3 text-left transition btn-mirror text-theme-muted hover:text-theme-primary">
+        <i data-lucide="settings" class="w-4 h-4 text-cyan-400"></i>
+        <span>Settings & Profile</span>
       </button>
 
       <div class="pt-3 pb-1 border-t border-theme">
@@ -638,7 +703,10 @@
           <i data-lucide="bell" class="w-4 h-4"></i>
           <span id="deadlineBadgeMobile" class="hidden absolute -top-1 -right-1 w-3.5 h-3.5 bg-rose-500 text-white font-bold text-[8px] rounded-full flex items-center justify-center">!</span>
         </button>
-        <button onclick="openAuthModal('login')" class="btn-mirror px-3 py-1.5 rounded-xl text-xs font-bold text-theme-primary border border-theme">
+        <button onclick="switchTab('settings')" class="btn-mirror p-2 rounded-xl text-theme-primary border border-theme hover:border-cyan-400" title="Settings & Profile">
+          <i data-lucide="settings" class="w-4 h-4 text-cyan-400"></i>
+        </button>
+        <button onclick="openAuthModal('login')" id="mobileAccountBtn" class="btn-mirror px-3 py-1.5 rounded-xl text-xs font-bold text-theme-primary border border-theme">
           Account
         </button>
       </div>
@@ -671,7 +739,21 @@
           <span id="deadlineBadge" class="hidden absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white font-black text-[9px] rounded-full flex items-center justify-center animate-pulse">0</span>
         </button>
 
-        <button onclick="openAuthModal('login')" class="btn-mirror px-4 py-2 rounded-xl text-xs font-bold text-theme-primary border border-theme hover:border-blue-500 shadow-sm">
+        <!-- UNIVERSAL SETTINGS BUTTON -->
+        <button onclick="switchTab('settings')" class="btn-mirror px-3 py-2 rounded-xl text-xs font-bold text-theme-primary border border-theme hover:border-cyan-400 transition flex items-center space-x-1.5 shadow-sm" title="Settings & Profile">
+          <i data-lucide="settings" class="w-4 h-4 text-cyan-400"></i>
+          <span>Settings</span>
+        </button>
+
+        <!-- Header Profile Indicator / Account Portal Button -->
+        <div id="headerUserChip" class="hidden flex items-center space-x-2 pl-1 cursor-pointer" onclick="switchTab('settings')" title="View Settings & Profile">
+          <div id="headerAvatarImg" class="w-8 h-8 rounded-full border border-theme bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 flex items-center justify-center font-bold text-xs text-theme-primary overflow-hidden shadow-sm">
+            <span id="headerAvatarInitials">👤</span>
+          </div>
+          <span id="headerUserName" class="text-xs font-bold text-theme-primary hidden xl:inline-block max-w-[120px] truncate">User</span>
+        </div>
+
+        <button onclick="openAuthModal('login')" id="headerLoginBtn" class="btn-mirror px-4 py-2 rounded-xl text-xs font-bold text-theme-primary border border-theme hover:border-blue-500 shadow-sm">
           Account Portal &rarr;
         </button>
       </div>
@@ -1807,8 +1889,8 @@
           <div class="card-3d rounded-3xl border border-theme p-6 space-y-4 bg-gradient-to-r from-blue-600/5 via-indigo-600/5 to-purple-600/5">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div class="flex items-center space-x-4">
-                <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-black text-lg border border-emerald-500/30">
-                  <i data-lucide="calendar" class="w-6 h-6"></i>
+                <div id="personalUserAvatarImg" class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-black text-lg border border-emerald-500/30 overflow-hidden shrink-0 shadow-sm">
+                  <span id="personalUserAvatarInitials">👤</span>
                 </div>
                 <div>
                   <div class="flex items-center space-x-2">
@@ -1819,7 +1901,11 @@
                   <div id="personalUserRoll" class="text-xs text-theme-muted font-mono">Roll: -- • Enrolled in 0 Clubs</div>
                 </div>
               </div>
-              <div class="flex items-center space-x-2">
+              <div class="flex flex-wrap items-center gap-2">
+                <button onclick="openAddPersonalNoteModal()" class="btn-mirror px-4 py-2 rounded-xl text-xs font-black text-white bg-emerald-600 hover:bg-emerald-500 shadow flex items-center space-x-1.5">
+                  <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                  <span>+ Add Personal Reminder</span>
+                </button>
                 <button onclick="loadPersonalCalendar()" class="btn-mirror px-3.5 py-2 rounded-xl text-xs font-bold text-theme-primary border border-theme flex items-center space-x-1.5">
                   <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
                   <span>Sync Dates</span>
@@ -1843,6 +1929,9 @@
             </button>
             <button onclick="filterPersonalCalendar('important')" id="filterPersonalImportant" class="personal-filter-btn px-3.5 py-1.5 rounded-xl font-bold text-theme-muted hover:text-theme-primary border border-theme transition">
               ⭐ Added by President/Advisor (<span id="countPersonalImportant">0</span>)
+            </button>
+            <button onclick="filterPersonalCalendar('personal')" id="filterPersonalNotes" class="personal-filter-btn px-3.5 py-1.5 rounded-xl font-bold text-theme-muted hover:text-theme-primary border border-theme transition">
+              📝 Private Notes (<span id="countPersonalNotes">0</span>)
             </button>
             <button onclick="filterPersonalCalendar('assignment')" id="filterPersonalAssignment" class="personal-filter-btn px-3.5 py-1.5 rounded-xl font-bold text-theme-muted hover:text-theme-primary border border-theme transition">
               📝 Project Deadlines (<span id="countPersonalAssignment">0</span>)
@@ -2269,6 +2358,320 @@
           <div id="analyticsClubsGrid" class="space-y-5">
             <!-- Dynamically populated with cards for Nextcell, Kaizen, Malhar, and Sports -->
           </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 7. SETTINGS & PROFILE VIEW (FOR EVERYONE) -->
+      <!-- ========================================== -->
+      <section id="view-settings" class="space-y-8 hidden">
+        <!-- Header Card -->
+        <div class="card-3d rounded-3xl border border-theme p-6 sm:p-8 space-y-3 bg-gradient-to-r from-blue-600/5 via-cyan-600/5 to-purple-600/5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center space-x-4">
+              <div class="w-14 h-14 rounded-2xl bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold text-2xl border border-cyan-500/30">
+                <i data-lucide="settings" class="w-7 h-7"></i>
+              </div>
+              <div>
+                <div class="flex items-center space-x-2">
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 uppercase">Universal Configuration</span>
+                  <span class="text-xs text-theme-muted font-mono">• All Members & Leadership</span>
+                </div>
+                <h2 class="text-2xl font-black text-theme-primary mt-0.5">Account Settings & Club Governance</h2>
+                <p class="text-xs text-theme-muted">Customize your profile photo, manage presidential club logos, and calibrate device preferences.</p>
+              </div>
+            </div>
+            <!-- Detected Platform badge -->
+            <div id="deviceInfoTag" class="btn-mirror px-3.5 py-2 rounded-xl text-xs font-mono text-theme-muted border border-theme flex items-center space-x-2 self-start sm:self-center">
+              <i data-lucide="smartphone" class="w-3.5 h-3.5 text-cyan-400"></i>
+              <span id="detectedPlatformText">Device: Cross-Platform (Android • iOS • Windows)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Non-logged in notice if visitor views settings -->
+        <div id="settingsGuestNotice" class="card-3d rounded-3xl border border-theme p-8 text-center space-y-4 hidden">
+          <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-500 mx-auto flex items-center justify-center">
+            <i data-lucide="user-x" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-lg font-black text-theme-primary">Sign In to Customize Your Profile</h3>
+          <p class="text-xs text-theme-muted max-w-md mx-auto">
+            You are browsing as a Guest. Sign in with your student, president, advisor, or executive account to set your profile picture, update contact details, and manage club branding.
+          </p>
+          <button onclick="openAuthModal('login')" class="btn-mirror px-6 py-2.5 rounded-xl text-xs font-black text-white bg-blue-600 hover:bg-blue-500 shadow">
+            Sign In Now &rarr;
+          </button>
+        </div>
+
+        <div id="settingsAuthenticatedContainer" class="space-y-8">
+          
+          <!-- SECTION 1: MEMBER PROFILE & PHOTO (FOR EVERYONE) -->
+          <div class="card-3d rounded-3xl border border-theme p-6 sm:p-8 space-y-6">
+            <div class="flex items-center justify-between border-b border-theme pb-4">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-500 flex items-center justify-center">
+                  <i data-lucide="user" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h3 class="text-base font-black text-theme-primary">Personal Profile & Photo</h3>
+                  <p class="text-xs text-theme-muted">Every group member can set and upload their avatar photo or provide an image URL.</p>
+                </div>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20">All Members</span>
+            </div>
+
+            <!-- Avatar Preview & Upload Area -->
+            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+              <!-- Avatar Display -->
+              <div class="relative group shrink-0">
+                <div id="settingsAvatarPreview" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-theme bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 flex items-center justify-center font-black text-2xl text-theme-primary overflow-hidden shadow-xl shadow-cyan-500/5">
+                  <span id="settingsAvatarInitials">👤</span>
+                </div>
+                <button onclick="document.getElementById('profilePhotoFileInput').click()" class="absolute bottom-0 right-0 p-2 rounded-full bg-blue-600 text-white shadow-lg border-2 border-theme hover:scale-110 transition" title="Change Avatar">
+                  <i data-lucide="camera" class="w-4 h-4"></i>
+                </button>
+              </div>
+
+              <!-- Upload Controls -->
+              <div class="space-y-3.5 flex-1 w-full">
+                <div>
+                  <label class="block text-xs font-mono text-theme-muted uppercase font-bold mb-1.5">Upload Custom Avatar</label>
+                  <div class="flex flex-wrap items-center gap-2.5">
+                    <input type="file" id="profilePhotoFileInput" accept="image/*" class="hidden" onchange="handleProfilePhotoUpload(this.files[0])" />
+                    <button type="button" onclick="document.getElementById('profilePhotoFileInput').click()" class="btn-mirror px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 shadow flex items-center space-x-2">
+                      <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                      <span>Upload Avatar File</span>
+                    </button>
+                    <span class="text-xs text-theme-muted font-mono">PNG, JPG, WEBP, or SVG (Max 5MB)</span>
+                  </div>
+                </div>
+
+                <!-- Or Image URL Input -->
+                <div class="space-y-1.5">
+                  <label class="block text-xs font-mono text-theme-muted uppercase font-bold">Or Enter Photo URL</label>
+                  <div class="flex items-center gap-2">
+                    <input type="url" id="profilePhotoUrlInput" placeholder="https://images.unsplash.com/... or image web link" class="flex-1 p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-primary text-xs focus:outline-none" />
+                    <button type="button" onclick="saveAvatarFromUrl()" class="btn-mirror px-4 py-2.5 rounded-xl text-xs font-bold text-theme-primary border border-theme hover:border-cyan-400">
+                      Save URL
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Avatar Preset Quick Avatars -->
+                <div>
+                  <span class="text-[11px] font-mono text-theme-muted">Quick Preset Avatars:</span>
+                  <div class="flex flex-wrap gap-2 mt-1.5">
+                    <button type="button" onclick="selectPresetAvatar('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80')" class="btn-mirror p-1 rounded-full border border-theme hover:border-blue-500 transition">
+                      <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80" class="w-7 h-7 rounded-full object-cover" />
+                    </button>
+                    <button type="button" onclick="selectPresetAvatar('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80')" class="btn-mirror p-1 rounded-full border border-theme hover:border-blue-500 transition">
+                      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80" class="w-7 h-7 rounded-full object-cover" />
+                    </button>
+                    <button type="button" onclick="selectPresetAvatar('https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&auto=format&fit=crop&q=80')" class="btn-mirror p-1 rounded-full border border-theme hover:border-blue-500 transition">
+                      <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&auto=format&fit=crop&q=80" class="w-7 h-7 rounded-full object-cover" />
+                    </button>
+                    <button type="button" onclick="selectPresetAvatar('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80')" class="btn-mirror p-1 rounded-full border border-theme hover:border-blue-500 transition">
+                      <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&auto=format&fit=crop&q=80" class="w-7 h-7 rounded-full object-cover" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Profile Details Form -->
+            <form id="settingsProfileForm" onsubmit="handleSaveProfileDetails(event)" class="space-y-4 pt-4 border-t border-theme">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                <div>
+                  <label class="block font-mono text-theme-muted mb-1 font-bold">Full Name *</label>
+                  <input type="text" id="settingsProfileName" required class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-primary focus:outline-none font-semibold" />
+                </div>
+                <div>
+                  <label class="block font-mono text-theme-muted mb-1 font-bold">Phone Number</label>
+                  <input type="tel" id="settingsProfilePhone" placeholder="+91 98888 77777" class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-primary focus:outline-none font-semibold" />
+                </div>
+                <div>
+                  <label class="block font-mono text-theme-muted mb-1 font-bold">Email Address (Primary Account)</label>
+                  <input type="email" id="settingsProfileEmail" readonly class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-muted cursor-not-allowed font-mono" />
+                </div>
+                <div>
+                  <label class="block font-mono text-theme-muted mb-1 font-bold">Roll Number / Student ID</label>
+                  <input type="text" id="settingsProfileRoll" readonly class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-muted cursor-not-allowed font-mono" />
+                </div>
+                <div>
+                  <label class="block font-mono text-theme-muted mb-1 font-bold">Campus Affiliation</label>
+                  <input type="text" id="settingsProfileCampus" readonly class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-muted cursor-not-allowed font-semibold" />
+                </div>
+                <div>
+                  <label class="block font-mono text-theme-muted mb-1 font-bold">Role & Permissions</label>
+                  <input type="text" id="settingsProfileRole" readonly class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-muted cursor-not-allowed font-semibold" />
+                </div>
+              </div>
+
+              <div class="flex items-center justify-end pt-2">
+                <button type="submit" id="saveProfileBtn" class="btn-mirror px-6 py-2.5 rounded-xl text-xs font-black text-white bg-blue-600 hover:bg-blue-500 shadow flex items-center space-x-2">
+                  <i data-lucide="save" class="w-4 h-4"></i>
+                  <span>Save Profile Details</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- SECTION 2: CLUB BRANDING & LOGO MANAGEMENT (FOR PRESIDENTS & ADVISORS) -->
+          <div class="card-3d rounded-3xl border border-theme p-6 sm:p-8 space-y-6">
+            <div class="flex items-center justify-between border-b border-theme pb-4">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-500 flex items-center justify-center font-bold">
+                  <i data-lucide="crown" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h3 class="text-base font-black text-theme-primary">Club Branding & Official Logo</h3>
+                  <p class="text-xs text-theme-muted">Club Presidents and Faculty Advisors have official authority to change and update their club's logo.</p>
+                </div>
+              </div>
+              <span id="clubBrandingAuthorityTag" class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/15 text-amber-500 border border-amber-500/30">Presidents & Advisors</span>
+            </div>
+
+            <!-- Presidential Controls (Shown if user is President, Advisor, or Admin) -->
+            <div id="presidentClubBrandingControls" class="space-y-6">
+              <div>
+                <label class="block text-xs font-mono text-theme-muted uppercase font-bold mb-1.5">Select Your Club to Update</label>
+                <select id="settingsPresidentClubSelect" onchange="onSettingsClubSelectChange(this.value)" class="w-full max-w-md p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-primary text-xs font-bold focus:outline-none">
+                  <!-- Populated dynamically with clubs user is president/advisor of -->
+                </select>
+              </div>
+
+              <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 p-5 rounded-2xl border border-theme bg-theme-elevated">
+                <!-- Club Logo Preview -->
+                <div class="w-24 h-24 rounded-2xl border border-theme bg-black/60 p-2 flex items-center justify-center shrink-0 overflow-hidden shadow-inner">
+                  <img id="settingsClubLogoPreview" src="" alt="Club Logo" class="max-w-full max-h-full object-contain filter drop-shadow" />
+                  <span id="settingsClubLogoPlaceholder" class="hidden text-3xl font-black text-theme-muted">🏛️</span>
+                </div>
+
+                <div class="space-y-3 flex-1 w-full">
+                  <div>
+                    <h4 id="settingsClubSelectedName" class="text-base font-extrabold text-theme-primary">Select Club</h4>
+                    <p id="settingsClubSelectedCategory" class="text-xs text-theme-muted font-mono">Category: Technical • Capacity: 60 Members</p>
+                  </div>
+
+                  <div class="flex flex-wrap items-center gap-2.5">
+                    <input type="file" id="clubLogoFileInput" accept="image/*" class="hidden" onchange="handleClubLogoUpload(this.files[0])" />
+                    <button type="button" onclick="document.getElementById('clubLogoFileInput').click()" class="btn-mirror px-4 py-2.5 rounded-xl text-xs font-bold text-black bg-amber-400 hover:bg-amber-300 shadow flex items-center space-x-2">
+                      <i data-lucide="upload" class="w-3.5 h-3.5"></i>
+                      <span>Upload New Logo File</span>
+                    </button>
+                    <span class="text-xs text-theme-muted font-mono">PNG, JPG, SVG, WEBP</span>
+                  </div>
+
+                  <!-- Or Enter Logo URL -->
+                  <div class="space-y-1">
+                    <label class="block text-[11px] font-mono text-theme-muted uppercase font-bold">Or Enter Logo Image URL</label>
+                    <div class="flex items-center gap-2">
+                      <input type="url" id="clubLogoUrlInput" placeholder="https://example.com/club_shield.png" class="flex-1 p-2 rounded-xl border border-theme bg-theme-surface text-theme-primary text-xs focus:outline-none" />
+                      <button type="button" onclick="saveClubLogoFromUrl()" class="btn-mirror px-3.5 py-2 rounded-xl text-xs font-bold text-amber-400 border border-amber-500/40 hover:bg-amber-500/10">
+                        Update Logo
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Non-President Candidate Notice -->
+            <div id="studentClubBrandingNotice" class="hidden p-5 rounded-2xl border border-theme bg-theme-elevated flex items-start space-x-3.5 text-xs text-theme-muted leading-relaxed">
+              <i data-lucide="shield" class="w-5 h-5 text-blue-500 shrink-0 mt-0.5"></i>
+              <div>
+                <strong class="text-theme-primary block mb-0.5">Club Governance Notice for Student Candidates:</strong>
+                Official club logos, emblems, and public branding are strictly curated by Club Presidents and Faculty Advisors to maintain institutional compliance. As a registered student member, your co-curricular submissions, attendance records, and verifiable certificates will feature your club's official emblem.
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 3: CALENDAR PERMISSIONS & RULES GUIDE -->
+          <div class="card-3d rounded-3xl border border-theme p-6 sm:p-8 space-y-4">
+            <div class="flex items-center space-x-3 border-b border-theme pb-4">
+              <div class="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center font-bold">
+                <i data-lucide="calendar" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-black text-theme-primary">Calendar Permissions & Authority Matrix</h3>
+                <p class="text-xs text-theme-muted">Rules governing Common Public Calendar vs. Personal Schedule.</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div class="p-4 rounded-2xl border border-theme bg-theme-elevated space-y-2">
+                <div class="flex items-center space-x-2 text-theme-primary font-bold">
+                  <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                  <span>Common Public Calendar</span>
+                </div>
+                <p class="text-theme-muted leading-relaxed">
+                  Visible to everyone (public visitors, candidates, faculty). Only <strong class="text-theme-primary">Club Presidents</strong>, <strong class="text-theme-primary">Club Advisors</strong>, and <strong class="text-theme-primary">Campus Managers</strong> can publish Saturday Club Days, flagship summits, and college-wide dates.
+                </p>
+                <div class="text-[11px] font-mono text-amber-500">Authority Gated: Requires Presidential or Advisor status.</div>
+              </div>
+
+              <div class="p-4 rounded-2xl border border-theme bg-theme-elevated space-y-2">
+                <div class="flex items-center space-x-2 text-emerald-500 font-bold">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  <span>Personal Calendar (Every Member)</span>
+                </div>
+                <p class="text-theme-muted leading-relaxed">
+                  Private to your account only. Displays club deadlines, Saturday check-in slots, and important events pushed by your President. <strong class="text-theme-primary">Student candidates can add private reminders & notes</strong> for themselves anytime.
+                </p>
+                <div class="text-[11px] font-mono text-emerald-500">Editable by You: Add & remove personal reminders.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 4: CROSS-PLATFORM & APPEARANCE (ANDROID, IOS, WINDOWS) -->
+          <div class="card-3d rounded-3xl border border-theme p-6 sm:p-8 space-y-4">
+            <div class="flex items-center justify-between border-b border-theme pb-4">
+              <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-cyan-500/15 text-cyan-400 flex items-center justify-center font-bold">
+                  <i data-lucide="monitor" class="w-5 h-5"></i>
+                </div>
+                <div>
+                  <h3 class="text-base font-black text-theme-primary">Display & Cross-Platform Calibration</h3>
+                  <p class="text-xs text-theme-muted">Optimized for Android, iOS (Safari / WebKit Safe Areas), and Windows (Smooth Edge / Chromium).</p>
+                </div>
+              </div>
+              <div class="flex items-center space-x-1.5 text-xs text-emerald-500 font-mono font-bold">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                <span>Cross-Platform Ready</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+              <div class="p-4 rounded-2xl border border-theme bg-theme-elevated space-y-2">
+                <div class="font-bold text-theme-primary flex items-center space-x-1.5">
+                  <span>📱</span>
+                  <span>Android & iOS Touch</span>
+                </div>
+                <p class="text-theme-muted">Zero tap latency (touch-action manipulation), safe-area padding for notches, and responsive drawer navigation.</p>
+                <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/10 text-emerald-500">Touch Active</span>
+              </div>
+
+              <div class="p-4 rounded-2xl border border-theme bg-theme-elevated space-y-2">
+                <div class="font-bold text-theme-primary flex items-center space-x-1.5">
+                  <span>🪟</span>
+                  <span>Windows Optimization</span>
+                </div>
+                <p class="text-theme-muted">Sub-pixel antialiased font rendering, thin sleek scrollbars, and high-DPI desktop viewports.</p>
+                <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-mono bg-blue-500/10 text-blue-500">Antialiased</span>
+              </div>
+
+              <div class="p-4 rounded-2xl border border-theme bg-theme-elevated space-y-2">
+                <div class="font-bold text-theme-primary flex items-center space-x-1.5">
+                  <span>🎨</span>
+                  <span>Theme Switcher</span>
+                </div>
+                <p class="text-theme-muted">Toggle between Royal Pitch Black and Crisp Pure White Canvas palettes.</p>
+                <button type="button" onclick="toggleTheme()" class="btn-mirror px-3 py-1.5 rounded-xl text-xs font-bold text-theme-primary border border-theme hover:border-cyan-400">
+                  Toggle Light / Dark Mode
+                </button>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -2944,6 +3347,69 @@
           </button>
         </div>
       </form>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- 9B. ADD PERSONAL CALENDAR NOTE / REMINDER (STUDENT & ALL) -->
+  <!-- ======================================================== -->
+  <div id="addPersonalNoteModal" class="fixed inset-0 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" style="background-color: rgba(0, 0, 0, 0.82);" onclick="if(event.target === this) closeAddPersonalNoteModal()">
+    <div class="card-3d max-w-lg w-full rounded-3xl p-6 border border-emerald-500/40 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto" style="background-color: var(--bg-surface);">
+      <div class="flex items-center justify-between border-b border-theme pb-3">
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-bold">
+            <i data-lucide="edit-3" class="w-5 h-5 text-emerald-500"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-black text-theme-primary">Add Personal Reminder / Note</h3>
+            <p class="text-xs text-emerald-500 font-medium">Private to Your Calendar Only</p>
+          </div>
+        </div>
+        <button onclick="closeAddPersonalNoteModal()" class="btn-mirror p-1.5 rounded-xl text-theme-muted hover:text-theme-primary">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="p-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 text-xs text-theme-muted leading-relaxed">
+        <strong class="text-emerald-500">Personal Calendar Rule:</strong> As a student candidate/member, you can edit your own calendar with personal milestones, study reminders, and deadlines. These are private to you only.
+      </div>
+
+      <form id="addPersonalNoteForm" onsubmit="handleAddPersonalNote(event)" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-mono text-theme-muted mb-1 font-bold">Note / Milestone Title *</label>
+          <input type="text" id="personalNoteTitle" required placeholder="e.g. Finish React assignment & test endpoints" class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-primary focus:outline-none" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block font-mono text-theme-muted mb-1 font-bold">Date & Time *</label>
+            <input type="datetime-local" id="personalNoteDate" required class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-primary focus:outline-none" />
+          </div>
+          <div>
+            <label class="block font-mono text-theme-muted mb-1 font-bold">Venue / Context</label>
+            <input type="text" id="personalNoteVenue" placeholder="e.g. Personal Milestone / Library Lab" class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-primary focus:outline-none" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-mono text-theme-muted mb-1 font-bold">Action Item / Goal</label>
+          <input type="text" id="personalNoteDeliverable" placeholder="e.g. Push working repo to GitHub before midnight" class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-primary focus:outline-none" />
+        </div>
+
+        <div>
+          <label class="block font-mono text-theme-muted mb-1 font-bold">Personal Description / Notes</label>
+          <textarea id="personalNoteDescription" rows="2" placeholder="Add study notes, references, or preparation checklist..." class="w-full p-2.5 rounded-xl border border-theme bg-theme-elevated text-theme-primary focus:outline-none"></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end space-x-2">
+          <button type="button" onclick="closeAddPersonalNoteModal()" class="btn-mirror px-4 py-2 rounded-xl text-theme-muted hover:text-theme-primary font-bold">
+            Cancel
+          </button>
+          <button type="submit" id="submitPersonalNoteBtn" class="btn-mirror px-5 py-2 rounded-xl text-white font-black bg-emerald-600 hover:bg-emerald-500 shadow-lg flex items-center space-x-1.5">
+            <i data-lucide="check" class="w-4 h-4"></i>
+            <span>Save to My Calendar</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -3157,6 +3623,7 @@
     let ringX = mouseX;
     let ringY = mouseY;
     let particles = [];
+    let trailPoints = [];
 
     function resizeTrailCanvas() {
       trailCanvas.width = window.innerWidth;
@@ -3171,19 +3638,26 @@
       cursorDot.style.left = `${mouseX}px`;
       cursorDot.style.top = `${mouseY}px`;
 
-      if (Math.random() < 0.6) {
-        const colors = currentTheme === 'dark' 
-          ? ['#FFFFFF', '#F8FAFC', '#E2E8F0', '#00A3FF', '#38BDF8']
-          : ['#09090B', '#18181B', '#3F3F46', '#1D4ED8', '#2563EB'];
+      // Track smooth trailing ribbon positions
+      trailPoints.push({ x: mouseX, y: mouseY, age: 0 });
+      if (trailPoints.length > 22) {
+        trailPoints.shift();
+      }
+
+      // Spawn larger, vibrant radiant stardust particles
+      const colors = currentTheme === 'dark' 
+        ? ['#FFFFFF', '#5465FF', '#788BFF', '#9BB1FF', '#00F0FF', '#38BDF8']
+        : ['#4338CA', '#2563EB', '#1D4ED8', '#0284C7', '#0F172A'];
+      for (let k = 0; k < 2; k++) {
         particles.push({
-          x: mouseX,
-          y: mouseY,
-          vx: (Math.random() - 0.5) * 1.5,
-          vy: (Math.random() - 0.5) * 1.5 - 0.5,
-          size: Math.random() * 3 + 1,
+          x: mouseX + (Math.random() - 0.5) * 6,
+          y: mouseY + (Math.random() - 0.5) * 6,
+          vx: (Math.random() - 0.5) * 2.2,
+          vy: (Math.random() - 0.5) * 2.2 - 0.5,
+          size: Math.random() * 5 + 3.2,
           color: colors[Math.floor(Math.random() * colors.length)],
           alpha: 1.0,
-          decay: Math.random() * 0.03 + 0.02
+          decay: Math.random() * 0.02 + 0.014
         });
       }
     });
@@ -3202,6 +3676,40 @@
       cursorRing.style.top = `${ringY}px`;
 
       ctx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+
+      // 1. Draw glowing, smooth trailing ribbon/comet tail connecting recent positions
+      if (trailPoints.length > 2) {
+        for (let i = 1; i < trailPoints.length; i++) {
+          const ptPrev = trailPoints[i - 1];
+          const ptCurr = trailPoints[i];
+          const progress = i / trailPoints.length;
+          const lineWidth = progress * 7.0;
+          const alpha = progress * 0.70;
+          
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(ptPrev.x, ptPrev.y);
+          ctx.lineTo(ptCurr.x, ptCurr.y);
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          ctx.lineWidth = lineWidth;
+          ctx.strokeStyle = currentTheme === 'dark' ? `rgba(84, 101, 255, ${alpha})` : `rgba(37, 99, 235, ${alpha})`;
+          ctx.shadowBlur = 16;
+          ctx.shadowColor = currentTheme === 'dark' ? '#00F0FF' : '#2563EB';
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      // Age and prune trailPoints smoothly if mouse pauses
+      for (let i = trailPoints.length - 1; i >= 0; i--) {
+        trailPoints[i].age += 1;
+        if (trailPoints[i].age > 18) {
+          trailPoints.splice(i, 1);
+        }
+      }
+
+      // 2. Draw Radiant Stardust Particles
       for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
         p.x += p.vx;
@@ -3214,7 +3722,7 @@
         ctx.save();
         ctx.globalAlpha = p.alpha;
         ctx.fillStyle = p.color;
-        ctx.shadowBlur = 8;
+        ctx.shadowBlur = 15;
         ctx.shadowColor = p.color;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
@@ -3686,6 +4194,21 @@
       actionFn();
     }
 
+    function getInitials(name) {
+      if (!name || !name.trim()) return '👤';
+      const parts = name.trim().split(/\s+/);
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    function renderAvatarHTML(avatarUrl, name, sizeClass = 'w-10 h-10', textClass = 'text-xs') {
+      if (avatarUrl && avatarUrl.trim() !== '') {
+        return `<img src="${avatarUrl}" alt="${name || 'Avatar'}" class="${sizeClass} rounded-full object-cover shadow-sm" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\\'font-bold ${textClass} text-theme-primary\\'>${getInitials(name)}</span>';" />`;
+      }
+      const initials = getInitials(name);
+      return `<span class="font-bold ${textClass} text-theme-primary">${initials}</span>`;
+    }
+
     function updateAuthStateUI() {
       const loginBtn = document.getElementById('loginNavBtn');
       const regBtn = document.getElementById('registerNavBtn');
@@ -3698,6 +4221,13 @@
       const gatedBanner = document.getElementById('guestGatedBanner');
       const tabPersonalCal = document.getElementById('tab-personal-cal');
       const calModeBtnPersonal = document.getElementById('calModeBtnPersonal');
+
+      // Avatar Elements in Header & Sidebar
+      const userAvatarImg = document.getElementById('userAvatarImg');
+      const headerUserChip = document.getElementById('headerUserChip');
+      const headerAvatarImg = document.getElementById('headerAvatarImg');
+      const headerUserName = document.getElementById('headerUserName');
+      const pAvatar = document.getElementById('personalUserAvatarImg');
 
       if (!currentUser) {
         badge.innerText = 'Guest / Public';
@@ -3712,6 +4242,12 @@
         if (gatedBanner) gatedBanner.classList.remove('hidden');
         if (tabPersonalCal) tabPersonalCal.classList.add('hidden');
         if (calModeBtnPersonal) calModeBtnPersonal.classList.add('hidden');
+
+        if (userAvatarImg) userAvatarImg.innerHTML = `<span id="userAvatarInitials">👤</span>`;
+        if (headerUserChip) headerUserChip.classList.add('hidden');
+        if (headerAvatarImg) headerAvatarImg.innerHTML = `<span id="headerAvatarInitials">👤</span>`;
+        if (headerUserName) headerUserName.innerText = 'Visitor';
+
         if (typeof currentCalendarMode !== 'undefined' && currentCalendarMode === 'personal') {
           switchCalendarMode('common');
         }
@@ -3724,6 +4260,12 @@
         if (gatedBanner) gatedBanner.classList.add('hidden');
         if (tabPersonalCal) tabPersonalCal.classList.remove('hidden');
         if (calModeBtnPersonal) calModeBtnPersonal.classList.remove('hidden');
+
+        if (userAvatarImg) userAvatarImg.innerHTML = renderAvatarHTML(currentUser.avatar_url, currentUser.name, 'w-10 h-10', 'text-xs');
+        if (headerUserChip) headerUserChip.classList.remove('hidden');
+        if (headerAvatarImg) headerAvatarImg.innerHTML = renderAvatarHTML(currentUser.avatar_url, currentUser.name, 'w-8 h-8', 'text-[11px]');
+        if (headerUserName) headerUserName.innerText = currentUser.name || 'Member';
+        if (pAvatar) pAvatar.innerHTML = renderAvatarHTML(currentUser.avatar_url, currentUser.name, 'w-12 h-12', 'text-sm');
 
         if (currentUser.is_domain_authorized || currentUser.role === 'ADMIN') {
           badge.innerText = `👑 Leadership`;
@@ -4031,6 +4573,7 @@
       else if (tabId === 'authority') loadClubMembersForAuthority();
       else if (tabId === 'budget') loadBudgets();
       else if (tabId === 'analytics') loadAnalytics();
+      else if (tabId === 'settings') loadSettingsView();
 
       const sidebar = document.getElementById('appSidebar');
       if (window.innerWidth < 1024) {
@@ -4086,17 +4629,29 @@
             catBadge = "bg-amber-500/15 text-amber-300 border-amber-500/30";
           }
 
+          let clubLogoEl = '';
+          if (c.logo_url) {
+            clubLogoEl = `
+              <div class="w-12 h-12 rounded-2xl border border-theme bg-black/40 p-1 flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+                <img src="${c.logo_url}" alt="${c.name} logo" class="max-w-full max-h-full object-contain" />
+              </div>
+            `;
+          }
+
           card.innerHTML = `
             <div class="space-y-3.5">
-              <div class="flex items-start justify-between gap-2">
-                <div>
-                  <div class="flex flex-wrap items-center gap-1.5 mb-1">
-                    <span class="text-[10px] font-mono text-zinc-400 uppercase font-bold tracking-wider">${c.campus_name || 'HIET Campus'}</span>
-                    <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border ${catBadge}">
-                      ${catIcon} ${c.category || 'Entrepreneurship & E-Cell'}
-                    </span>
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-start space-x-3 min-w-0">
+                  ${clubLogoEl}
+                  <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                      <span class="text-[10px] font-mono text-zinc-400 uppercase font-bold tracking-wider">${c.campus_name || 'HIET Campus'}</span>
+                      <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold border ${catBadge}">
+                        ${catIcon} ${c.category || 'Entrepreneurship & E-Cell'}
+                      </span>
+                    </div>
+                    <h3 class="text-xl font-black text-theme-primary transition leading-tight truncate">${c.name}</h3>
                   </div>
-                  <h3 class="text-xl font-black text-theme-primary transition leading-tight">${c.name}</h3>
                 </div>
                 ${c.is_recruiting 
                   ? `<span class="bg-emerald-500/20 text-emerald-500 font-mono text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-500/30 shrink-0">Recruiting Open</span>`
@@ -4720,14 +5275,22 @@
         // Update Category Counts
         const countAll = document.getElementById('countPersonalAll');
         const countImportant = document.getElementById('countPersonalImportant');
+        const countPersonalNotes = document.getElementById('countPersonalNotes');
         const countAssignment = document.getElementById('countPersonalAssignment');
         const countSession = document.getElementById('countPersonalSession');
 
         const items = data.items || [];
         if (countAll) countAll.innerText = items.length;
         if (countImportant) countImportant.innerText = items.filter(i => i.is_important || i.category === 'CLUB_IMPORTANT_EVENT').length;
+        if (countPersonalNotes) countPersonalNotes.innerText = items.filter(i => i.is_personal || i.category === 'PERSONAL_NOTE').length;
         if (countAssignment) countAssignment.innerText = items.filter(i => i.category === 'ASSIGNMENT_DEADLINE').length;
         if (countSession) countSession.innerText = items.filter(i => i.category === 'SESSION_EVENT').length;
+
+        // Sync banner avatar
+        const pAvatar = document.getElementById('personalUserAvatarImg');
+        if (pAvatar && currentUser) {
+          pAvatar.innerHTML = renderAvatarHTML(currentUser.avatar_url, currentUser.name, 'w-12 h-12', 'text-sm');
+        }
 
         renderCalendarMonthGrid();
         renderPersonalCalendarItems();
@@ -4743,6 +5306,7 @@
       const buttons = [
         { id: 'filterPersonalAll', key: 'all' },
         { id: 'filterPersonalImportant', key: 'important' },
+        { id: 'filterPersonalNotes', key: 'personal' },
         { id: 'filterPersonalAssignment', key: 'assignment' },
         { id: 'filterPersonalSession', key: 'session' }
       ];
@@ -4770,7 +5334,7 @@
           <div class="card-3d p-8 rounded-3xl border border-theme text-center space-y-2">
             <i data-lucide="calendar-check-2" class="w-8 h-8 text-theme-muted mx-auto"></i>
             <div class="text-sm font-bold text-theme-primary">No dates scheduled for this member account.</div>
-            <div class="text-xs text-theme-muted">Once this user enrolls in clubs, deadlines, Saturday sessions, and dates pushed by the Club President will appear here.</div>
+            <div class="text-xs text-theme-muted">You can add your own personal reminders or wait for club sessions and milestones.</div>
           </div>
         `;
         lucide.createIcons();
@@ -4791,6 +5355,8 @@
       // Filter by category tab
       if (personalActiveFilter === 'important') {
         items = items.filter(i => i.is_important || i.category === 'CLUB_IMPORTANT_EVENT');
+      } else if (personalActiveFilter === 'personal') {
+        items = items.filter(i => i.is_personal || i.category === 'PERSONAL_NOTE');
       } else if (personalActiveFilter === 'assignment') {
         items = items.filter(i => i.category === 'ASSIGNMENT_DEADLINE');
       } else if (personalActiveFilter === 'session') {
@@ -4819,12 +5385,14 @@
         const dateStr = itemDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
 
         const isPresidentPushed = item.is_important || item.category === 'CLUB_IMPORTANT_EVENT';
+        const isPersonalNote = item.is_personal || item.category === 'PERSONAL_NOTE';
         const isAssignment = item.category === 'ASSIGNMENT_DEADLINE';
         const isSession = item.category === 'SESSION_EVENT';
 
         // Card Border Styling
         let cardBorderClass = 'border-theme';
         if (isPresidentPushed) cardBorderClass = 'border-amber-500/50 bg-amber-500/5 shadow-md shadow-amber-500/5';
+        else if (isPersonalNote) cardBorderClass = 'border-emerald-500/40 bg-emerald-500/5';
         else if (isAssignment && item.submission_status === 'PENDING') cardBorderClass = 'border-blue-500/40 bg-blue-500/5';
 
         // Category Tag
@@ -4834,6 +5402,13 @@
             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-black bg-amber-500/20 text-amber-500 border border-amber-500/40 flex items-center space-x-1">
               <span>⭐</span>
               <span>IMPORTANT: Added by ${item.created_by_name || 'Club Leadership'} (${item.creator_post || 'President/Advisor'})</span>
+            </span>
+          `;
+        } else if (isPersonalNote) {
+          categoryTag = `
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 flex items-center space-x-1">
+              <span>📝</span>
+              <span>Personal Reminder (Private to You)</span>
             </span>
           `;
         } else if (isAssignment) {
@@ -4943,8 +5518,8 @@
           <div class="flex items-center space-x-3 shrink-0 self-end md:self-center">
             ${statusBadge}
             ${actionCta}
-            ${(item.event_id && userHasCalendarAuthority) ? `
-              <button onclick="deleteCalendarEvent(${item.event_id})" class="btn-mirror p-2 rounded-xl text-xs font-bold text-rose-500 hover:bg-rose-500/10 border border-rose-500/30 transition" title="Delete event">
+            ${(item.event_id && (userHasCalendarAuthority || isPersonalNote)) ? `
+              <button onclick="deleteCalendarEvent(${item.event_id})" class="btn-mirror p-2 rounded-xl text-xs font-bold text-rose-500 hover:bg-rose-500/10 border border-rose-500/30 transition" title="Delete reminder">
                 <i data-lucide="trash-2" class="w-4 h-4"></i>
               </button>
             ` : ''}
@@ -5127,6 +5702,403 @@
         showAlert('Push event error: ' + err.message, 'error');
       } finally {
         if (btn) { btn.disabled = false; btn.innerText = '⭐ Push to Member Calendars'; }
+      }
+    }
+
+    /* --- PERSONAL CALENDAR NOTE / REMINDER HANDLERS (STUDENTS & ALL MEMBERS) --- */
+    function openAddPersonalNoteModal() {
+      if (!currentUser) {
+        showAlert('Please sign in or register to add personal reminders to your calendar!', 'error');
+        openAuthModal('login');
+        return;
+      }
+      const modal = document.getElementById('addPersonalNoteModal');
+      if (modal) modal.classList.remove('hidden');
+
+      // Set default date to tomorrow at 10:00 AM
+      const d = new Date(Date.now() + 86400000);
+      d.setHours(10, 0, 0, 0);
+      const isoLocal = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+      const dateInput = document.getElementById('personalNoteDate');
+      if (dateInput) dateInput.value = isoLocal;
+    }
+
+    function closeAddPersonalNoteModal() {
+      const modal = document.getElementById('addPersonalNoteModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function handleAddPersonalNote(e) {
+      e.preventDefault();
+      if (!currentUser) {
+        showAlert('Authentication required', 'error');
+        return;
+      }
+
+      const title = document.getElementById('personalNoteTitle').value.trim();
+      const dateVal = document.getElementById('personalNoteDate').value;
+      const venue = document.getElementById('personalNoteVenue').value.trim();
+      const deliverable = document.getElementById('personalNoteDeliverable').value.trim();
+      const desc = document.getElementById('personalNoteDescription').value.trim();
+
+      const btn = document.getElementById('submitPersonalNoteBtn');
+      if (btn) { btn.disabled = true; btn.innerText = 'Saving Note...'; }
+
+      try {
+        const res = await fetch('/api/events/personal-note', {
+          method: 'POST',
+          headers: getApiHeaders(),
+          body: JSON.stringify({
+            title: title,
+            date: new Date(dateVal).toISOString(),
+            venue: venue || 'Personal Note',
+            deliverable_info: deliverable || null,
+            description: desc || null
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showAlert(`📝 Personal reminder "${title}" saved to your calendar!`, 'success');
+          closeAddPersonalNoteModal();
+          document.getElementById('addPersonalNoteForm')?.reset();
+          loadPersonalCalendar();
+        } else {
+          showAlert(data.detail || 'Failed to save personal note.', 'error');
+        }
+      } catch (err) {
+        showAlert('Error saving personal note: ' + err.message, 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i><span>Save to My Calendar</span>`;
+          if (window.lucide) lucide.createIcons();
+        }
+      }
+    }
+
+    /* ========================================================
+       UNIVERSAL SETTINGS & PROFILE CONTROLLER (ALL ROLES)
+       ======================================================== */
+    let cachedAllClubs = [];
+
+    function detectDevicePlatform() {
+      const ua = navigator.userAgent || '';
+      if (/android/i.test(ua)) return 'Android Device (Touch & Fast Response)';
+      if (/iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) return 'Apple iOS (Safe Area & WebKit Momentum)';
+      if (/windows/i.test(ua)) return 'Windows PC (Hardware Accelerated Smooth Scroll)';
+      if (/mac/i.test(ua)) return 'macOS Workstation';
+      if (/linux/i.test(ua)) return 'Linux Environment';
+      return 'Cross-Platform Web Engine';
+    }
+
+    async function loadSettingsView() {
+      // 1. Detect device & calibrate badge
+      const platformText = document.getElementById('detectedPlatformText');
+      if (platformText) {
+        platformText.innerText = `Device: ${detectDevicePlatform()} • Active`;
+      }
+
+      const guestNotice = document.getElementById('settingsGuestNotice');
+      const authContainer = document.getElementById('settingsAuthenticatedContainer');
+
+      if (!currentUser) {
+        if (guestNotice) guestNotice.classList.remove('hidden');
+        if (authContainer) authContainer.classList.add('hidden');
+        return;
+      }
+
+      if (guestNotice) guestNotice.classList.add('hidden');
+      if (authContainer) authContainer.classList.remove('hidden');
+
+      // 2. Populate personal profile form fields
+      const pName = document.getElementById('settingsProfileName');
+      const pPhone = document.getElementById('settingsProfilePhone');
+      const pEmail = document.getElementById('settingsProfileEmail');
+      const pRoll = document.getElementById('settingsProfileRoll');
+      const pCampus = document.getElementById('settingsProfileCampus');
+      const pRole = document.getElementById('settingsProfileRole');
+      const pUrlInput = document.getElementById('profilePhotoUrlInput');
+      const pPreview = document.getElementById('settingsAvatarPreview');
+
+      if (pName) pName.value = currentUser.name || '';
+      if (pPhone) pPhone.value = currentUser.phone || '';
+      if (pEmail) pEmail.value = currentUser.email || '';
+      if (pRoll) pRoll.value = currentUser.roll_no || currentUser.roll_number || 'N/A';
+      if (pCampus) pCampus.value = currentUser.campus_name || 'HIET Campus';
+      if (pRole) pRole.value = currentUser.is_domain_authorized ? `${currentUser.role} (👑 Leadership Authorized)` : currentUser.role || 'STUDENT';
+      if (pUrlInput) pUrlInput.value = currentUser.avatar_url || '';
+
+      if (pPreview) {
+        pPreview.innerHTML = renderAvatarHTML(currentUser.avatar_url, currentUser.name, 'w-24 h-24 sm:w-28 sm:h-28', 'text-2xl');
+      }
+
+      // 3. Check club president / leadership authority for branding
+      const presControls = document.getElementById('presidentClubBrandingControls');
+      const studentNotice = document.getElementById('studentClubBrandingNotice');
+      const brandTag = document.getElementById('clubBrandingAuthorityTag');
+      const clubSelect = document.getElementById('settingsPresidentClubSelect');
+
+      try {
+        // Fetch clubs to know available clubs and user authority
+        const resClubs = await fetch('/api/clubs', { headers: getApiHeaders() });
+        cachedAllClubs = await resClubs.json();
+
+        // Also check calendar authority endpoint
+        const calRes = await fetch('/api/events/common-calendar', { headers: getApiHeaders() });
+        const calData = await calRes.json();
+        const hasLeadership = Boolean(calData.user_has_authority) || currentUser.role === 'ADMIN' || currentUser.role === 'CAMPUS_MANAGER' || currentUser.is_domain_authorized;
+        const myClubs = calData.authorized_clubs || [];
+
+        if (hasLeadership) {
+          if (presControls) presControls.classList.remove('hidden');
+          if (studentNotice) studentNotice.classList.add('hidden');
+          if (brandTag) {
+            brandTag.innerText = 'President / Advisor Authority Active';
+            brandTag.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/15 text-amber-500 border border-amber-500/30';
+          }
+
+          if (clubSelect) {
+            clubSelect.innerHTML = '';
+            // If user has specific authorized clubs, list them. If admin, list all clubs.
+            const clubsToList = (myClubs.length > 0 && currentUser.role !== 'ADMIN') 
+              ? cachedAllClubs.filter(c => myClubs.some(m => m.id === c.id))
+              : cachedAllClubs;
+
+            if (clubsToList.length > 0) {
+              clubsToList.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.innerText = `${c.name} (${c.campus_name || 'HIET'})`;
+                clubSelect.appendChild(opt);
+              });
+              onSettingsClubSelectChange(clubSelect.value);
+            } else if (cachedAllClubs.length > 0) {
+              cachedAllClubs.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.innerText = `${c.name} (${c.campus_name || 'HIET'})`;
+                clubSelect.appendChild(opt);
+              });
+              onSettingsClubSelectChange(clubSelect.value);
+            }
+          }
+        } else {
+          // Regular student candidate: cannot change public club branding or publish important dates
+          if (presControls) presControls.classList.add('hidden');
+          if (studentNotice) studentNotice.classList.remove('hidden');
+          if (brandTag) {
+            brandTag.innerText = 'Student Member Account';
+            brandTag.className = 'px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-blue-500/15 text-blue-500 border border-blue-500/30';
+          }
+        }
+      } catch (err) {
+        console.error('Error calibrating settings view:', err);
+      }
+
+      if (window.lucide) lucide.createIcons();
+      attachCursorHover();
+    }
+
+    function onSettingsClubSelectChange(clubId) {
+      const id = parseInt(clubId);
+      const club = cachedAllClubs.find(c => c.id === id);
+      if (!club) return;
+
+      const nameEl = document.getElementById('settingsClubSelectedName');
+      const catEl = document.getElementById('settingsClubSelectedCategory');
+      const previewImg = document.getElementById('settingsClubLogoPreview');
+      const placeholder = document.getElementById('settingsClubLogoPlaceholder');
+      const urlInput = document.getElementById('clubLogoUrlInput');
+
+      if (nameEl) nameEl.innerText = club.name;
+      if (catEl) catEl.innerText = `Category: ${club.category || 'General'} • Campus: ${club.campus_name || 'HIET Campus'}`;
+
+      if (club.logo_url && club.logo_url.trim() !== '') {
+        if (previewImg) {
+          previewImg.src = club.logo_url;
+          previewImg.classList.remove('hidden');
+        }
+        if (placeholder) placeholder.classList.add('hidden');
+        if (urlInput) urlInput.value = club.logo_url;
+      } else {
+        if (previewImg) {
+          previewImg.src = '';
+          previewImg.classList.add('hidden');
+        }
+        if (placeholder) placeholder.classList.remove('hidden');
+        if (urlInput) urlInput.value = '';
+      }
+    }
+
+    /* Profile Photo Upload & Save Handlers */
+    async function handleProfilePhotoUpload(file) {
+      if (!file) return;
+      if (!currentUser) {
+        showAlert('Please sign in to update your avatar', 'error');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const res = await fetch('/api/users/profile-photo', {
+          method: 'POST',
+          headers: {
+            'x-user-id': currentUser.id.toString(),
+            ...(localStorage.getItem('msot_token') ? { 'Authorization': `Bearer ${localStorage.getItem('msot_token')}` } : {})
+          },
+          body: formData
+        });
+        const data = await res.json();
+        if (res.ok) {
+          currentUser.avatar_url = data.avatar_url;
+          localStorage.setItem('msot_user', JSON.stringify(currentUser));
+          updateAuthStateUI();
+          loadSettingsView();
+          showAlert('🎉 Profile photo updated successfully!', 'success');
+        } else {
+          showAlert(data.detail || 'Failed to upload profile photo.', 'error');
+        }
+      } catch (err) {
+        showAlert('Upload error: ' + err.message, 'error');
+      }
+    }
+
+    async function saveAvatarFromUrl() {
+      const url = document.getElementById('profilePhotoUrlInput')?.value.trim();
+      if (!url) {
+        showAlert('Please enter a valid image URL for your profile photo.', 'error');
+        return;
+      }
+      if (!currentUser) return;
+
+      try {
+        const res = await fetch('/api/users/profile', {
+          method: 'PUT',
+          headers: getApiHeaders(),
+          body: JSON.stringify({ avatar_url: url })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          currentUser.avatar_url = data.avatar_url || url;
+          localStorage.setItem('msot_user', JSON.stringify(currentUser));
+          updateAuthStateUI();
+          loadSettingsView();
+          showAlert('Profile avatar URL updated successfully!', 'success');
+        } else {
+          showAlert(data.detail || 'Failed to update avatar URL.', 'error');
+        }
+      } catch (err) {
+        showAlert('Save error: ' + err.message, 'error');
+      }
+    }
+
+    function selectPresetAvatar(url) {
+      const input = document.getElementById('profilePhotoUrlInput');
+      if (input) input.value = url;
+      saveAvatarFromUrl();
+    }
+
+    async function handleSaveProfileDetails(e) {
+      e.preventDefault();
+      if (!currentUser) return;
+
+      const name = document.getElementById('settingsProfileName')?.value.trim();
+      const phone = document.getElementById('settingsProfilePhone')?.value.trim();
+      const btn = document.getElementById('saveProfileBtn');
+      if (btn) { btn.disabled = true; btn.innerText = 'Saving...'; }
+
+      try {
+        const res = await fetch('/api/users/profile', {
+          method: 'PUT',
+          headers: getApiHeaders(),
+          body: JSON.stringify({ name: name, phone: phone })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          currentUser.name = data.name;
+          currentUser.phone = data.phone;
+          localStorage.setItem('msot_user', JSON.stringify(currentUser));
+          updateAuthStateUI();
+          showAlert('Profile details updated successfully!', 'success');
+        } else {
+          showAlert(data.detail || 'Failed to save profile.', 'error');
+        }
+      } catch (err) {
+        showAlert('Save error: ' + err.message, 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i data-lucide="save" class="w-4 h-4"></i><span>Save Profile Details</span>`;
+          if (window.lucide) lucide.createIcons();
+        }
+      }
+    }
+
+    /* Presidential Club Logo Upload & Update Handlers */
+    async function handleClubLogoUpload(file) {
+      if (!file) return;
+      const clubId = document.getElementById('settingsPresidentClubSelect')?.value;
+      if (!clubId) {
+        showAlert('Please select a club to update its logo.', 'error');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const res = await fetch(`/api/clubs/${clubId}/logo`, {
+          method: 'POST',
+          headers: {
+            'x-user-id': currentUser.id.toString(),
+            ...(localStorage.getItem('msot_token') ? { 'Authorization': `Bearer ${localStorage.getItem('msot_token')}` } : {})
+          },
+          body: formData
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showAlert(`Official club logo updated successfully!`, 'success');
+          // Update cached club
+          const c = cachedAllClubs.find(item => item.id === parseInt(clubId));
+          if (c) c.logo_url = data.logo_url;
+          onSettingsClubSelectChange(clubId);
+          loadClubs();
+        } else {
+          showAlert(data.detail || 'Only Club Presidents & Advisors have authority to update club logos.', 'error');
+        }
+      } catch (err) {
+        showAlert('Logo upload error: ' + err.message, 'error');
+      }
+    }
+
+    async function saveClubLogoFromUrl() {
+      const clubId = document.getElementById('settingsPresidentClubSelect')?.value;
+      const logoUrl = document.getElementById('clubLogoUrlInput')?.value.trim();
+      if (!clubId || !logoUrl) {
+        showAlert('Please select a club and enter a valid image URL.', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/clubs/${clubId}/logo`, {
+          method: 'PUT',
+          headers: getApiHeaders(),
+          body: JSON.stringify({ logo_url: logoUrl })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showAlert(`Club logo URL updated successfully!`, 'success');
+          const c = cachedAllClubs.find(item => item.id === parseInt(clubId));
+          if (c) c.logo_url = data.logo_url;
+          onSettingsClubSelectChange(clubId);
+          loadClubs();
+        } else {
+          showAlert(data.detail || 'Authority check failed.', 'error');
+        }
+      } catch (err) {
+        showAlert('Logo URL error: ' + err.message, 'error');
       }
     }
 
@@ -6585,6 +7557,7 @@
         closeSubmitProjectModal();
         closeRecordHackathonModal();
         closeAdvisorAuditModal();
+        closeAddPersonalNoteModal();
       }
     });
 

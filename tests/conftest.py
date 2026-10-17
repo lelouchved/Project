@@ -1,10 +1,17 @@
 import os
 import shutil
+import sqlite3
 
 TEST_DB_PATH = "./test_temp_tracker.db"
 
 # Copy live database to temporary isolated test database before any backend imports
 if os.path.exists("./club_tracker.db"):
+    try:
+        conn = sqlite3.connect("./club_tracker.db")
+        conn.execute("PRAGMA wal_checkpoint(FULL);")
+        conn.close()
+    except Exception:
+        pass
     shutil.copy("./club_tracker.db", TEST_DB_PATH)
 
 # Set environment variable so backend.database initializes directly with the isolated test DB

@@ -36,6 +36,7 @@ app.add_middleware(
 
 # Static file directories
 os.makedirs("./uploads/logos", exist_ok=True)
+os.makedirs("./uploads/avatars", exist_ok=True)
 os.makedirs("./uploads/deliverables", exist_ok=True)
 os.makedirs("./uploads/receipts", exist_ok=True)
 os.makedirs("./uploads/certificates", exist_ok=True)
@@ -46,6 +47,7 @@ app.mount("/frontend", StaticFiles(directory="./frontend"), name="frontend")
 
 # Include Routers
 app.include_router(auth_routes.router)
+app.include_router(auth_routes.users_router)
 app.include_router(club_routes.router)
 app.include_router(budget_routes.router)
 app.include_router(event_routes.router)

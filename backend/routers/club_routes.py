@@ -138,6 +138,32 @@ def create_club(
     db.refresh(club)
     return get_club(club.id, db)
 
+from pydantic import BaseModel
+
+class ClubLogoUpdate(BaseModel):
+    logo_url: str
+
+def check_club_president_authority(club: Club, current_user: User, db: Session) -> bool:
+    is_domain_auth = getattr(current_user, "is_domain_authorized", False) or current_user.role in ["ADMIN", "CAMPUS_MANAGER"]
+    if is_domain_auth:
+        return True
+
+    # Check if user is President or Vice President of this club
+    membership = db.query(ClubMembership).filter(
+        ClubMembership.club_id == club.id,
+        ClubMembership.user_id == current_user.id
+    ).first()
+    if membership and membership.post in ["PRESIDENT", "VICE_PRESIDENT"]:
+        return True
+
+    # Check if user is the Faculty Advisor
+    if current_user.id == club.faculty_advisor_id:
+        return True
+    if current_user.role == "FACULTY_ADVISOR" and any(c.id == club.id for c in current_user.advised_clubs):
+        return True
+
+    return False
+
 @router.post("/{club_id}/logo")
 def upload_club_logo(
     club_id: int,
@@ -148,17 +174,67 @@ def upload_club_logo(
     club = db.query(Club).filter(Club.id == club_id).first()
     if not club:
         raise HTTPException(status_code=404, detail="Club not found")
-    
+
+    if not check_club_president_authority(club, current_user, db):
+        raise HTTPException(
+            status_code=403,
+            detail="Only Club Presidents, Faculty Advisors, and Campus Leadership have authority to update this club's logo."
+        )
+
     # Save file
-    file_ext = os.path.splitext(file.filename)[1]
+    file_ext = os.path.splitext(file.filename)[1].lower() if file.filename else ".png"
+    if file_ext not in [".png", ".jpg", ".jpeg", ".webp", ".svg", ".gif"]:
+        file_ext = ".png"
     safe_name = f"club_{club_id}_{int(datetime.utcnow().timestamp())}{file_ext}"
     dest_path = os.path.join(UPLOAD_DIR, safe_name)
     with open(dest_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
     club.logo_url = f"/uploads/logos/{safe_name}"
+    
+    # Audit log
+    audit = AuditLog(
+        user_id=current_user.id,
+        action="UPDATE_CLUB_LOGO",
+        target_type="CLUB",
+        target_id=str(club_id),
+        details=f"Updated official logo for {club.name}"
+    )
+    db.add(audit)
     db.commit()
-    return {"message": "Logo uploaded successfully", "logo_url": club.logo_url}
+
+    return {"status": "success", "message": f"Official logo for {club.name} updated successfully!", "logo_url": club.logo_url}
+
+@router.put("/{club_id}/logo")
+def update_club_logo_url(
+    club_id: int,
+    data: ClubLogoUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    club = db.query(Club).filter(Club.id == club_id).first()
+    if not club:
+        raise HTTPException(status_code=404, detail="Club not found")
+
+    if not check_club_president_authority(club, current_user, db):
+        raise HTTPException(
+            status_code=403,
+            detail="Only Club Presidents, Faculty Advisors, and Campus Leadership have authority to update this club's logo."
+        )
+
+    club.logo_url = data.logo_url.strip()
+    
+    audit = AuditLog(
+        user_id=current_user.id,
+        action="UPDATE_CLUB_LOGO_URL",
+        target_type="CLUB",
+        target_id=str(club_id),
+        details=f"Updated logo URL for {club.name}"
+    )
+    db.add(audit)
+    db.commit()
+
+    return {"status": "success", "message": f"Official logo for {club.name} updated successfully!", "logo_url": club.logo_url}
 
 @router.put("/{club_id}/recruitment")
 def toggle_recruitment(

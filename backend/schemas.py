@@ -20,10 +20,16 @@ class UserOut(BaseModel):
     roll_no: Optional[str] = None
     role: str
     is_domain_authorized: bool = False
+    avatar_url: Optional[str] = None
     campus_id: int
     campus_name: Optional[str] = None
     class Config:
         from_attributes = True
+
+class UserProfileUpdate(BaseModel):
+    name: Optional[str] = None
+    phone: Optional[str] = None
+    avatar_url: Optional[str] = None
 
 class UserLogin(BaseModel):
     email: str

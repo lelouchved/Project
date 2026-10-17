@@ -1,7 +1,9 @@
+import os
+import shutil
 import time
 import random
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 
@@ -9,11 +11,30 @@ from backend.database import get_db
 from backend.models import User, Campus, AuditLog
 from backend.schemas import (
     UserLogin, UserOut, CampusOut, OTPRequest, RegisterWithOTP, LoginWithOTP,
-    SocialLoginRequest, ResetPasswordRequest
+    SocialLoginRequest, ResetPasswordRequest, UserProfileUpdate
 )
 from backend.auth import hash_password, verify_password, create_access_token, get_current_user
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication & OTP"])
+users_router = APIRouter(prefix="/api/users", tags=["Users & Profiles"])
+
+AVATARS_DIR = "./uploads/avatars"
+os.makedirs(AVATARS_DIR, exist_ok=True)
+
+def serialize_user(user: User) -> dict:
+    return {
+        "id": user.id,
+        "username": user.username,
+        "name": user.name,
+        "email": user.email,
+        "phone": user.phone,
+        "role": user.role,
+        "is_domain_authorized": bool(user.is_domain_authorized),
+        "avatar_url": user.avatar_url,
+        "campus_id": user.campus_id,
+        "campus_name": user.campus.name if user.campus else None,
+        "roll_no": user.roll_no
+    }
 
 # In-memory OTP store (identifier -> {otp, expires_at})
 OTP_STORE = {}
@@ -135,18 +156,7 @@ def register_with_otp(data: RegisterWithOTP, db: Session = Depends(get_db)):
         "message": authority_message,
         "access_token": token,
         "token_type": "bearer",
-        "user": {
-            "id": user.id,
-            "username": user.username,
-            "name": user.name,
-            "email": user.email,
-            "phone": user.phone,
-            "role": user.role,
-            "is_domain_authorized": user.is_domain_authorized,
-            "campus_id": user.campus_id,
-            "campus_name": user.campus.name if user.campus else None,
-            "roll_no": user.roll_no
-        }
+        "user": serialize_user(user)
     }
 
 @router.post("/login-otp")
@@ -172,18 +182,7 @@ def login_with_otp(data: LoginWithOTP, db: Session = Depends(get_db)):
     return {
         "access_token": token,
         "token_type": "bearer",
-        "user": {
-            "id": user.id,
-            "username": user.username,
-            "name": user.name,
-            "email": user.email,
-            "phone": user.phone,
-            "role": user.role,
-            "is_domain_authorized": user.is_domain_authorized,
-            "campus_id": user.campus_id,
-            "campus_name": user.campus.name if user.campus else None,
-            "roll_no": user.roll_no
-        }
+        "user": serialize_user(user)
     }
 
 @router.post("/social-login")
@@ -230,18 +229,7 @@ def social_login(data: SocialLoginRequest, db: Session = Depends(get_db)):
         "message": f"Welcome! Authenticated via {provider.capitalize()}.",
         "access_token": token,
         "token_type": "bearer",
-        "user": {
-            "id": user.id,
-            "username": user.username,
-            "name": user.name,
-            "email": user.email,
-            "phone": user.phone,
-            "role": user.role,
-            "is_domain_authorized": user.is_domain_authorized,
-            "campus_id": user.campus_id,
-            "campus_name": user.campus.name if user.campus else None,
-            "roll_no": user.roll_no
-        }
+        "user": serialize_user(user)
     }
 
 @router.post("/login")
@@ -260,33 +248,59 @@ def login(creds: UserLogin, db: Session = Depends(get_db)):
     return {
         "access_token": token,
         "token_type": "bearer",
-        "user": {
-            "id": user.id,
-            "username": user.username,
-            "name": user.name,
-            "email": user.email,
-            "phone": user.phone,
-            "role": user.role,
-            "is_domain_authorized": user.is_domain_authorized,
-            "campus_id": user.campus_id,
-            "campus_name": user.campus.name if user.campus else None,
-            "roll_no": user.roll_no
-        }
+        "user": serialize_user(user)
     }
 
 @router.get("/me")
 def get_me(current_user: User = Depends(get_current_user)):
+    return serialize_user(current_user)
+
+@router.post("/profile-photo")
+@users_router.post("/profile-photo")
+def upload_profile_photo(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Allows every member, student, president, and advisor to set their profile photo."""
+    ext = os.path.splitext(file.filename)[1].lower() if file.filename else ".png"
+    if ext not in [".png", ".jpg", ".jpeg", ".webp", ".svg", ".gif"]:
+        ext = ".png"
+    safe_filename = f"avatar_{current_user.id}_{int(time.time())}{ext}"
+    dest_path = os.path.join(AVATARS_DIR, safe_filename)
+    with open(dest_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    current_user.avatar_url = f"/uploads/avatars/{safe_filename}"
+    db.commit()
+    db.refresh(current_user)
     return {
-        "id": current_user.id,
-        "username": current_user.username,
-        "name": current_user.name,
-        "email": current_user.email,
-        "phone": current_user.phone,
-        "role": current_user.role,
-        "is_domain_authorized": current_user.is_domain_authorized,
-        "campus_id": current_user.campus_id,
-        "campus_name": current_user.campus.name if current_user.campus else None,
-        "roll_no": current_user.roll_no
+        "status": "success",
+        "message": "Profile photo updated successfully!",
+        "avatar_url": current_user.avatar_url,
+        "user": serialize_user(current_user)
+    }
+
+@router.put("/profile")
+@users_router.put("/profile")
+def update_profile(
+    data: UserProfileUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Allows any member to update their profile settings (name, phone, avatar_url)."""
+    if data.name and data.name.strip():
+        current_user.name = data.name.strip()
+    if data.phone is not None:
+        current_user.phone = data.phone.strip()
+    if data.avatar_url is not None:
+        current_user.avatar_url = data.avatar_url.strip()
+    
+    db.commit()
+    db.refresh(current_user)
+    return {
+        "status": "success",
+        "message": "Profile updated successfully!",
+        "user": serialize_user(current_user)
     }
 
 @router.get("/users")
@@ -304,6 +318,7 @@ def list_demo_users(db: Session = Depends(get_db)):
             "phone": u.phone,
             "role": u.role,
             "is_domain_authorized": u.is_domain_authorized,
+            "avatar_url": u.avatar_url,
             "campus_id": u.campus_id,
             "campus_code": u.campus.code if u.campus else "",
             "roll_no": u.roll_no,
