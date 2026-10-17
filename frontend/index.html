@@ -579,15 +579,6 @@
 
     <!-- Sidebar Footer & Controls -->
     <div class="p-4 border-t border-theme space-y-3">
-      <!-- Live Backend Status -->
-      <div class="px-3 py-2 rounded-xl bg-black/60 border border-white/10 flex items-center justify-between text-[11px] font-mono">
-        <span class="text-zinc-400">FastAPI Backend:</span>
-        <span class="text-emerald-400 font-bold flex items-center space-x-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span>Port 8000 Active</span>
-        </span>
-      </div>
-
       <!-- Theme Switcher -->
       <button onclick="toggleTheme()" id="themeToggleBtn" class="btn-mirror w-full px-3 py-2 rounded-xl text-xs font-bold flex items-center justify-between text-theme-primary">
         <span class="flex items-center space-x-2">
@@ -680,18 +671,6 @@
           <span id="deadlineBadge" class="hidden absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white font-black text-[9px] rounded-full flex items-center justify-center animate-pulse">0</span>
         </button>
 
-        <div id="backendLiveBadge" class="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full text-[11px] font-mono bg-emerald-500/10 border border-emerald-500/30 text-emerald-500">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span id="backendStatusText">Backend: Online (:8000)</span>
-        </div>
-        <span class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full text-[11px] font-mono bg-white/5 border border-white/20 text-theme-primary">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span>Ledger Synced • Dynamic 20s TOTP</span>
-        </span>
-        <a href="http://localhost:5173" target="_blank" class="btn-mirror px-3.5 py-1.5 rounded-xl text-xs font-bold text-cyan-500 border-cyan-500/30 hover:border-cyan-400 flex items-center space-x-1.5">
-          <i data-lucide="shield" class="w-3.5 h-3.5"></i>
-          <span>Bento Auth (:5173) &rarr;</span>
-        </a>
         <button onclick="openAuthModal('login')" class="btn-mirror px-4 py-2 rounded-xl text-xs font-bold text-theme-primary border border-theme hover:border-blue-500 shadow-sm">
           Account Portal &rarr;
         </button>
@@ -719,29 +698,6 @@
             View Urgent Deadlines &rarr;
           </button>
         </div>
-      </div>
-    </div>
-
-    <!-- DOMAIN AUTHORITY SUPREME BANNER -->
-    <div id="authorityBanner" class="hidden max-w-6xl mx-auto px-4 sm:px-6 pt-4 w-full relative z-20">
-      <div class="card-3d rounded-3xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs border border-amber-500/50 glow-yuzuru" style="background-color: var(--bg-surface-elevated);">
-        <div class="flex items-center space-x-3.5">
-          <div class="w-11 h-11 rounded-2xl bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xl shadow-lg shrink-0">
-            👑
-          </div>
-          <div>
-            <div class="flex items-center space-x-2">
-              <span class="font-black text-amber-400 text-base">Supreme Domain Authority Active</span>
-              <span class="bg-amber-500/20 text-amber-400 font-mono text-[10px] font-bold px-2 py-0.5 rounded-full border border-amber-500/40">Verified Keyholder</span>
-            </div>
-            <p class="text-theme-muted mt-0.5 text-xs">
-              You possess supreme authority to modify club member posts (President, VP, Finance, Media), oversee attendance, and audit all operations across HIET, RIT, and JU campuses.
-            </p>
-          </div>
-        </div>
-        <button onclick="switchTab('authority')" class="btn-mirror px-5 py-2.5 rounded-xl font-black text-xs text-amber-400 border-amber-500/40 hover:bg-amber-500/20 shrink-0">
-          Open Console &rarr;
-        </button>
       </div>
     </div>
 
@@ -1709,7 +1665,6 @@
                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-blue-600/10 text-blue-600 border border-blue-500/20">
                   Mirai Institutional Calendar
                 </span>
-                <span class="text-xs text-theme-muted font-mono">• Multi-Tier Role Authority</span>
               </div>
               <h2 class="text-2xl font-black text-theme-primary mt-1">Calendar & Schedule Hub</h2>
               <p class="text-theme-muted text-xs sm:text-sm">
@@ -1732,18 +1687,15 @@
             </div>
           </div>
 
-          <!-- Authority Controls Bar (Gated to Presidents, Advisors & Domain Authority) -->
-          <div id="calendarAuthorityControls" class="p-4 rounded-2xl border border-blue-500/30 bg-blue-500/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <!-- Schedule & Publish Action Bar (Only visible to authorized leadership) -->
+          <div id="calendarAuthorityControls" class="p-4 rounded-2xl border border-blue-500/30 bg-blue-500/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hidden">
             <div class="flex items-center space-x-3">
               <div class="w-8 h-8 rounded-xl bg-blue-600/20 text-blue-600 flex items-center justify-center font-bold">
-                <i data-lucide="shield-check" class="w-4 h-4"></i>
+                <i data-lucide="calendar-plus" class="w-4 h-4"></i>
               </div>
               <div>
-                <div class="text-xs font-bold text-theme-primary flex items-center space-x-2">
-                  <span>Executive & Advisor Calendar Authority</span>
-                  <span id="calAuthorityBadge" class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/15 text-amber-600 border border-amber-500/30">Verified</span>
-                </div>
-                <div id="calAuthoritySubtitle" class="text-[11px] text-theme-muted">You have publishing access for your authorized clubs.</div>
+                <div class="text-xs font-bold text-theme-primary">Event Management</div>
+                <div id="calAuthoritySubtitle" class="text-[11px] text-theme-muted">Schedule campus events or push milestones to members.</div>
               </div>
             </div>
             <div class="flex items-center space-x-2 flex-wrap" id="calAuthorityActions">
@@ -1840,11 +1792,7 @@
                 <i data-lucide="globe" class="w-5 h-5 text-blue-600"></i>
                 <span>Mirai Common Calendar (Upcoming Campus Events)</span>
               </h3>
-              <p class="text-xs text-theme-muted">All upcoming public summits, hackathons, Saturday Club Days, and orientations across all campuses.</p>
             </div>
-            <span class="text-xs font-mono text-theme-muted px-3 py-1 rounded-full border border-theme bg-theme-elevated">
-              Authority Gated: Presidents & Advisors Only
-            </span>
           </div>
 
           <div id="commonEventsList" class="space-y-4">
@@ -3743,7 +3691,6 @@
       const regBtn = document.getElementById('registerNavBtn');
       const logoutBtn = document.getElementById('logoutNavBtn');
       const badge = document.getElementById('roleBadge');
-      const authBanner = document.getElementById('authorityBanner');
       const authTab = document.getElementById('tab-authority');
       const addEventBtn = document.getElementById('addEventBtn');
       const userDisplay = document.getElementById('userDisplayName');
@@ -3760,8 +3707,7 @@
         loginBtn.classList.remove('hidden');
         regBtn.classList.remove('hidden');
         logoutBtn.classList.add('hidden');
-        authBanner.classList.add('hidden');
-        authTab.classList.add('hidden');
+        if (authTab) authTab.classList.add('hidden');
         if (addEventBtn) addEventBtn.classList.add('hidden');
         if (gatedBanner) gatedBanner.classList.remove('hidden');
         if (tabPersonalCal) tabPersonalCal.classList.add('hidden');
@@ -3780,16 +3726,14 @@
         if (calModeBtnPersonal) calModeBtnPersonal.classList.remove('hidden');
 
         if (currentUser.is_domain_authorized || currentUser.role === 'ADMIN') {
-          badge.innerText = `👑 Authorized Lead`;
+          badge.innerText = `👑 Leadership`;
           badge.className = 'bg-amber-500 text-slate-950 font-black px-2.5 py-0.5 rounded-full text-[10px] font-mono glow-yuzuru';
-          authBanner.classList.remove('hidden');
-          authTab.classList.remove('hidden');
+          if (authTab) authTab.classList.remove('hidden');
           if (addEventBtn) addEventBtn.classList.remove('hidden');
         } else {
           badge.innerText = `🎓 ${currentUser.role}`;
           badge.className = 'px-2 py-0.5 rounded-full text-[10px] font-mono border border-theme bg-theme-surface text-theme-primary';
-          authBanner.classList.add('hidden');
-          authTab.classList.add('hidden');
+          if (authTab) authTab.classList.add('hidden');
           if (addEventBtn) addEventBtn.classList.add('hidden');
         }
       }
@@ -4571,26 +4515,12 @@
           if (authControls) authControls.classList.remove('hidden');
           if (pushBtn) pushBtn.classList.remove('hidden');
           if (addBtn) addBtn.classList.remove('hidden');
-          if (authBadge) {
-            authBadge.innerText = data.user_post ? `${data.user_post} Authority` : `${data.user_role} Authority`;
-            authBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/15 text-amber-500 border border-amber-500/30';
-          }
           if (authSubtitle) {
             const clubNames = commonAuthorizedClubs.map(c => c.name).join(', ') || 'All Clubs';
-            authSubtitle.innerText = `Authorized to schedule campus events & push to members of: ${clubNames}`;
+            authSubtitle.innerText = `Publishing events for: ${clubNames}`;
           }
         } else {
-          // Member / Guest Read-Only view
-          if (authControls) authControls.classList.remove('hidden');
-          if (pushBtn) pushBtn.classList.add('hidden');
-          if (addBtn) addBtn.classList.add('hidden');
-          if (authBadge) {
-            authBadge.innerText = 'Read-Only';
-            authBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-zinc-500/15 text-zinc-400 border border-zinc-500/30';
-          }
-          if (authSubtitle) {
-            authSubtitle.innerText = 'Viewing Mirai Common Calendar • Only Club Presidents and Club Advisors have publishing authority.';
-          }
+          if (authControls) authControls.classList.add('hidden');
         }
 
         renderCalendarMonthGrid();
@@ -5713,7 +5643,7 @@
           title: 'Where is Attendance History Log?',
           keywords: ['history', 'attendance history', 'log', 'records', 'attendence ki alag', 'past', 'sessions', 'audit'],
           description: 'Your complete cryptographic Attendance History Log is maintained in "My Portfolio & Attn" under "Attendance History & Dynamic Verification Log".',
-          badge: 'Verification Ledger',
+          badge: 'Attendance History',
           actionText: 'View Attendance History Log',
           action: () => navigateFromSearch('student', 'attendanceHistorySection')
         },
@@ -6658,28 +6588,6 @@
       }
     });
 
-    /* Backend Connection Monitor */
-    async function checkBackendHealth() {
-      try {
-        const res = await fetch('/api/health');
-        if (res.ok) {
-          const badge = document.getElementById('backendLiveBadge');
-          const txt = document.getElementById('backendStatusText');
-          if (badge && txt) {
-            badge.className = 'inline-flex items-center space-x-2 px-3 py-1.5 rounded-full text-[11px] font-mono bg-emerald-500/10 border border-emerald-500/30 text-emerald-500';
-            txt.innerText = 'Backend: Online (:8000)';
-          }
-        }
-      } catch (e) {
-        const badge = document.getElementById('backendLiveBadge');
-        const txt = document.getElementById('backendStatusText');
-        if (badge && txt) {
-          badge.className = 'inline-flex items-center space-x-2 px-3 py-1.5 rounded-full text-[11px] font-mono bg-amber-500/10 border border-amber-500/30 text-amber-500';
-          txt.innerText = 'Backend: Connecting...';
-        }
-      }
-    }
-
     /* Initialize Application */
     document.addEventListener('DOMContentLoaded', () => {
       applyTheme(currentTheme);
@@ -6692,8 +6600,6 @@
       }
       updateAuthStateUI();
       checkDeadlinesAndAlerts();
-      checkBackendHealth();
-      setInterval(checkBackendHealth, 12000);
       setInterval(checkDeadlinesAndAlerts, 30000);
       loadClubs();
       attachCursorHover();
