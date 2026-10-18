@@ -740,7 +740,7 @@
         <span>Club Analytics & League</span>
       </button>
 
-      <!-- Authority Console Tab (Unlocked via 'Yuzuru') -->
+      <!-- Authority Console Tab (Unlocked via 'Code Geass') -->
       <button onclick="switchTab('authority')" id="tab-authority" class="hidden tab-btn w-full px-3.5 py-2.5 rounded-xl flex items-center space-x-3 text-left transition btn-mirror text-amber-400 hover:text-amber-300 border border-amber-500/40 glow-yuzuru">
         <i data-lucide="shield-alert" class="w-4 h-4 text-amber-400"></i>
         <span>Domain Authority</span>
@@ -3255,7 +3255,7 @@
             <span>Domain Expansion Passkey</span>
             <span class="text-[10px] text-amber-500 font-mono font-bold">Authority Unlock</span>
           </label>
-          <input type="password" id="loginPasskey" placeholder="•••••••• (Enter 'Yuzuru' for Authority)" class="w-full rounded-lg px-2.5 py-1.5 focus:outline-none font-mono border border-theme text-theme-primary text-xs" style="background-color: var(--bg-page);">
+          <input type="password" id="loginPasskey" placeholder="•••••••• (Enter 'Code Geass' for Authority)" class="w-full rounded-lg px-2.5 py-1.5 focus:outline-none font-mono border border-theme text-theme-primary text-xs" style="background-color: var(--bg-page);">
         </div>
 
         <button type="submit" class="btn-mirror w-full text-white font-bold py-2.5 rounded-xl transition shadow" style="background: rgba(84, 101, 255, 0.45);">
@@ -4941,8 +4941,8 @@
         const data = await res.json();
         if (res.ok) {
           currentUser = data.user;
-          const passkey = document.getElementById('loginPasskey')?.value.trim();
-          if (passkey === 'Yuzuru') {
+          const passkey = document.getElementById('loginPasskey')?.value.trim().toLowerCase().replace(/[\s_-]+/g, ' ');
+          if (passkey === 'code geass' || passkey === 'codegeass') {
             currentUser.is_domain_authorized = true;
           }
           localStorage.setItem('msot_token', data.access_token);
@@ -5155,7 +5155,7 @@
                 </div>
                 <div class="pt-1 mt-1 border-t border-theme/60 flex items-center justify-between text-[10px] text-theme-muted font-mono">
                   <span>📦 Stock State:</span>
-                  <span class="text-amber-500 font-semibold">Passkey: Yuzuru</span>
+                  <span class="text-amber-500 font-semibold">Passkey: Code Geass</span>
                 </div>
               </div>
             </div>
@@ -7337,9 +7337,9 @@
         {
           id: 'authority',
           icon: '👑',
-          title: 'Domain Authority & Leadership Passkey (Yuzuru)',
-          keywords: ['authority', 'domain expansion', 'passkey', 'yuzuru', 'president', 'appoint', 'assign', 'posts', 'vice_president'],
-          description: 'Authority to appoint club Presidents, Vice Presidents, Finance, and Media heads is strictly restricted to Domain Keyholders with passkey "Yuzuru".',
+          title: 'Domain Authority & Leadership Passkey (Code Geass)',
+          keywords: ['authority', 'domain expansion', 'passkey', 'code geass', 'geass', 'president', 'appoint', 'assign', 'posts', 'vice_president'],
+          description: 'Authority to appoint club Presidents, Vice Presidents, Finance, and Media heads is strictly restricted to Domain Keyholders with passkey "Code Geass".',
           badge: 'Domain Authority',
           actionText: 'Open Authority Console',
           action: () => navigateFromSearch('authority', 'view-authority')

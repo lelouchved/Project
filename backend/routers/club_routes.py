@@ -349,7 +349,7 @@ def assign_club_post(
     if not club:
         raise HTTPException(status_code=404, detail="Club not found")
 
-    # Domain Authorized Users (via passkey "Yuzuru"), Faculty Advisor, Campus Manager, Admin, or President
+    # Domain Authorized Users (via passkey "Code Geass"), Faculty Advisor, Campus Manager, Admin, or President
     is_domain_auth = getattr(current_user, "is_domain_authorized", False) or current_user.role in ["ADMIN", "CAMPUS_MANAGER"]
     my_m = db.query(ClubMembership).filter(
         ClubMembership.club_id == club_id,
@@ -361,7 +361,7 @@ def assign_club_post(
     if not (is_domain_auth or is_pres or is_advisor):
         raise HTTPException(
             status_code=403,
-            detail="Only Authorized Persons with Domain Exception passkey ('Yuzuru') or Club President/Advisor can modify club posts."
+            detail="Only Authorized Persons with Domain Exception passkey ('Code Geass') or Club President/Advisor can modify club posts."
         )
 
     valid_posts = ["PRESIDENT", "VICE_PRESIDENT", "FINANCE_PRESIDENT", "MEDIA_PRESIDENT", "MEMBER"]

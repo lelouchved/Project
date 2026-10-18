@@ -270,11 +270,11 @@ def test_07_monthly_academic_csv_export():
     assert res.headers["content-type"] == "text/csv; charset=utf-8"
     assert "Student ID,Student Name,Roll Number" in res.text
 
-def test_08_registration_otp_and_domain_passkey_yuzuru():
+def test_08_registration_otp_and_domain_passkey_code_geass():
     """
-    Test Area: Dynamic Registration with OTP and Domain Exception Passkey ('Yuzuru')
+    Test Area: Dynamic Registration with OTP and Domain Exception Passkey ('code geass' / 'Code Geass')
     1. Request OTP for a new user.
-    2. Register user WITH passkey 'Yuzuru' -> becomes domain authorized (ADMIN/Authorized Lead).
+    2. Register user WITH passkey 'code geass' -> becomes domain authorized (ADMIN/Authorized Lead).
     3. Successfully reassigns club posts for any club.
     4. Register user WITHOUT passkey -> becomes regular student/member without authority.
     """
@@ -287,16 +287,16 @@ def test_08_registration_otp_and_domain_passkey_yuzuru():
     assert otp_res.status_code == 200
     otp = otp_res.json()["simulated_otp"]
 
-    # 2. Register WITH passkey 'Yuzuru'
+    # 2. Register WITH passkey 'code geass'
     reg_res = client.post("/api/auth/register", json={
         "email": email1,
-        "name": "Yuzuru Authorised Lead",
+        "name": "Geass Authorised Lead",
         "phone": f"+91 99999 {rand_tag[:5]}",
         "student_id": f"MSOT-{rand_tag[:4].upper()}",
-        "username": f"yuzuru_{rand_tag}",
+        "username": f"geass_{rand_tag}",
         "password": "securepassword",
         "otp": otp,
-        "domain_passkey": "Yuzuru",
+        "domain_passkey": "code geass",
         "campus_id": 1
     })
     assert reg_res.status_code == 200

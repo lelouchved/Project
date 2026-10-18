@@ -43,7 +43,13 @@ def serialize_user(user: User) -> dict:
 # In-memory OTP store (identifier -> {otp, expires_at})
 OTP_STORE = {}
 
-DOMAIN_PASSKEY = "Yuzuru"
+DOMAIN_PASSKEY = "Code Geass"
+
+def is_domain_passkey_valid(input_key: Optional[str]) -> bool:
+    if not input_key:
+        return False
+    clean = " ".join(input_key.strip().lower().split()).replace("-", " ").replace("_", " ")
+    return clean in ["code geass", "codegeass"]
 
 def generate_otp() -> str:
     return f"{random.randint(100000, 999999)}"
@@ -94,7 +100,7 @@ def verify_otp_internal(identifier: str, input_otp: str) -> bool:
 def register_with_otp(data: RegisterWithOTP, db: Session = Depends(get_db)):
     """
     Registers a new user with OTP verification and domain exception passkey.
-    If passkey == 'Yuzuru', user gets supreme domain authority to reassign posts,
+    If passkey == 'Code Geass', user gets supreme domain authority to reassign posts,
     members, attendance, and all club operations.
     Otherwise, user is registered as a regular Member / MSOT Student.
     """
@@ -118,15 +124,15 @@ def register_with_otp(data: RegisterWithOTP, db: Session = Depends(get_db)):
     if existing_email:
         raise HTTPException(status_code=400, detail="An account with this email address already exists.")
 
-    # 4. Check domain exception passkey "Yuzuru"
+    # 4. Check domain exception passkey "Code Geass"
     is_authorized = False
     assigned_role = "STUDENT"
     authority_message = "Registered as MSOT Student / Member."
 
-    if data.domain_passkey and data.domain_passkey.strip() == DOMAIN_PASSKEY:
+    if is_domain_passkey_valid(data.domain_passkey):
         is_authorized = True
         assigned_role = "ADMIN"
-        authority_message = "👑 Domain Exception Passkey 'Yuzuru' verified! Supreme Club Management Authority granted."
+        authority_message = "👑 Domain Exception Passkey 'Code Geass' verified! Supreme Club Management Authority granted."
 
     # 5. Create user
     user = User(
