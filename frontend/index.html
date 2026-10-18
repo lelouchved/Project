@@ -103,53 +103,53 @@
        ======================================================== */
     :root[data-theme="dark"] {
       --bg-page: #000000;               /* Absolute Royal Pitch Black */
-      --bg-surface: #060709;            /* Obsidian Royal Surface */
-      --bg-surface-elevated: #0C0E14;   /* Elevated Dark Graphite Surface */
-      --border-app: rgba(255, 255, 255, 0.16); /* Fine Royal White/Platinum Border */
-      --border-subtle: rgba(255, 255, 255, 0.08); /* Subtle Silver Edge */
+      --bg-surface: rgba(10, 14, 26, 0.70);            /* Foggy Mirror Obsidian Glass */
+      --bg-surface-elevated: rgba(16, 22, 38, 0.75);   /* Elevated Foggy Mirror Glass */
+      --border-app: rgba(255, 255, 255, 0.18); /* Fine Royal Mirror Glass Border */
+      --border-subtle: rgba(255, 255, 255, 0.10); /* Subtle Silver Edge */
       --accent-primary: #FFFFFF;        /* Crisp Brilliant Royal White */
       --accent-hover: #F8FAFC;          /* Pure Platinum White */
       --accent-soft: #E2E8F0;           /* Silver White */
       --accent-ice: #00A3FF;            /* Mirai Azure / Cyan */
       --accent-frost: #FFFFFF;          /* Pure White Frost */
-      --text-muted: #A1A1AA;            /* Elegant Zinc/Silver Muted Text */
+      --text-muted: #CBD5E1;            /* High-contrast crisp light silver for foggy glass */
       --text-primary: #FFFFFF;          /* Royal Pure White Primary */
       --yuzuru-gold: #f59e0b;           /* Imperial Crown Gold */
-      --header-bg: rgba(2, 3, 5, 0.94); /* Deep Obsidian Header */
-      --sidebar-bg: rgba(3, 4, 7, 0.96); /* Deep Obsidian Sidebar */
-      --btn-mirror-bg: rgba(255, 255, 255, 0.06);  /* 90% Transparent Mirror Glass */
-      --btn-mirror-border: rgba(255, 255, 255, 0.22);
-      --btn-mirror-hover-bg: rgba(255, 255, 255, 0.16);
-      --btn-mirror-hover-border: rgba(255, 255, 255, 0.65);
-      --btn-mirror-hover-shadow: 0 0 25px rgba(255, 255, 255, 0.25), 0 0 45px rgba(0, 163, 255, 0.20);
-      --card-shadow: 0 20px 60px rgba(0, 0, 0, 0.98), 0 0 35px rgba(255, 255, 255, 0.04);
-      --glare-opacity: 0.22;
+      --header-bg: rgba(6, 9, 18, 0.78); /* Foggy Translucent Mirror Header */
+      --sidebar-bg: rgba(6, 9, 18, 0.82); /* Foggy Translucent Mirror Sidebar */
+      --btn-mirror-bg: rgba(255, 255, 255, 0.08);  /* Translucent Mirror Glass Button */
+      --btn-mirror-border: rgba(255, 255, 255, 0.25);
+      --btn-mirror-hover-bg: rgba(255, 255, 255, 0.18);
+      --btn-mirror-hover-border: rgba(255, 255, 255, 0.70);
+      --btn-mirror-hover-shadow: 0 0 25px rgba(255, 255, 255, 0.30), 0 0 45px rgba(0, 163, 255, 0.25);
+      --card-shadow: 0 16px 40px -4px rgba(0, 0, 0, 0.65), inset 0 1px 1px 0 rgba(255, 255, 255, 0.22), 0 0 24px rgba(255, 255, 255, 0.03);
+      --glare-opacity: 0.25;
     }
 
     :root[data-theme="light"] {
       /* User Specified Light Mode: Pure White Canvas, Black, Slate Grey, Royal Blue (#1D4ED8) */
-      --bg-page: #FFFFFF;               /* Pure Crisp White Base Canvas */
-      --bg-surface: #FFFFFF;            /* Pure Crisp White Primary Surface */
-      --bg-surface-elevated: #F8FAFC;   /* Very Light Grey/White Elevated Surface */
-      --border-app: #E2E8F0;            /* Clean Slate Grey Border */
-      --border-subtle: #F1F5F9;         /* Subtle Slate Border */
+      --bg-page: #F8FAFC;               /* Clean Pearl Base Canvas */
+      --bg-surface: rgba(255, 255, 255, 0.82);        /* Foggy Frosted Mirror Glass */
+      --bg-surface-elevated: rgba(248, 250, 252, 0.88); /* Elevated Frosted Surface */
+      --border-app: rgba(226, 232, 240, 0.90);        /* Clean Frost Slate Border */
+      --border-subtle: rgba(241, 245, 249, 0.85);
       --accent-primary: #1D4ED8;        /* Royal Blue Accent */
       --accent-hover: #2563EB;          /* Royal Blue Hover */
       --accent-soft: #EFF6FF;           /* Soft Royal Blue Tint */
       --accent-ice: #1D4ED8;            /* Royal Blue */
       --accent-frost: #DBEAFE;          /* Soft Royal Blue Frost */
-      --text-muted: #4B5563;            /* High Contrast Slate Grey */
+      --text-muted: #334155;            /* Ultra-high contrast slate for easy visibility */
       --text-primary: #09090B;          /* Solid Jet Black */
       --yuzuru-gold: #B45309;           /* Amber/Gold */
-      --header-bg: rgba(255, 255, 255, 0.96);         /* Crisp White Header */
-      --sidebar-bg: rgba(255, 255, 255, 0.98);        /* Crisp White Sidebar */
-      --btn-mirror-bg: #FFFFFF;                       /* Clean White Button Surface */
-      --btn-mirror-border: #E2E8F0;                   /* Slate Border */
+      --header-bg: rgba(255, 255, 255, 0.84);         /* Frosted Mirror White Header */
+      --sidebar-bg: rgba(255, 255, 255, 0.88);        /* Frosted Mirror White Sidebar */
+      --btn-mirror-bg: rgba(255, 255, 255, 0.90);     /* Clean White Button Surface */
+      --btn-mirror-border: rgba(203, 213, 225, 0.85); /* Slate Border */
       --btn-mirror-hover-bg: #EFF6FF;                 /* Royal Blue Hover Tint */
       --btn-mirror-hover-border: #2563EB;             /* Royal Blue Hover Border */
-      --btn-mirror-hover-shadow: 0 4px 15px rgba(29, 78, 216, 0.12);
-      --card-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
-      --glare-opacity: 0.08;
+      --btn-mirror-hover-shadow: 0 4px 15px rgba(29, 78, 216, 0.16);
+      --card-shadow: 0 12px 36px -4px rgba(15, 23, 42, 0.08), inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
+      --glare-opacity: 0.10;
     }
 
     * {
@@ -293,18 +293,38 @@
       transform: translateY(0px) scale(0.98);
     }
 
-    /* 3D Card Interactive Tilt & Specular Glare */
+    /* 3D Card Interactive Tilt & Specular Glare with Foggy Mirror Glassmorphism */
     .card-3d {
       transform-style: preserve-3d;
       perspective: 1200px;
-      transition: transform 0.12s ease-out, box-shadow 0.25s ease;
+      transition: transform 0.12s ease-out, box-shadow 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
       background-color: var(--bg-surface);
       border: 1px solid var(--border-app);
       box-shadow: var(--card-shadow);
       position: relative;
       overflow: hidden;
-      backdrop-filter: blur(14px);
+      backdrop-filter: blur(20px) saturate(190%);
+      -webkit-backdrop-filter: blur(20px) saturate(190%);
     }
+
+    /* Foggy Mirror Top Specular Bevel Line */
+    .card-3d::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35) 25%, rgba(255, 255, 255, 0.65) 50%, rgba(255, 255, 255, 0.35) 75%, transparent);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .card-3d:hover {
+      border-color: rgba(255, 255, 255, 0.32);
+      box-shadow: 0 20px 48px -4px rgba(0, 0, 0, 0.75), 0 0 28px rgba(84, 101, 255, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.32);
+    }
+
     .card-3d::after {
       content: '';
       position: absolute;
@@ -316,13 +336,22 @@
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.3s;
+      z-index: 1;
     }
     .card-3d:hover::after {
       opacity: 1;
     }
 
-    .bg-theme-surface { background-color: var(--bg-surface); }
-    .bg-theme-elevated { background-color: var(--bg-surface-elevated); }
+    .bg-theme-surface { 
+      background-color: var(--bg-surface);
+      backdrop-filter: blur(20px) saturate(190%);
+      -webkit-backdrop-filter: blur(20px) saturate(190%);
+    }
+    .bg-theme-elevated { 
+      background-color: var(--bg-surface-elevated);
+      backdrop-filter: blur(20px) saturate(190%);
+      -webkit-backdrop-filter: blur(20px) saturate(190%);
+    }
     .border-theme { border-color: var(--border-app); }
     .text-theme-primary { color: var(--text-primary); }
     .text-theme-muted { color: var(--text-muted); }
@@ -464,11 +493,16 @@
       color: #1D4ED8 !important;
     }
 
-    /* 3D cards in light mode */
+    /* 3D cards in light mode: Foggy Frosted Glass with Razor-Sharp Contrast */
     [data-theme="light"] .card-3d {
-      background-color: #FFFFFF !important;
-      border-color: #E2E8F0 !important;
-      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04) !important;
+      background-color: rgba(255, 255, 255, 0.84) !important;
+      border-color: rgba(226, 232, 240, 0.90) !important;
+      box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.95) !important;
+      backdrop-filter: blur(20px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    }
+    [data-theme="light"] .card-3d::before {
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85) 50%, transparent) !important;
     }
 
     /* Invert white Mirai logo in light mode so it displays crisp black */
