@@ -5,7 +5,7 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form
 from sqlalchemy.orm import Session
 
-from backend.database import get_db
+from backend.database import get_db, DELIVERABLES_DIR
 from backend.models import (
     Club, ClubMembership, AssignmentProject, Submission, Evaluation, ClubResource, User, Certificate, AuditLog
 )
@@ -16,8 +16,7 @@ from backend.auth import get_current_user, get_optional_user
 
 router = APIRouter(prefix="/api/assignments", tags=["Assignments, Projects & Evaluation"])
 
-UPLOAD_DIR = "./uploads/deliverables"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+UPLOAD_DIR = DELIVERABLES_DIR
 
 @router.get("", response_model=List[AssignmentOut])
 def list_assignments(

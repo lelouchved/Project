@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, HTMLResponse
 from contextlib import asynccontextmanager
 
-from backend.database import engine, Base
+from backend.database import engine, Base, BASE_DIR, UPLOADS_DIR
 from backend.routers import (
     auth_routes, club_routes, budget_routes, event_routes,
     attendance_routes, assignment_routes, certificate_routes, report_routes,
@@ -35,15 +35,14 @@ app.add_middleware(
 )
 
 # Static file directories
-os.makedirs("./uploads/logos", exist_ok=True)
-os.makedirs("./uploads/avatars", exist_ok=True)
-os.makedirs("./uploads/deliverables", exist_ok=True)
-os.makedirs("./uploads/receipts", exist_ok=True)
-os.makedirs("./uploads/certificates", exist_ok=True)
-os.makedirs("./frontend", exist_ok=True)
+frontend_dir = os.path.join(BASE_DIR, "frontend")
+try:
+    os.makedirs(frontend_dir, exist_ok=True)
+except OSError:
+    pass
 
-app.mount("/uploads", StaticFiles(directory="./uploads"), name="uploads")
-app.mount("/frontend", StaticFiles(directory="./frontend"), name="frontend")
+app.mount("/uploads", StaticFiles(directory=UPLOADS_DIR), name="uploads")
+app.mount("/frontend", StaticFiles(directory=frontend_dir), name="frontend")
 
 # Include Routers
 app.include_router(auth_routes.router)
@@ -71,7 +70,7 @@ def api_health():
 @app.get("/")
 def serve_index():
     return FileResponse(
-        "./frontend/index.html",
+        os.path.join(BASE_DIR, "frontend", "index.html"),
         headers={
             "Cache-Control": "no-cache, no-store, must-revalidate",
             "Pragma": "no-cache",
@@ -82,9 +81,10 @@ def serve_index():
 @app.get("/verify/{cert_id}")
 def serve_verification_page(cert_id: str):
     # Returns the standalone public verification web interface
-    if os.path.exists("./frontend/verify.html"):
-        return FileResponse("./frontend/verify.html")
-    return FileResponse("./frontend/index.html")
+    verify_html = os.path.join(BASE_DIR, "frontend", "verify.html")
+    if os.path.exists(verify_html):
+        return FileResponse(verify_html)
+    return FileResponse(os.path.join(BASE_DIR, "frontend", "index.html"))
 
 if __name__ == "__main__":
     import uvicorn

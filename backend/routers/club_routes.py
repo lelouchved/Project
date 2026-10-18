@@ -5,15 +5,14 @@ from sqlalchemy.orm import Session
 import os
 import shutil
 
-from backend.database import get_db
+from backend.database import get_db, LOGOS_DIR
 from backend.models import Club, ClubMembership, User, AuditLog
 from backend.schemas import ClubCreate, ClubOut, MembershipOut
 from backend.auth import get_current_user, get_optional_user
 
 router = APIRouter(prefix="/api/clubs", tags=["Clubs Management"])
 
-UPLOAD_DIR = "./uploads/logos"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+UPLOAD_DIR = LOGOS_DIR
 
 @router.get("", response_model=List[ClubOut])
 def get_clubs(

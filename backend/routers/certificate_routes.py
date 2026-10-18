@@ -9,7 +9,7 @@ from reportlab.lib.pagesizes import letter, landscape
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 
-from backend.database import get_db
+from backend.database import get_db, CERTIFICATES_DIR
 from backend.models import (
     Certificate, User, Club, Event, ClubMembership, AttendanceRecord, AttendanceSession, Submission, Evaluation, AuditLog
 )
@@ -18,8 +18,7 @@ from backend.auth import get_current_user
 
 router = APIRouter(prefix="/api/certificates", tags=["Certificates & Co-Curricular Transcripts"])
 
-CERT_PDF_DIR = "./uploads/certificates"
-os.makedirs(CERT_PDF_DIR, exist_ok=True)
+CERT_PDF_DIR = CERTIFICATES_DIR
 
 def generate_verification_hash(cert_id: str, user_id: int, title: str, issue_date_str: str) -> str:
     raw = f"{cert_id}:{user_id}:{title}:{issue_date_str}:MSOT_OFFICIAL_STAMP_2026"

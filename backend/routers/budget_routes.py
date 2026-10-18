@@ -5,15 +5,14 @@ from sqlalchemy.orm import Session
 import os
 import shutil
 
-from backend.database import get_db
+from backend.database import get_db, RECEIPTS_DIR
 from backend.models import Club, ClubMembership, ClubBudget, User, AuditLog
 from backend.schemas import BudgetCreate, BudgetReview, BudgetOut
 from backend.auth import get_current_user
 
 router = APIRouter(prefix="/api/budgets", tags=["Club Budget & Finance"])
 
-UPLOAD_DIR = "./uploads/receipts"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+UPLOAD_DIR = RECEIPTS_DIR
 
 @router.get("", response_model=List[BudgetOut])
 def list_budgets(

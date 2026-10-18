@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 
-from backend.database import get_db
+from backend.database import get_db, AVATARS_DIR
 from backend.models import (
     User, Campus, AuditLog, Submission, AttendanceRecord,
     Certificate, ClubMembership, ClubBudget, Event
@@ -21,9 +21,6 @@ from backend.auth import hash_password, verify_password, create_access_token, ge
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication & OTP"])
 users_router = APIRouter(prefix="/api/users", tags=["Users & Profiles"])
-
-AVATARS_DIR = "./uploads/avatars"
-os.makedirs(AVATARS_DIR, exist_ok=True)
 
 def serialize_user(user: User) -> dict:
     return {
