@@ -552,14 +552,15 @@
   </div>
 
   <!-- ======================================================== -->
+  <!-- ======================================================== -->
   <!-- MOBILE SIDEBAR BACKDROP OVERLAY (ANDROID & IOS) -->
   <!-- ======================================================== -->
-  <div id="sidebarMobileBackdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-35 lg:hidden hidden transition-opacity duration-300"></div>
+  <div id="sidebarMobileBackdrop" onclick="closeMobileSidebar()" ontouchstart="closeMobileSidebar()" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-[90] lg:hidden hidden transition-opacity duration-300 cursor-pointer"></div>
 
   <!-- ======================================================== -->
   <!-- LEFT VERTICAL SIDEBAR NAVIGATION (FIXED) -->
   <!-- ======================================================== -->
-  <aside id="appSidebar" class="w-64 fixed left-0 top-0 bottom-0 z-40 border-r border-theme flex flex-col backdrop-blur-xl transition-transform duration-300 -translate-x-full lg:translate-x-0 overflow-y-auto overflow-x-hidden" style="background-color: var(--sidebar-bg); overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);">
+  <aside id="appSidebar" class="w-64 fixed left-0 top-0 bottom-0 z-[100] border-r border-theme flex flex-col backdrop-blur-xl transition-transform duration-300 -translate-x-full lg:translate-x-0 overflow-y-auto overflow-x-hidden" style="background-color: var(--sidebar-bg); overscroll-behavior: contain; -webkit-overflow-scrolling: touch; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);">
     
     <!-- Top Brand & Hierarchy -->
     <div class="p-5 border-b border-theme space-y-4">
@@ -570,7 +571,7 @@
           </div>
         </div>
         <!-- Mobile close button -->
-        <button onclick="toggleMobileSidebar()" class="lg:hidden text-theme-muted hover:text-white p-1">
+        <button onclick="closeMobileSidebar()" class="lg:hidden text-theme-muted hover:text-white p-1" aria-label="Close Navigation Drawer">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
@@ -616,6 +617,13 @@
       <button onclick="guardAction(() => switchTab('student'))" id="tab-student" class="tab-btn w-full px-3.5 py-2.5 rounded-xl flex items-center space-x-3 text-left transition btn-mirror text-theme-muted hover:text-theme-primary">
         <i data-lucide="user-check" class="w-4 h-4 text-[#BFD7FF]"></i>
         <span>My Portfolio & Attn</span>
+      </button>
+
+      <!-- Personal Work History (Private to User) -->
+      <button onclick="guardAction(() => switchTab('history'))" id="tab-history" class="tab-btn w-full px-3.5 py-2.5 rounded-xl flex items-center space-x-3 text-left transition btn-mirror text-theme-muted hover:text-theme-primary">
+        <i data-lucide="history" class="w-4 h-4 text-purple-400"></i>
+        <span class="flex-1">My Work History</span>
+        <span class="px-1.5 py-0.5 rounded text-[8px] font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30">Private</span>
       </button>
 
       <button onclick="guardAction(() => switchTab('budget'))" id="tab-budget" class="tab-btn w-full px-3.5 py-2.5 rounded-xl flex items-center space-x-3 text-left transition btn-mirror text-theme-muted hover:text-theme-primary">
@@ -735,7 +743,7 @@
     <!-- TOP MOBILE BAR (Visible on mobile: Android & iOS) -->
     <header class="lg:hidden border-b border-theme py-2 px-3 sticky top-0 z-30 backdrop-blur-xl flex items-center justify-between" style="background-color: var(--header-bg); padding-top: max(0.5rem, env(safe-area-inset-top, 0px)); padding-left: max(0.75rem, env(safe-area-inset-left, 0px)); padding-right: max(0.75rem, env(safe-area-inset-right, 0px));">
       <div class="flex items-center space-x-2 min-w-0">
-        <button onclick="toggleMobileSidebar()" class="btn-mirror p-2 rounded-xl text-theme-primary shrink-0" aria-label="Open Navigation Drawer">
+        <button id="mobileMenuBtn" onclick="toggleMobileSidebar()" class="btn-mirror p-2 rounded-xl text-theme-primary shrink-0" aria-label="Open Navigation Drawer">
           <i data-lucide="menu" class="w-5 h-5"></i>
         </button>
         <div class="flex items-center space-x-2 cursor-pointer truncate" onclick="switchTab('explore')">
@@ -2452,6 +2460,26 @@
 
         <div id="settingsAuthenticatedContainer" class="space-y-8">
           
+          <!-- QUICK LINK: PERSONAL WORK HISTORY (PRIVATE) -->
+          <div class="card-3d rounded-3xl border border-purple-500/30 p-6 bg-gradient-to-r from-purple-900/10 to-indigo-900/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div class="flex items-center space-x-3.5">
+              <div class="w-10 h-10 rounded-xl bg-purple-500/20 text-purple-300 flex items-center justify-center shrink-0 border border-purple-500/30">
+                <i data-lucide="history" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <div class="flex items-center space-x-2">
+                  <h4 class="text-sm font-black text-theme-primary">Personal Work & Activity History</h4>
+                  <span class="px-2 py-0.5 rounded text-[9px] font-mono bg-purple-500/20 text-purple-300 border border-purple-500/30">Private</span>
+                </div>
+                <p class="text-xs text-theme-muted">View all your project submissions, QR attendance check-ins, certificates, and actions in one private log.</p>
+              </div>
+            </div>
+            <button onclick="switchTab('history')" class="btn-mirror px-4 py-2 rounded-xl text-xs font-bold text-white bg-purple-600 hover:bg-purple-500 transition shrink-0 flex items-center space-x-1.5 shadow">
+              <span>View My Work History</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
           <!-- SECTION 1: MEMBER PROFILE & PHOTO (FOR EVERYONE) -->
           <div class="card-3d rounded-3xl border border-theme p-6 sm:p-8 space-y-6">
             <div class="flex items-center justify-between border-b border-theme pb-4">
@@ -2718,6 +2746,102 @@
                 </button>
               </div>
             </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- 8. PERSONAL WORK HISTORY VIEW (PRIVATE) -->
+      <!-- ========================================== -->
+      <section id="view-history" class="space-y-8 hidden">
+        <!-- Header Card with Strict Privacy Banner -->
+        <div class="card-3d rounded-3xl border border-theme p-6 sm:p-8 space-y-4 bg-gradient-to-r from-purple-600/10 via-indigo-600/10 to-blue-600/10 relative overflow-hidden">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center space-x-4">
+              <div class="w-14 h-14 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-2xl border border-purple-500/30">
+                <i data-lucide="history" class="w-7 h-7"></i>
+              </div>
+              <div>
+                <div class="flex items-center space-x-2">
+                  <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-purple-500/15 text-purple-400 border border-purple-500/30 uppercase flex items-center space-x-1">
+                    <i data-lucide="lock" class="w-3 h-3 mr-1"></i>
+                    <span>Private Personal Data</span>
+                  </span>
+                  <span class="text-xs text-theme-muted font-mono">• Strictly Confidential</span>
+                </div>
+                <h2 class="text-2xl font-black text-theme-primary mt-1">Personal Work & Activity History</h2>
+                <p class="text-xs text-theme-muted">Tamper-proof, chronological record of every deliverable submitted, attendance check-in, certificate earned, and club action.</p>
+              </div>
+            </div>
+
+            <!-- Privacy Guarantee Badge -->
+            <div class="btn-mirror px-4 py-2.5 rounded-2xl text-xs font-mono text-purple-300 border border-purple-500/40 flex items-center space-x-2 self-start sm:self-center shadow-lg bg-purple-950/30">
+              <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400 shrink-0"></i>
+              <div>
+                <span class="font-bold text-white block text-[11px]">Zero Compromise Privacy</span>
+                <span class="text-[9px] text-zinc-400">Isolated to your user session only</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guest Warning if not logged in -->
+        <div id="historyGuestNotice" class="card-3d rounded-3xl border border-theme p-8 text-center space-y-4 hidden">
+          <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 mx-auto flex items-center justify-center">
+            <i data-lucide="lock" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-lg font-black text-theme-primary">Personal History is Private</h3>
+          <p class="text-xs text-theme-muted max-w-md mx-auto">
+            You must be signed in to access your personal work history, attendance records, and project submissions.
+          </p>
+          <button onclick="openAuthModal('login')" class="btn-mirror px-6 py-2.5 rounded-xl text-xs font-black text-white bg-purple-600 hover:bg-purple-500 shadow">
+            Sign In to View Your History &rarr;
+          </button>
+        </div>
+
+        <!-- Authenticated Content Container -->
+        <div id="historyAuthenticatedContainer" class="space-y-6">
+          
+          <!-- Summary Metrics Cards -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div class="card-3d p-4 rounded-2xl border border-theme bg-theme-elevated space-y-1">
+              <span class="text-[10px] font-mono text-theme-muted uppercase tracking-wider block">Total Work Items</span>
+              <div id="histKpiTotal" class="text-2xl font-black text-purple-400">0</div>
+              <span class="text-[10px] text-theme-muted">Recorded activities</span>
+            </div>
+            <div class="card-3d p-4 rounded-2xl border border-theme bg-theme-elevated space-y-1">
+              <span class="text-[10px] font-mono text-theme-muted uppercase tracking-wider block">Deliverables</span>
+              <div id="histKpiDeliverables" class="text-2xl font-black text-emerald-400">0</div>
+              <span class="text-[10px] text-theme-muted">Assignments submitted</span>
+            </div>
+            <div class="card-3d p-4 rounded-2xl border border-theme bg-theme-elevated space-y-1">
+              <span class="text-[10px] font-mono text-theme-muted uppercase tracking-wider block">Events Attended</span>
+              <div id="histKpiAttendance" class="text-2xl font-black text-blue-400">0</div>
+              <span class="text-[10px] text-theme-muted">Verified QR check-ins</span>
+            </div>
+            <div class="card-3d p-4 rounded-2xl border border-theme bg-theme-elevated space-y-1">
+              <span class="text-[10px] font-mono text-theme-muted uppercase tracking-wider block">Certificates</span>
+              <div id="histKpiCerts" class="text-2xl font-black text-amber-400">0</div>
+              <span class="text-[10px] text-theme-muted">Issued credentials</span>
+            </div>
+          </div>
+
+          <!-- Category Filter Bar -->
+          <div class="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-none text-xs">
+            <button onclick="filterHistory('all')" id="hist-filter-all" class="hist-filter-btn px-3 py-1.5 rounded-xl font-bold transition btn-mirror bg-purple-600 text-white shrink-0">All Records</button>
+            <button onclick="filterHistory('PROJECT_DELIVERABLE')" id="hist-filter-PROJECT_DELIVERABLE" class="hist-filter-btn px-3 py-1.5 rounded-xl font-bold transition btn-mirror text-theme-muted hover:text-white shrink-0">Submissions</button>
+            <button onclick="filterHistory('EVENT_ATTENDANCE')" id="hist-filter-EVENT_ATTENDANCE" class="hist-filter-btn px-3 py-1.5 rounded-xl font-bold transition btn-mirror text-theme-muted hover:text-white shrink-0">Attendance</button>
+            <button onclick="filterHistory('CREDENTIALS')" id="hist-filter-CREDENTIALS" class="hist-filter-btn px-3 py-1.5 rounded-xl font-bold transition btn-mirror text-theme-muted hover:text-white shrink-0">Certificates</button>
+            <button onclick="filterHistory('CLUB_ROLE')" id="hist-filter-CLUB_ROLE" class="hist-filter-btn px-3 py-1.5 rounded-xl font-bold transition btn-mirror text-theme-muted hover:text-white shrink-0">Club Roles</button>
+            <button onclick="filterHistory('FINANCE')" id="hist-filter-FINANCE" class="hist-filter-btn px-3 py-1.5 rounded-xl font-bold transition btn-mirror text-theme-muted hover:text-white shrink-0">Budgets</button>
+            <button onclick="filterHistory('CALENDAR')" id="hist-filter-CALENDAR" class="hist-filter-btn px-3 py-1.5 rounded-xl font-bold transition btn-mirror text-theme-muted hover:text-white shrink-0">Calendar Notes</button>
+            <button onclick="filterHistory('AUDIT')" id="hist-filter-AUDIT" class="hist-filter-btn px-3 py-1.5 rounded-xl font-bold transition btn-mirror text-theme-muted hover:text-white shrink-0">Audit Log</button>
+          </div>
+
+          <!-- Timeline Container -->
+          <div id="historyTimelineContainer" class="space-y-4">
+            <!-- Dynamic History Cards injected here -->
           </div>
 
         </div>
@@ -3688,20 +3812,55 @@
       applyTheme(nextTheme);
     }
 
-    /* Mobile Sidebar Toggle */
-    function toggleMobileSidebar() {
+    /* Mobile Sidebar Drawer Control & Tap-Outside Dismissal */
+    function openMobileSidebar() {
       const sidebar = document.getElementById('appSidebar');
       const backdrop = document.getElementById('sidebarMobileBackdrop');
+      if (sidebar) sidebar.classList.remove('-translate-x-full');
+      if (backdrop) backdrop.classList.remove('hidden');
+    }
+
+    function closeMobileSidebar() {
+      const sidebar = document.getElementById('appSidebar');
+      const backdrop = document.getElementById('sidebarMobileBackdrop');
+      if (sidebar) sidebar.classList.add('-translate-x-full');
+      if (backdrop) backdrop.classList.add('hidden');
+    }
+
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('appSidebar');
       if (!sidebar) return;
-      const isClosed = sidebar.classList.contains('-translate-x-full');
-      if (isClosed) {
-        sidebar.classList.remove('-translate-x-full');
-        if (backdrop) backdrop.classList.remove('hidden');
+      if (sidebar.classList.contains('-translate-x-full')) {
+        openMobileSidebar();
       } else {
-        sidebar.classList.add('-translate-x-full');
-        if (backdrop) backdrop.classList.add('hidden');
+        closeMobileSidebar();
       }
     }
+
+    // Dismiss mobile drawer whenever user touches or clicks anywhere on main content / body
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth < 1024) {
+        const sidebar = document.getElementById('appSidebar');
+        const menuBtn = document.getElementById('mobileMenuBtn');
+        if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+          if (!sidebar.contains(e.target) && (!menuBtn || !menuBtn.contains(e.target))) {
+            closeMobileSidebar();
+          }
+        }
+      }
+    });
+
+    document.addEventListener('touchstart', (e) => {
+      if (window.innerWidth < 1024) {
+        const sidebar = document.getElementById('appSidebar');
+        const menuBtn = document.getElementById('mobileMenuBtn');
+        if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+          if (!sidebar.contains(e.target) && (!menuBtn || !menuBtn.contains(e.target))) {
+            closeMobileSidebar();
+          }
+        }
+      }
+    }, { passive: true });
 
     /* ==========================================
        2. CUSTOM 3D ANIMATED CURSOR & STARDUST
@@ -4751,13 +4910,9 @@
       else if (tabId === 'budget') loadBudgets();
       else if (tabId === 'analytics') loadAnalytics();
       else if (tabId === 'settings') loadSettingsView();
+      else if (tabId === 'history') loadPersonalWorkHistory();
 
-      const sidebar = document.getElementById('appSidebar');
-      const backdrop = document.getElementById('sidebarMobileBackdrop');
-      if (window.innerWidth < 1024) {
-        if (sidebar) sidebar.classList.add('-translate-x-full');
-        if (backdrop) backdrop.classList.add('hidden');
-      }
+      closeMobileSidebar();
       const mainScroller = document.getElementById('mainScrollArea');
       if (mainScroller) {
         mainScroller.scrollTo({ top: 0, behavior: 'smooth' });
@@ -6285,6 +6440,214 @@
       } catch (err) {
         showAlert('Logo URL error: ' + err.message, 'error');
       }
+    }
+
+    /* ==========================================
+       9B. PERSONAL WORK HISTORY CONTROLLER (PRIVATE)
+       ========================================== */
+    let currentHistoryData = [];
+    let currentHistoryFilter = 'all';
+
+    function escapeHtmlStr(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    async function loadPersonalWorkHistory() {
+      const guestNotice = document.getElementById('historyGuestNotice');
+      const authContainer = document.getElementById('historyAuthenticatedContainer');
+      const timelineContainer = document.getElementById('historyTimelineContainer');
+
+      if (!currentUser) {
+        if (guestNotice) guestNotice.classList.remove('hidden');
+        if (authContainer) authContainer.classList.add('hidden');
+        return;
+      }
+
+      if (guestNotice) guestNotice.classList.add('hidden');
+      if (authContainer) authContainer.classList.remove('hidden');
+
+      if (timelineContainer) {
+        timelineContainer.innerHTML = `
+          <div class="p-8 text-center text-theme-muted font-mono text-xs flex items-center justify-center space-x-2">
+            <span class="w-4 h-4 rounded-full border-2 border-purple-500 border-t-transparent animate-spin"></span>
+            <span>Loading your private personal work history...</span>
+          </div>
+        `;
+      }
+
+      try {
+        const res = await fetch('/api/users/me/work-history', { headers: getApiHeaders() });
+        if (!res.ok) {
+          throw new Error('Failed to load personal work history.');
+        }
+        const data = await res.json();
+        currentHistoryData = data.history || [];
+
+        // Update KPIs
+        const s = data.summary || {};
+        const kTotal = document.getElementById('histKpiTotal');
+        const kDeliv = document.getElementById('histKpiDeliverables');
+        const kAttn = document.getElementById('histKpiAttendance');
+        const kCerts = document.getElementById('histKpiCerts');
+        if (kTotal) kTotal.textContent = s.total_activities !== undefined ? s.total_activities : currentHistoryData.length;
+        if (kDeliv) kDeliv.textContent = s.submissions_count || 0;
+        if (kAttn) kAttn.textContent = s.attendance_count || 0;
+        if (kCerts) kCerts.textContent = s.certificates_count || 0;
+
+        filterHistory(currentHistoryFilter || 'all');
+      } catch (err) {
+        console.error('Error fetching work history:', err);
+        if (timelineContainer) {
+          timelineContainer.innerHTML = `
+            <div class="card-3d p-6 rounded-2xl border border-red-500/30 text-center space-y-2">
+              <span class="text-rose-400 font-bold text-sm block">Unable to load personal work history</span>
+              <p class="text-xs text-theme-muted">${escapeHtmlStr(err.message)}</p>
+            </div>
+          `;
+        }
+      }
+    }
+
+    function filterHistory(cat) {
+      currentHistoryFilter = cat;
+      document.querySelectorAll('.hist-filter-btn').forEach(btn => {
+        btn.classList.remove('bg-purple-600', 'text-white');
+        btn.classList.add('text-theme-muted');
+      });
+      const activeBtn = document.getElementById(`hist-filter-${cat}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('text-theme-muted');
+        activeBtn.classList.add('bg-purple-600', 'text-white');
+      }
+
+      if (cat === 'all') {
+        renderHistoryTimeline(currentHistoryData);
+      } else {
+        const filtered = currentHistoryData.filter(i => i.category === cat || i.type === cat);
+        renderHistoryTimeline(filtered);
+      }
+    }
+
+    function renderHistoryTimeline(items) {
+      const container = document.getElementById('historyTimelineContainer');
+      if (!container) return;
+
+      if (!items || items.length === 0) {
+        container.innerHTML = `
+          <div class="card-3d p-10 rounded-3xl border border-theme text-center space-y-3 bg-theme-elevated">
+            <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 mx-auto flex items-center justify-center">
+              <i data-lucide="inbox" class="w-6 h-6"></i>
+            </div>
+            <h4 class="font-bold text-sm text-theme-primary">No Records Found in this Category</h4>
+            <p class="text-xs text-theme-muted max-w-sm mx-auto">
+              Any assignments you submit, QR attendance sessions you attend, and credentials you earn will automatically populate here in your personal private log.
+            </p>
+          </div>
+        `;
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+
+      const colorMap = {
+        emerald: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/30' },
+        blue: { bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/30' },
+        purple: { bg: 'bg-purple-500/10', text: 'text-purple-400', border: 'border-purple-500/30' },
+        amber: { bg: 'bg-amber-500/10', text: 'text-amber-400', border: 'border-amber-500/30' },
+        cyan: { bg: 'bg-cyan-500/10', text: 'text-cyan-400', border: 'border-cyan-500/30' },
+        indigo: { bg: 'bg-indigo-500/10', text: 'text-indigo-400', border: 'border-indigo-500/30' },
+        rose: { bg: 'bg-rose-500/10', text: 'text-rose-400', border: 'border-rose-500/30' },
+        sky: { bg: 'bg-sky-500/10', text: 'text-sky-400', border: 'border-sky-500/30' },
+        zinc: { bg: 'bg-zinc-500/10', text: 'text-zinc-400', border: 'border-zinc-500/30' }
+      };
+
+      container.innerHTML = items.map((item) => {
+        const theme = colorMap[item.badge_color] || colorMap.purple;
+        const dt = new Date(item.timestamp);
+        const formattedDate = isNaN(dt.getTime()) ? item.timestamp : dt.toLocaleString('en-US', {
+          month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+
+        let detailHtml = '';
+        if (item.details) {
+          if (item.type === 'SUBMISSION') {
+            detailHtml = `
+              <div class="mt-2.5 p-3 rounded-xl bg-black/40 border border-white/10 space-y-1.5 text-xs">
+                ${item.details.score !== null && item.details.score !== undefined ? `
+                  <div class="flex items-center space-x-2">
+                    <span class="font-bold text-white">Score:</span>
+                    <span class="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">${item.details.score} / ${item.details.max_score}</span>
+                  </div>
+                ` : ''}
+                ${item.details.feedback ? `
+                  <div class="text-zinc-300 text-[11px]"><span class="font-bold text-zinc-400">Feedback:</span> ${escapeHtmlStr(item.details.feedback)}</div>
+                ` : ''}
+                ${item.details.external_link ? `
+                  <div class="pt-1">
+                    <a href="${escapeHtmlStr(item.details.external_link)}" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:underline flex items-center space-x-1 font-mono text-[11px]">
+                      <span>View Submission Code / Live URL &rarr;</span>
+                    </a>
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          } else if (item.type === 'CERTIFICATE') {
+            detailHtml = `
+              <div class="mt-2.5 p-3 rounded-xl bg-purple-950/20 border border-purple-500/20 space-y-1 text-xs font-mono">
+                <div class="text-[10px] text-zinc-400">Credential Verification Hash:</div>
+                <div class="text-purple-300 text-[11px] break-all select-all">${escapeHtmlStr(item.details.verification_hash || '')}</div>
+                ${item.details.verify_url ? `
+                  <div class="pt-1">
+                    <a href="${escapeHtmlStr(item.details.verify_url)}" target="_blank" class="text-amber-400 hover:underline text-[11px]">Verify Certificate Hash &rarr;</a>
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          } else if (item.type === 'BUDGET') {
+            detailHtml = `
+              <div class="mt-2.5 p-3 rounded-xl bg-black/40 border border-white/10 text-xs space-y-1">
+                <div class="text-emerald-400 font-bold font-mono">Amount: ₹${Number(item.details.amount || 0).toLocaleString()}</div>
+                <div class="text-zinc-300 text-[11px]">${escapeHtmlStr(item.details.purpose || '')}</div>
+                ${item.details.admin_notes ? `<div class="text-[11px] text-zinc-400 font-italic">Reviewer Note: ${escapeHtmlStr(item.details.admin_notes)}</div>` : ''}
+              </div>
+            `;
+          }
+        }
+
+        return `
+          <div class="card-3d p-4 sm:p-5 rounded-2xl border border-theme bg-theme-surface transition hover:border-purple-500/40 relative">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-theme pb-3">
+              <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-xl ${theme.bg} ${theme.text} flex items-center justify-center shrink-0 border ${theme.border}">
+                  <i data-lucide="${item.icon || 'activity'}" class="w-4 h-4"></i>
+                </div>
+                <div>
+                  <div class="flex items-center space-x-2">
+                    <span class="px-2 py-0.5 rounded text-[9px] font-mono font-bold ${theme.bg} ${theme.text} border ${theme.border} uppercase">${escapeHtmlStr(item.category_label || item.category)}</span>
+                    <span class="text-[10px] font-mono text-theme-muted">• ${escapeHtmlStr(item.club_name || 'Personal')}</span>
+                  </div>
+                  <h4 class="font-bold text-sm text-theme-primary mt-0.5">${escapeHtmlStr(item.title)}</h4>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2 self-start sm:self-center">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold ${theme.bg} ${theme.text} border ${theme.border}">${escapeHtmlStr(item.status)}</span>
+                <span class="text-[10px] font-mono text-theme-muted">${formattedDate}</span>
+              </div>
+            </div>
+            <div class="mt-2.5">
+              <p class="text-xs text-theme-muted">${escapeHtmlStr(item.summary || '')}</p>
+              ${detailHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (window.lucide) lucide.createIcons();
     }
 
     /* ==========================================

@@ -2,13 +2,17 @@ import os
 import shutil
 import time
 import random
+from datetime import datetime
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 
 from backend.database import get_db
-from backend.models import User, Campus, AuditLog
+from backend.models import (
+    User, Campus, AuditLog, Submission, AttendanceRecord,
+    Certificate, ClubMembership, ClubBudget, Event
+)
 from backend.schemas import (
     UserLogin, UserOut, CampusOut, OTPRequest, RegisterWithOTP, LoginWithOTP,
     SocialLoginRequest, ResetPasswordRequest, UserProfileUpdate
@@ -271,6 +275,16 @@ def upload_profile_photo(
     with open(dest_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
     current_user.avatar_url = f"/uploads/avatars/{safe_filename}"
+    
+    # Audit log
+    audit = AuditLog(
+        user_id=current_user.id,
+        action="UPDATE_PROFILE_PHOTO",
+        target_type="USER",
+        target_id=str(current_user.id),
+        details=f"Updated profile photo"
+    )
+    db.add(audit)
     db.commit()
     db.refresh(current_user)
     return {
@@ -295,12 +309,256 @@ def update_profile(
     if data.avatar_url is not None:
         current_user.avatar_url = data.avatar_url.strip()
     
+    audit = AuditLog(
+        user_id=current_user.id,
+        action="UPDATE_PROFILE_DETAILS",
+        target_type="USER",
+        target_id=str(current_user.id),
+        details=f"Updated profile info for {current_user.name}"
+    )
+    db.add(audit)
     db.commit()
     db.refresh(current_user)
     return {
         "status": "success",
         "message": "Profile updated successfully!",
         "user": serialize_user(current_user)
+    }
+
+@users_router.get("/me/work-history")
+@router.get("/me/work-history")
+def get_my_work_history(
+    category: Optional[str] = None,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    STRICT PRIVACY GUARANTEE:
+    This endpoint retrieves personal work, project deliverables, attendance check-ins,
+    certificates, club roles, budget proposals, and audit records strictly for
+    the authenticated user (`current_user`). No other user or external party
+    can access another member's private work history.
+    """
+    items = []
+    
+    # 1. Project Deliverables & Submissions
+    submissions = db.query(Submission).filter(
+        Submission.student_id == current_user.id
+    ).order_by(Submission.submitted_at.desc()).all()
+    
+    for s in submissions:
+        assign_title = s.assignment.title if s.assignment else "Project Deliverable"
+        club_name = s.assignment.club.name if (s.assignment and s.assignment.club) else "Campus Track"
+        score_info = None
+        feedback_info = None
+        if s.evaluation:
+            score_info = s.evaluation.total_score
+            feedback_info = s.evaluation.feedback_comments
+        
+        items.append({
+            "id": f"submission_{s.id}",
+            "category": "PROJECT_DELIVERABLE",
+            "category_label": "Project Deliverable",
+            "type": "SUBMISSION",
+            "title": assign_title,
+            "club_name": club_name,
+            "timestamp": s.submitted_at.isoformat() if s.submitted_at else s.created_at.isoformat(),
+            "status": s.status or "SUBMITTED",
+            "badge_color": "emerald" if s.status == "EVALUATED" else "amber",
+            "icon": "code-2",
+            "summary": "Delivered project codebase / submission.",
+            "details": {
+                "score": score_info,
+                "max_score": 30,
+                "feedback": feedback_info or "Awaiting evaluation by club lead / advisor.",
+                "external_link": s.external_link,
+                "file_url": s.file_url,
+                "notes": s.notes
+            }
+        })
+        
+    # 2. Attendance & QR Check-ins
+    attendance_records = db.query(AttendanceRecord).filter(
+        AttendanceRecord.user_id == current_user.id
+    ).order_by(AttendanceRecord.checkin_time.desc()).all()
+    
+    for a in attendance_records:
+        event_title = a.session.event.title if (a.session and a.session.event) else "Club Session"
+        club_name = a.session.event.club.name if (a.session and a.session.event and a.session.event.club) else "Mirai Clubs"
+        items.append({
+            "id": f"attendance_{a.id}",
+            "category": "EVENT_ATTENDANCE",
+            "category_label": "Event Attendance",
+            "type": "ATTENDANCE",
+            "title": event_title,
+            "club_name": club_name,
+            "timestamp": a.checkin_time.isoformat() if a.checkin_time else datetime.utcnow().isoformat(),
+            "status": a.status or "PRESENT",
+            "badge_color": "blue" if a.status == "PRESENT" else "indigo",
+            "icon": "qr-code",
+            "summary": f"Verified check-in via {a.status.replace('_', ' ').title()}",
+            "details": {
+                "status": a.status,
+                "checkin_time": a.checkin_time.isoformat() if a.checkin_time else None,
+                "override_reason": a.override_reason
+            }
+        })
+
+    # 3. Tamper-Proof Certificates Earned
+    certificates = db.query(Certificate).filter(
+        Certificate.user_id == current_user.id
+    ).order_by(Certificate.issue_date.desc()).all()
+    
+    for c in certificates:
+        cert_title = c.title if c.title else (c.event.title if c.event else "Certificate of Accomplishment")
+        club_name = c.club.name if c.club else (c.event.club.name if (c.event and c.event.club) else "Mirai Autonomous Ecosystem")
+        items.append({
+            "id": f"certificate_{c.id}",
+            "category": "CREDENTIALS",
+            "category_label": "Certificate & Honor",
+            "type": "CERTIFICATE",
+            "title": cert_title,
+            "club_name": club_name,
+            "timestamp": c.issue_date.isoformat() if c.issue_date else datetime.utcnow().isoformat(),
+            "status": "ISSUED",
+            "badge_color": "purple",
+            "icon": "award",
+            "summary": f"Tamper-proof verified credential #{c.certificate_number}",
+            "details": {
+                "certificate_number": c.certificate_number,
+                "verification_hash": c.verification_hash,
+                "cert_type": c.cert_type,
+                "pdf_url": c.pdf_url,
+                "verify_url": f"/api/certificates/{c.verification_hash}"
+            }
+        })
+
+    # 4. Club Memberships & Posts
+    memberships = db.query(ClubMembership).filter(
+        ClubMembership.user_id == current_user.id
+    ).all()
+    for m in memberships:
+        items.append({
+            "id": f"membership_{m.id}",
+            "category": "CLUB_ROLE",
+            "category_label": "Club Position & Role",
+            "type": "ROLE",
+            "title": f"{m.post.replace('_', ' ').title()} of {m.club.name if m.club else 'Club'}",
+            "club_name": m.club.name if m.club else "Club",
+            "timestamp": m.joined_at.isoformat() if m.joined_at else datetime.utcnow().isoformat(),
+            "status": m.status or "ACTIVE",
+            "badge_color": "cyan",
+            "icon": "shield",
+            "summary": f"Active official role: {m.post}",
+            "details": {
+                "post": m.post,
+                "joined_at": m.joined_at.isoformat() if m.joined_at else None
+            }
+        })
+
+    # 5. Budgets Proposed (if President / Officer)
+    budgets = db.query(ClubBudget).filter(
+        ClubBudget.requested_by_id == current_user.id
+    ).order_by(ClubBudget.created_at.desc()).all()
+    for b in budgets:
+        items.append({
+            "id": f"budget_{b.id}",
+            "category": "FINANCE",
+            "category_label": "Budget Proposal",
+            "type": "BUDGET",
+            "title": f"Budget Request: {b.title}",
+            "club_name": b.club.name if b.club else "Club",
+            "timestamp": b.created_at.isoformat() if b.created_at else datetime.utcnow().isoformat(),
+            "status": b.status or "PENDING",
+            "badge_color": "emerald" if b.status == "APPROVED" else ("rose" if b.status == "REJECTED" else "amber"),
+            "icon": "wallet",
+            "summary": f"₹{b.amount:,} requested for {b.purpose[:60]}...",
+            "details": {
+                "amount": b.amount,
+                "purpose": b.purpose,
+                "admin_notes": b.admin_notes
+            }
+        })
+
+    # 6. Personal Calendar Notes & Events Created
+    personal_events = db.query(Event).filter(
+        Event.created_by_id == current_user.id
+    ).order_by(Event.date.desc()).all()
+    for pe in personal_events:
+        items.append({
+            "id": f"event_{pe.id}",
+            "category": "CALENDAR",
+            "category_label": "Scheduled Event / Note",
+            "type": "EVENT",
+            "title": pe.title,
+            "club_name": pe.club.name if pe.club else "Personal Calendar",
+            "timestamp": pe.date.isoformat() if pe.date else datetime.utcnow().isoformat(),
+            "status": "SCHEDULED",
+            "badge_color": "sky",
+            "icon": "calendar",
+            "summary": f"{pe.visibility.title()} event: {pe.title}",
+            "details": {
+                "venue": pe.venue or "TBD",
+                "visibility": pe.visibility,
+                "event_type": pe.event_type
+            }
+        })
+
+    # 7. Audit Log actions initiated by user
+    audits = db.query(AuditLog).filter(
+        AuditLog.user_id == current_user.id
+    ).order_by(AuditLog.timestamp.desc()).limit(30).all()
+    for a in audits:
+        items.append({
+            "id": f"audit_{a.id}",
+            "category": "AUDIT",
+            "category_label": "Account Action",
+            "type": "AUDIT",
+            "title": a.action.replace("_", " ").title(),
+            "club_name": "Personal Audit Trail",
+            "timestamp": a.timestamp.isoformat() if a.timestamp else datetime.utcnow().isoformat(),
+            "status": "RECORDED",
+            "badge_color": "zinc",
+            "icon": "activity",
+            "summary": a.details or a.action,
+            "details": {
+                "action": a.action,
+                "target_type": a.target_type,
+                "target_id": a.target_id
+            }
+        })
+
+    # Sort all activities chronologically (newest first)
+    items.sort(key=lambda x: x["timestamp"], reverse=True)
+
+    # Optional category filter
+    if category and category.lower() != "all":
+        cat_upper = category.upper()
+        items = [item for item in items if item["category"] == cat_upper or item["type"] == cat_upper]
+
+    return {
+        "status": "success",
+        "privacy": "CONFIDENTIAL_PERSONAL_DATA",
+        "privacy_note": "🔒 This work history is private personal data and accessible exclusively to you.",
+        "user": {
+            "id": current_user.id,
+            "name": current_user.name,
+            "username": current_user.username,
+            "email": current_user.email,
+            "role": current_user.role,
+            "roll_no": current_user.roll_no,
+            "avatar_url": current_user.avatar_url
+        },
+        "summary": {
+            "total_activities": len(items),
+            "submissions_count": len(submissions),
+            "attendance_count": len(attendance_records),
+            "certificates_count": len(certificates),
+            "memberships_count": len(memberships),
+            "budgets_count": len(budgets),
+            "personal_events_count": len(personal_events)
+        },
+        "history": items
     }
 
 @router.get("/users")
