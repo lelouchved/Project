@@ -103,8 +103,8 @@
        ======================================================== */
     :root[data-theme="dark"] {
       --bg-page: #000000;               /* Absolute Royal Pitch Black */
-      --bg-surface: rgba(10, 14, 26, 0.70);            /* Foggy Mirror Obsidian Glass */
-      --bg-surface-elevated: rgba(16, 22, 38, 0.75);   /* Elevated Foggy Mirror Glass */
+      --bg-surface: rgba(8, 12, 22, 0.38);            /* Ultra-translucent Foggy Mirror Obsidian Glass */
+      --bg-surface-elevated: rgba(14, 18, 30, 0.48);   /* Elevated Foggy Mirror Glass */
       --border-app: rgba(255, 255, 255, 0.18); /* Fine Royal Mirror Glass Border */
       --border-subtle: rgba(255, 255, 255, 0.10); /* Subtle Silver Edge */
       --accent-primary: #FFFFFF;        /* Crisp Brilliant Royal White */
@@ -115,8 +115,8 @@
       --text-muted: #CBD5E1;            /* High-contrast crisp light silver for foggy glass */
       --text-primary: #FFFFFF;          /* Royal Pure White Primary */
       --yuzuru-gold: #f59e0b;           /* Imperial Crown Gold */
-      --header-bg: rgba(6, 9, 18, 0.78); /* Foggy Translucent Mirror Header */
-      --sidebar-bg: rgba(6, 9, 18, 0.82); /* Foggy Translucent Mirror Sidebar */
+      --header-bg: rgba(6, 9, 18, 0.65); /* Foggy Translucent Mirror Header */
+      --sidebar-bg: rgba(6, 9, 18, 0.72); /* Foggy Translucent Mirror Sidebar */
       --btn-mirror-bg: rgba(255, 255, 255, 0.08);  /* Translucent Mirror Glass Button */
       --btn-mirror-border: rgba(255, 255, 255, 0.25);
       --btn-mirror-hover-bg: rgba(255, 255, 255, 0.18);
@@ -129,22 +129,22 @@
     :root[data-theme="light"] {
       /* User Specified Light Mode: Pure White Canvas, Black, Slate Grey, Royal Blue (#1D4ED8) */
       --bg-page: #F8FAFC;               /* Clean Pearl Base Canvas */
-      --bg-surface: rgba(255, 255, 255, 0.82);        /* Foggy Frosted Mirror Glass */
-      --bg-surface-elevated: rgba(248, 250, 252, 0.88); /* Elevated Frosted Surface */
-      --border-app: rgba(226, 232, 240, 0.90);        /* Clean Frost Slate Border */
-      --border-subtle: rgba(241, 245, 249, 0.85);
+      --bg-surface: rgba(255, 255, 255, 0.55);        /* Foggy Frosted Mirror Glass */
+      --bg-surface-elevated: rgba(248, 250, 252, 0.68); /* Elevated Frosted Surface */
+      --border-app: rgba(226, 232, 240, 0.85);        /* Clean Frost Slate Border */
+      --border-subtle: rgba(241, 245, 249, 0.80);
       --accent-primary: #1D4ED8;        /* Royal Blue Accent */
       --accent-hover: #2563EB;          /* Royal Blue Hover */
       --accent-soft: #EFF6FF;           /* Soft Royal Blue Tint */
       --accent-ice: #1D4ED8;            /* Royal Blue */
       --accent-frost: #DBEAFE;          /* Soft Royal Blue Frost */
-      --text-muted: #334155;            /* Ultra-high contrast slate for easy visibility */
+      --text-muted: #1E293B;            /* Ultra-high contrast slate for easy visibility */
       --text-primary: #09090B;          /* Solid Jet Black */
       --yuzuru-gold: #B45309;           /* Amber/Gold */
-      --header-bg: rgba(255, 255, 255, 0.84);         /* Frosted Mirror White Header */
-      --sidebar-bg: rgba(255, 255, 255, 0.88);        /* Frosted Mirror White Sidebar */
-      --btn-mirror-bg: rgba(255, 255, 255, 0.90);     /* Clean White Button Surface */
-      --btn-mirror-border: rgba(203, 213, 225, 0.85); /* Slate Border */
+      --header-bg: rgba(255, 255, 255, 0.75);         /* Frosted Mirror White Header */
+      --sidebar-bg: rgba(255, 255, 255, 0.80);        /* Frosted Mirror White Sidebar */
+      --btn-mirror-bg: rgba(255, 255, 255, 0.85);     /* Clean White Button Surface */
+      --btn-mirror-border: rgba(203, 213, 225, 0.80); /* Slate Border */
       --btn-mirror-hover-bg: #EFF6FF;                 /* Royal Blue Hover Tint */
       --btn-mirror-hover-border: #2563EB;             /* Royal Blue Hover Border */
       --btn-mirror-hover-shadow: 0 4px 15px rgba(29, 78, 216, 0.16);
@@ -303,8 +303,8 @@
       box-shadow: var(--card-shadow);
       position: relative;
       overflow: hidden;
-      backdrop-filter: blur(20px) saturate(190%);
-      -webkit-backdrop-filter: blur(20px) saturate(190%);
+      backdrop-filter: blur(14px) saturate(180%);
+      -webkit-backdrop-filter: blur(14px) saturate(180%);
     }
 
     /* Foggy Mirror Top Specular Bevel Line */
@@ -342,15 +342,27 @@
       opacity: 1;
     }
 
+    /* High-contrast crisp text calibration over translucent foggy mirror cards */
+    .card-3d h1, .card-3d h2, .card-3d h3, .card-3d h4, .card-3d p strong {
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
+    }
+    :root[data-theme="light"] .card-3d h1,
+    :root[data-theme="light"] .card-3d h2,
+    :root[data-theme="light"] .card-3d h3,
+    :root[data-theme="light"] .card-3d h4,
+    :root[data-theme="light"] .card-3d p strong {
+      text-shadow: none;
+    }
+
     .bg-theme-surface { 
       background-color: var(--bg-surface);
-      backdrop-filter: blur(20px) saturate(190%);
-      -webkit-backdrop-filter: blur(20px) saturate(190%);
+      backdrop-filter: blur(14px) saturate(180%);
+      -webkit-backdrop-filter: blur(14px) saturate(180%);
     }
     .bg-theme-elevated { 
       background-color: var(--bg-surface-elevated);
-      backdrop-filter: blur(20px) saturate(190%);
-      -webkit-backdrop-filter: blur(20px) saturate(190%);
+      backdrop-filter: blur(14px) saturate(180%);
+      -webkit-backdrop-filter: blur(14px) saturate(180%);
     }
     .border-theme { border-color: var(--border-app); }
     .text-theme-primary { color: var(--text-primary); }
@@ -850,10 +862,10 @@
     </header>
 
     <!-- NOTIFICATION ALERT BANNER -->
-    <div id="alertBanner" class="hidden max-w-6xl mx-auto px-4 sm:px-6 pt-4 w-full relative z-20"></div>
+    <div id="alertBanner" class="hidden max-w-5xl mx-auto px-4 sm:px-6 pt-4 w-full relative z-20"></div>
 
     <!-- URGENT 2-DAY DEADLINE BANNER (48H WARNING) -->
-    <div id="urgentDeadlineBanner" class="hidden max-w-6xl mx-auto px-4 sm:px-6 pt-4 w-full relative z-20">
+    <div id="urgentDeadlineBanner" class="hidden max-w-5xl mx-auto px-4 sm:px-6 pt-4 w-full relative z-20">
       <div class="card-3d rounded-2xl p-4 border border-rose-500/40 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs" style="background-color: var(--bg-surface-elevated);">
         <div class="flex items-center space-x-3">
           <span class="w-9 h-9 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center font-bold text-lg shrink-0">⚠️</span>
@@ -874,15 +886,15 @@
     </div>
 
     <!-- MAIN APP VIEWS CONTAINER -->
-    <main class="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8 flex-1 w-full space-y-6 sm:space-y-10 min-w-0">
+    <main class="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-7 flex-1 w-full space-y-6 sm:space-y-8 min-w-0">
 
       <!-- ========================================== -->
       <!-- 1. EXPLORE CLUBS & CAMPUSES VIEW (HOME) -->
       <!-- ========================================== -->
-      <section id="view-explore" class="space-y-6 sm:space-y-10 min-w-0">
+      <section id="view-explore" class="space-y-6 sm:space-y-8 min-w-0">
         
         <!-- HERO SECTION: WELCOME TO MIRAI CLUBS -->
-        <div class="card-3d rounded-2xl sm:rounded-3xl p-5 sm:p-10 border border-theme relative overflow-hidden glow-mirai" style="background-color: var(--bg-surface);">
+        <div class="card-3d rounded-2xl sm:rounded-3xl p-5 sm:p-7 border border-theme relative overflow-hidden glow-mirai" style="background-color: var(--bg-surface);">
           <div class="max-w-3xl space-y-5 sm:space-y-6 relative z-10">
             
             <!-- Official Institution Logo & Emblem Badge -->
@@ -2885,7 +2897,7 @@
 
     <!-- FOOTER -->
     <footer class="border-t border-white/15 py-10 px-6 text-xs text-theme-muted relative z-10" style="background-color: var(--header-bg);">
-      <div class="max-w-6xl mx-auto space-y-8">
+      <div class="max-w-5xl mx-auto space-y-8">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8 text-left">
           
           <!-- Col 1: Brand & Contact -->
@@ -4100,9 +4112,10 @@
        ========================================== */
     let scene, camera, renderer;
     let particleSystem, particleGeo, particleMat;
-    let celestialGeometryGroup, outerMesh, innerRing;
+    let celestialGeometryGroup, outerMesh, innerRing, middleRing;
     let targetMouseX = 0, targetMouseY = 0;
     let currentMouseX = 0, currentMouseY = 0;
+    let targetScrollY = 0, currentScrollY = 0;
 
     function init3DEnvironment() {
       const canvas = document.getElementById('threeCanvas');
@@ -4115,48 +4128,60 @@
       scene.add(celestialGeometryGroup);
 
       // Outer 3D Wireframe Icosahedron
-      const icosaGeo = new THREE.IcosahedronGeometry(230, 2);
+      const icosaGeo = new THREE.IcosahedronGeometry(290, 2);
       const icosaMat = new THREE.MeshBasicMaterial({
         color: 0xFFFFFF,
         wireframe: true,
         transparent: true,
-        opacity: 0.16
+        opacity: 0.42
       });
       outerMesh = new THREE.Mesh(icosaGeo, icosaMat);
       celestialGeometryGroup.add(outerMesh);
 
-      // Inner Rotating Torus Ring
-      const torusGeo = new THREE.TorusGeometry(150, 4, 16, 100);
+      // Inner Rotating Cyan Torus Ring
+      const torusGeo = new THREE.TorusGeometry(180, 3.5, 16, 100);
       const torusMat = new THREE.MeshBasicMaterial({
         color: 0x00A3FF,
         wireframe: true,
         transparent: true,
-        opacity: 0.32
+        opacity: 0.70
       });
       innerRing = new THREE.Mesh(torusGeo, torusMat);
       innerRing.rotation.x = Math.PI / 3;
       celestialGeometryGroup.add(innerRing);
 
-      // Celestial Particle Cloud (550 Nodes)
-      const count = 550;
+      // Middle Astrolabe Gyroscopic Ring
+      const middleGeo = new THREE.TorusGeometry(245, 2.5, 16, 100);
+      const middleMat = new THREE.MeshBasicMaterial({
+        color: 0xBFD7FF,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.45
+      });
+      middleRing = new THREE.Mesh(middleGeo, middleMat);
+      middleRing.rotation.y = Math.PI / 4;
+      celestialGeometryGroup.add(middleRing);
+
+      // Celestial Particle Cloud (950 Nodes)
+      const count = 950;
       particleGeo = new THREE.BufferGeometry();
       const posArray = new Float32Array(count * 3);
       const colArray = new Float32Array(count * 3);
 
       for (let i = 0; i < count * 3; i += 3) {
-        posArray[i] = (Math.random() - 0.5) * 2400;
-        posArray[i + 1] = (Math.random() - 0.5) * 1900;
-        posArray[i + 2] = (Math.random() - 0.5) * 1500;
+        posArray[i] = (Math.random() - 0.5) * 2800;
+        posArray[i + 1] = (Math.random() - 0.5) * 2400;
+        posArray[i + 2] = (Math.random() - 0.5) * 1600;
       }
 
       particleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
       particleGeo.setAttribute('color', new THREE.BufferAttribute(colArray, 3));
 
       particleMat = new THREE.PointsMaterial({
-        size: 5.5,
+        size: 6.0,
         vertexColors: true,
         transparent: true,
-        opacity: 0.8
+        opacity: 0.85
       });
 
       particleSystem = new THREE.Points(particleGeo, particleMat);
@@ -4170,8 +4195,13 @@
 
       window.addEventListener('resize', onWindowResize, false);
       document.addEventListener('mousemove', onThreeMouseMove, false);
+      window.addEventListener('scroll', onThreeScroll, { passive: true });
 
       animate3D();
+    }
+
+    function onThreeScroll() {
+      targetScrollY = window.scrollY || document.documentElement.scrollTop || 0;
     }
 
     function update3DThemeColors(theme) {
@@ -4185,28 +4215,36 @@
         c1 = new THREE.Color(0xFFFFFF); // Brilliant Diamond White
         c2 = new THREE.Color(0xF1F5F9); // Crisp Silver/White
         c3 = new THREE.Color(0x00A3FF); // Mirai Logo Cyan
-        scene.fog = new THREE.FogExp2(0x000000, 0.0006);
+        scene.fog = new THREE.FogExp2(0x000000, 0.00018);
         if (outerMesh) {
           outerMesh.material.color.setHex(0xFFFFFF);
-          outerMesh.material.opacity = 0.16;
+          outerMesh.material.opacity = 0.42;
         }
         if (innerRing) {
           innerRing.material.color.setHex(0x00A3FF);
-          innerRing.material.opacity = 0.32;
+          innerRing.material.opacity = 0.70;
+        }
+        if (middleRing) {
+          middleRing.material.color.setHex(0xBFD7FF);
+          middleRing.material.opacity = 0.45;
         }
       } else {
         // Light Mode: Black 3D motion, black particles, and wireframe over pure white background with Royal Blue accent ring!
         c1 = new THREE.Color(0x000000); // Pitch Black Particles
         c2 = new THREE.Color(0x18181B); // Charcoal Black Particles
         c3 = new THREE.Color(0x1D4ED8); // Royal Blue Accent Particles
-        scene.fog = new THREE.FogExp2(0xFFFFFF, 0.0006); // Pure White Base Fog
+        scene.fog = new THREE.FogExp2(0xFFFFFF, 0.00018); // Pure White Base Fog
         if (outerMesh) {
           outerMesh.material.color.setHex(0x09090B); // Black Torus Wireframe
-          outerMesh.material.opacity = 0.38;
+          outerMesh.material.opacity = 0.45;
         }
         if (innerRing) {
           innerRing.material.color.setHex(0x1D4ED8); // Royal Blue Inner Ring
-          innerRing.material.opacity = 0.70;
+          innerRing.material.opacity = 0.75;
+        }
+        if (middleRing) {
+          middleRing.material.color.setHex(0x2563EB); // Royal Blue Middle Ring
+          middleRing.material.opacity = 0.50;
         }
       }
 
@@ -4249,6 +4287,7 @@
 
       currentMouseX += (targetMouseX - currentMouseX) * 0.04;
       currentMouseY += (targetMouseY - currentMouseY) * 0.04;
+      currentScrollY += (targetScrollY - currentScrollY) * 0.05;
 
       camera.position.x = currentMouseX;
       camera.position.y = -currentMouseY;
@@ -4259,7 +4298,13 @@
         outerMesh.rotation.y += 0.0030;
         innerRing.rotation.z += 0.0035;
         innerRing.rotation.y += 0.0018;
+        if (middleRing) {
+          middleRing.rotation.x += 0.0026;
+          middleRing.rotation.z += 0.0019;
+        }
         celestialGeometryGroup.rotation.y += 0.0008;
+        celestialGeometryGroup.position.y = -currentScrollY * 0.16;
+        celestialGeometryGroup.rotation.z = currentScrollY * 0.0004;
       }
 
       if (particleSystem) {
