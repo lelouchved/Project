@@ -34,6 +34,7 @@ class UserProfileUpdate(BaseModel):
 class UserLogin(BaseModel):
     email: str
     password: str
+    domain_passkey: Optional[str] = None
 
 class OTPRequest(BaseModel):
     identifier: str  # email or phone or username

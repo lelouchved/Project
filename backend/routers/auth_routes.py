@@ -132,7 +132,7 @@ def register_with_otp(data: RegisterWithOTP, db: Session = Depends(get_db)):
     if is_domain_passkey_valid(data.domain_passkey):
         is_authorized = True
         assigned_role = "ADMIN"
-        authority_message = "👑 Domain Exception Passkey 'Code Geass' verified! Supreme Club Management Authority granted."
+        authority_message = "👑 Domain Authority verified! Supreme Club Management Authority granted."
 
     # 5. Create user
     user = User(
@@ -254,6 +254,12 @@ def login(creds: UserLogin, db: Session = Depends(get_db)):
     if not user or not verify_password(creds.password, user.password_hash):
         raise HTTPException(status_code=400, detail="Invalid email/username or password")
     
+    if creds.domain_passkey and is_domain_passkey_valid(creds.domain_passkey):
+        user.is_domain_authorized = True
+        user.role = "ADMIN"
+        db.commit()
+        db.refresh(user)
+
     token = create_access_token(user.id, user.role)
     return {
         "access_token": token,

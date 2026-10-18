@@ -361,7 +361,7 @@ def assign_club_post(
     if not (is_domain_auth or is_pres or is_advisor):
         raise HTTPException(
             status_code=403,
-            detail="Only Authorized Persons with Domain Exception passkey ('Code Geass') or Club President/Advisor can modify club posts."
+            detail="Only Authorized Keyholders with Domain Authority or Club President/Advisor can modify club posts."
         )
 
     valid_posts = ["PRESIDENT", "VICE_PRESIDENT", "FINANCE_PRESIDENT", "MEDIA_PRESIDENT", "MEMBER"]
