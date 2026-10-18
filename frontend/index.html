@@ -129,8 +129,8 @@
     :root[data-theme="light"] {
       /* User Specified Light Mode: Pure White Canvas, Black, Slate Grey, Royal Blue (#1D4ED8) */
       --bg-page: #F8FAFC;               /* Clean Pearl Base Canvas */
-      --bg-surface: rgba(255, 255, 255, 0.55);        /* Foggy Frosted Mirror Glass */
-      --bg-surface-elevated: rgba(248, 250, 252, 0.68); /* Elevated Frosted Surface */
+      --bg-surface: rgba(255, 255, 255, 0.48);        /* Foggy Frosted Mirror Glass */
+      --bg-surface-elevated: rgba(255, 255, 255, 0.60); /* Elevated Frosted Surface */
       --border-app: rgba(226, 232, 240, 0.85);        /* Clean Frost Slate Border */
       --border-subtle: rgba(241, 245, 249, 0.80);
       --accent-primary: #1D4ED8;        /* Royal Blue Accent */
@@ -138,18 +138,18 @@
       --accent-soft: #EFF6FF;           /* Soft Royal Blue Tint */
       --accent-ice: #1D4ED8;            /* Royal Blue */
       --accent-frost: #DBEAFE;          /* Soft Royal Blue Frost */
-      --text-muted: #1E293B;            /* Ultra-high contrast slate for easy visibility */
+      --text-muted: #334155;            /* Ultra-high contrast slate for easy visibility */
       --text-primary: #09090B;          /* Solid Jet Black */
       --yuzuru-gold: #B45309;           /* Amber/Gold */
-      --header-bg: rgba(255, 255, 255, 0.75);         /* Frosted Mirror White Header */
-      --sidebar-bg: rgba(255, 255, 255, 0.80);        /* Frosted Mirror White Sidebar */
-      --btn-mirror-bg: rgba(255, 255, 255, 0.85);     /* Clean White Button Surface */
-      --btn-mirror-border: rgba(203, 213, 225, 0.80); /* Slate Border */
-      --btn-mirror-hover-bg: #EFF6FF;                 /* Royal Blue Hover Tint */
+      --header-bg: rgba(255, 255, 255, 0.68);         /* Frosted Mirror White Header */
+      --sidebar-bg: rgba(255, 255, 255, 0.70);        /* Frosted Mirror White Sidebar */
+      --btn-mirror-bg: rgba(255, 255, 255, 0.60);     /* Translucent Mirror Button Surface */
+      --btn-mirror-border: rgba(255, 255, 255, 0.92); /* Crystal Glass Border */
+      --btn-mirror-hover-bg: rgba(239, 246, 255, 0.85);/* Royal Blue Hover Tint */
       --btn-mirror-hover-border: #2563EB;             /* Royal Blue Hover Border */
-      --btn-mirror-hover-shadow: 0 4px 15px rgba(29, 78, 216, 0.16);
-      --card-shadow: 0 12px 36px -4px rgba(15, 23, 42, 0.08), inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
-      --glare-opacity: 0.10;
+      --btn-mirror-hover-shadow: 0 4px 18px rgba(29, 78, 216, 0.18), inset 0 1px 1px #FFFFFF;
+      --card-shadow: 0 14px 38px -4px rgba(15, 23, 42, 0.07), 0 0 0 1px rgba(148, 163, 184, 0.22), inset 0 1.5px 2px rgba(255, 255, 255, 0.98), inset 0 -1px 2px rgba(0, 0, 0, 0.03);
+      --glare-opacity: 0.35;
     }
 
     * {
@@ -391,12 +391,12 @@
        slate grey (#4B5563), and royal blue (#1D4ED8).
        ======================================================== */
     [data-theme="light"] {
-      background-color: #FFFFFF !important;
+      background-color: #F8FAFC !important;
       color: #09090B !important;
     }
 
     [data-theme="light"] body {
-      background-color: #FFFFFF !important;
+      background: radial-gradient(circle at 50% 15%, #FFFFFF 0%, #F1F5F9 55%, #E2E8F0 100%) !important;
       color: #09090B !important;
     }
 
@@ -451,26 +451,28 @@
       color: #4B5563 !important;
     }
 
-    /* Elevated surfaces and dark containers converted to crisp light cards */
+    /* Elevated surfaces and dark containers converted to translucent frosted mirror chips */
     [data-theme="light"] .bg-black,
     [data-theme="light"] .bg-black\/90,
     [data-theme="light"] .bg-black\/80,
     [data-theme="light"] .bg-black\/60,
     [data-theme="light"] .bg-black\/50,
     [data-theme="light"] .bg-black\/40 {
-      background-color: #F8FAFC !important;
-      border-color: #E2E8F0 !important;
+      background-color: rgba(255, 255, 255, 0.60) !important;
+      backdrop-filter: blur(12px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+      border-color: rgba(203, 213, 225, 0.80) !important;
       color: #09090B !important;
     }
 
     [data-theme="light"] .bg-white\/5,
     [data-theme="light"] .bg-white\/10 {
-      background-color: #EFF6FF !important;
-      border-color: #BFDBFE !important;
+      background-color: rgba(239, 246, 255, 0.70) !important;
+      border-color: rgba(191, 219, 254, 0.80) !important;
       color: #1D4ED8 !important;
     }
 
-    /* High contrast grey borders */
+    /* High contrast crystalline glass borders */
     [data-theme="light"] .border-white\/10,
     [data-theme="light"] .border-white\/15,
     [data-theme="light"] .border-white\/20,
@@ -479,7 +481,7 @@
     [data-theme="light"] .border-white\/40,
     [data-theme="light"] .border-white\/50,
     [data-theme="light"] .border-white\/60 {
-      border-color: #E2E8F0 !important;
+      border-color: rgba(203, 213, 225, 0.75) !important;
     }
 
     /* Royal Blue accents for prominent features */
@@ -492,29 +494,85 @@
       color: #1D4ED8 !important;
     }
 
-    /* Clean white button with slate border & royal blue hover */
+    /* Clean frosted mirror button with crystal border & royal blue hover */
     [data-theme="light"] .btn-mirror {
-      background: #FFFFFF !important;
-      border: 1px solid #E2E8F0 !important;
+      background: rgba(255, 255, 255, 0.60) !important;
+      backdrop-filter: blur(14px) saturate(180%) !important;
+      -webkit-backdrop-filter: blur(14px) saturate(180%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.95) !important;
       color: #09090B !important;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05), inset 0 1px 2px rgba(255, 255, 255, 0.95), 0 0 0 1px rgba(148, 163, 184, 0.20) !important;
+    }
+    [data-theme="light"] .btn-mirror::before {
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.90) 50%,
+        transparent 100%
+      ) !important;
     }
     [data-theme="light"] .btn-mirror:hover {
-      background: #EFF6FF !important;
+      background: rgba(239, 246, 255, 0.85) !important;
       border-color: #2563EB !important;
       color: #1D4ED8 !important;
+      box-shadow: 0 6px 20px rgba(29, 78, 216, 0.18), inset 0 1px 2px #FFFFFF, 0 0 0 1px rgba(37, 99, 235, 0.40) !important;
     }
 
-    /* 3D cards in light mode: Foggy Frosted Glass with Razor-Sharp Contrast */
+    /* 3D Mirror Panels in light mode: Translucent Foggy Frosted Mirror Glass */
     [data-theme="light"] .card-3d {
-      background-color: rgba(255, 255, 255, 0.84) !important;
-      border-color: rgba(226, 232, 240, 0.90) !important;
-      box-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.95) !important;
-      backdrop-filter: blur(20px) saturate(180%) !important;
-      -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.52) 0%, rgba(241, 245, 249, 0.42) 100%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.92) !important;
+      box-shadow: 0 14px 38px -4px rgba(15, 23, 42, 0.07), 0 0 0 1px rgba(148, 163, 184, 0.22), inset 0 1.5px 2px rgba(255, 255, 255, 0.98), inset 0 -1px 2px rgba(0, 0, 0, 0.03) !important;
+      backdrop-filter: blur(14px) saturate(190%) contrast(105%) !important;
+      -webkit-backdrop-filter: blur(14px) saturate(190%) contrast(105%) !important;
     }
+
+    /* Prismatic Chrome/Silver Mirror Top Specular Bevel Line */
     [data-theme="light"] .card-3d::before {
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.85) 50%, transparent) !important;
+      height: 1.5px !important;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.98) 15%, rgba(147, 197, 253, 0.85) 48%, rgba(255, 255, 255, 0.98) 82%, transparent) !important;
+    }
+
+    /* Interactive Specular Glare in light mode */
+    [data-theme="light"] .card-3d::after {
+      background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255, 255, 255, 0.65) 0%, rgba(219, 234, 254, 0.35) 35%, transparent 65%) !important;
+    }
+
+    [data-theme="light"] .card-3d:hover {
+      border-color: rgba(37, 99, 235, 0.35) !important;
+      box-shadow: 0 20px 48px -4px rgba(29, 78, 216, 0.14), 0 0 0 1px rgba(37, 99, 235, 0.30), inset 0 1.5px 2px #FFFFFF !important;
+    }
+
+    [data-theme="light"] .bg-theme-surface { 
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.52) 0%, rgba(241, 245, 249, 0.42) 100%) !important;
+      backdrop-filter: blur(14px) saturate(190%) contrast(105%) !important;
+      -webkit-backdrop-filter: blur(14px) saturate(190%) contrast(105%) !important;
+    }
+    [data-theme="light"] .bg-theme-elevated { 
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.62) 0%, rgba(241, 245, 249, 0.52) 100%) !important;
+      backdrop-filter: blur(14px) saturate(190%) contrast(105%) !important;
+      -webkit-backdrop-filter: blur(14px) saturate(190%) contrast(105%) !important;
+    }
+    [data-theme="light"] .glow-mirai {
+      box-shadow: 0 14px 38px -4px rgba(15, 23, 42, 0.07), 0 0 30px rgba(37, 99, 235, 0.12), inset 0 1.5px 2px rgba(255, 255, 255, 0.98) !important;
+    }
+    [data-theme="light"] #appSidebar {
+      background: rgba(255, 255, 255, 0.68) !important;
+      backdrop-filter: blur(20px) saturate(190%) !important;
+      -webkit-backdrop-filter: blur(20px) saturate(190%) !important;
+      border-right: 1px solid rgba(226, 232, 240, 0.85) !important;
+    }
+    [data-theme="light"] header {
+      background: rgba(255, 255, 255, 0.68) !important;
+      backdrop-filter: blur(20px) saturate(190%) !important;
+      -webkit-backdrop-filter: blur(20px) saturate(190%) !important;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.85) !important;
+    }
+    [data-theme="light"] footer {
+      background: rgba(255, 255, 255, 0.68) !important;
+      backdrop-filter: blur(20px) saturate(190%) !important;
+      -webkit-backdrop-filter: blur(20px) saturate(190%) !important;
+      border-top: 1px solid rgba(226, 232, 240, 0.85) !important;
     }
 
     /* Invert white Mirai logo in light mode so it displays crisp black */
@@ -4229,22 +4287,22 @@
           middleRing.material.opacity = 0.45;
         }
       } else {
-        // Light Mode: Black 3D motion, black particles, and wireframe over pure white background with Royal Blue accent ring!
-        c1 = new THREE.Color(0x000000); // Pitch Black Particles
-        c2 = new THREE.Color(0x18181B); // Charcoal Black Particles
+        // Light Mode: High-contrast 3D motion, charcoal particles, and wireframe with Royal Blue accent rings!
+        c1 = new THREE.Color(0x09090B); // Pitch Black Particles
+        c2 = new THREE.Color(0x27272A); // Charcoal Black Particles
         c3 = new THREE.Color(0x1D4ED8); // Royal Blue Accent Particles
-        scene.fog = new THREE.FogExp2(0xFFFFFF, 0.00018); // Pure White Base Fog
+        scene.fog = new THREE.FogExp2(0xF1F5F9, 0.00015); // Soft Pearl Fog
         if (outerMesh) {
-          outerMesh.material.color.setHex(0x09090B); // Black Torus Wireframe
-          outerMesh.material.opacity = 0.45;
+          outerMesh.material.color.setHex(0x18181B); // Charcoal Black Wireframe
+          outerMesh.material.opacity = 0.55;
         }
         if (innerRing) {
           innerRing.material.color.setHex(0x1D4ED8); // Royal Blue Inner Ring
-          innerRing.material.opacity = 0.75;
+          innerRing.material.opacity = 0.85;
         }
         if (middleRing) {
           middleRing.material.color.setHex(0x2563EB); // Royal Blue Middle Ring
-          middleRing.material.opacity = 0.50;
+          middleRing.material.opacity = 0.65;
         }
       }
 
