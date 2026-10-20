@@ -7,29 +7,33 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
     
     :root[data-theme="dark"] {
-      --bg-page: #000000;
-      --bg-surface: #17181B;
-      --bg-surface-elevated: #202226;
-      --border-app: #434A50;
-      --accent-primary: #4B6170;
-      --text-muted: #979DA1;
-      --text-primary: #EFE9E0;
+      --bg-page: #05070a;
+      --bg-surface: #0a0e1c;
+      --bg-surface-elevated: #0d1526;
+      --border-app: rgba(255, 255, 255, 0.08);
+      --accent-primary: #194cd1;
+      --clr-teal: #069bad;
+      --clr-cyan: #22d3ee;
+      --text-muted: #a8b4c4;
+      --text-primary: #ffffff;
     }
     :root[data-theme="light"] {
-      --bg-page: #F9F9FB;
-      --bg-surface: #FFFFFF;
-      --bg-surface-elevated: #EDE3FF;
-      --border-app: #EDE3FF;
-      --accent-primary: #7c3aed;
-      --text-muted: #4B6170;
-      --text-primary: #17181B;
+      --bg-page: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #f0f7ff;
+      --border-app: #e2e8f0;
+      --accent-primary: #194cd1;
+      --clr-teal: #069bad;
+      --clr-cyan: #0891b2;
+      --text-muted: #64748b;
+      --text-primary: #0f172a;
     }
 
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
       background-color: var(--bg-page);
       color: var(--text-primary);
       transition: background-color 0.25s ease, color 0.25s ease;

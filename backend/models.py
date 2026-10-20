@@ -28,7 +28,11 @@ class User(Base):
     phone = Column(String(20), nullable=True)
     roll_no = Column(String(50), nullable=True)
     password_hash = Column(String(255), nullable=False)
-    role = Column(String(50), nullable=False)  # ADMIN, CAMPUS_MANAGER, FACULTY_ADVISOR, STUDENT
+    role = Column(String(50), nullable=False)  # ADMIN, CAMPUS_MANAGER, FACULTY_ADVISOR, TEACHER, STUDENT, GUEST
+    user_category = Column(String(50), default="STUDENT_MEMBER")  # NON_MIRAI, TEACHER, FACULTY_ADVISOR, STUDENT_NON_MEMBER, STUDENT_MEMBER
+    is_mirai_entity = Column(Boolean, default=True)
+    teacher_type = Column(String(50), nullable=True)  # ADVISOR, NORMAL
+    student_type = Column(String(50), nullable=True)  # CLUB_MEMBER, NON_CLUB_MEMBER
     is_domain_authorized = Column(Boolean, default=False)  # Granted via passkey "Code Geass"
     avatar_url = Column(String(255), nullable=True)
     campus_id = Column(Integer, ForeignKey("campuses.id"), nullable=False)
@@ -68,6 +72,7 @@ class Club(Base):
     resources = relationship("ClubResource", back_populates="club", cascade="all, delete-orphan")
     hackathon_achievements = relationship("HackathonAchievement", back_populates="club", cascade="all, delete-orphan")
     advisor_audit = relationship("ClubAdvisorAudit", back_populates="club", uselist=False, cascade="all, delete-orphan")
+    president_reports = relationship("ClubPresidentReport", back_populates="club", cascade="all, delete-orphan")
 
 
 class ClubMembership(Base):
@@ -76,7 +81,8 @@ class ClubMembership(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     club_id = Column(Integer, ForeignKey("clubs.id"), nullable=False)
-    post = Column(String(50), default="MEMBER")  # PRESIDENT, VICE_PRESIDENT, FINANCE_PRESIDENT, MEDIA_PRESIDENT, MEMBER
+    post = Column(String(50), default="MEMBER")  # PRESIDENT, VICE_PRESIDENT, FINANCE_PRESIDENT, MEDIA_PRESIDENT, GENERAL_SECRETARY, MEMBER
+    branch = Column(String(100), nullable=True)  # For Kaizen: "CPP Club", "Dev Club", "Kaizen Intelligence", "Media Club"
     status = Column(String(50), default="ACTIVE")  # ACTIVE, PENDING
     joined_at = Column(DateTime, default=datetime.datetime.utcnow)
 
@@ -297,4 +303,28 @@ class ClubAdvisorAudit(Base):
 
     club = relationship("Club", back_populates="advisor_audit")
     advisor = relationship("User", foreign_keys=[advisor_id])
+
+
+class ClubPresidentReport(Base):
+    __tablename__ = "club_president_reports"
+
+    id = Column(Integer, primary_key=True, index=True)
+    club_id = Column(Integer, ForeignKey("clubs.id"), nullable=False)
+    president_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    advisor_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    title = Column(String(200), nullable=False)
+    vision_statement = Column(Text, nullable=False)
+    vp_operational_orders = Column(Text, nullable=True)
+    finance_budget_overview = Column(Text, nullable=True)
+    media_campaign_plan = Column(Text, nullable=True)
+    general_secretary_notes = Column(Text, nullable=True)
+    status = Column(String(50), default="SUBMITTED")  # SUBMITTED, APPROVED, NEEDS_REVISION
+    advisor_feedback = Column(Text, nullable=True)
+    submitted_at = Column(DateTime, default=datetime.datetime.utcnow)
+    reviewed_at = Column(DateTime, nullable=True)
+
+    club = relationship("Club", back_populates="president_reports")
+    president = relationship("User", foreign_keys=[president_id])
+    advisor = relationship("User", foreign_keys=[advisor_id])
+
 

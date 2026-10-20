@@ -9,7 +9,10 @@ from sqlalchemy.orm import Session
 from backend.database import get_db
 from backend.models import User
 
-SECRET_KEY = "msot-club-governance-secret-key-2026"
+import os
+
+SECRET_KEY = os.environ.get("SECRET_KEY", "msot-club-governance-secret-key-2026")
+ALLOW_ROLE_SWITCHER = os.environ.get("ALLOW_ROLE_SWITCHER", "true").lower() in ("true", "1")
 
 def hash_password(password: str) -> str:
     return hashlib.sha256(password.encode("utf-8")).hexdigest()
@@ -50,8 +53,8 @@ def get_current_user(
     x_user_id: Optional[str] = Header(None), # Support easy role switcher in testing/UI
     db: Session = Depends(get_db)
 ) -> User:
-    # 1. Quick switcher header (great for testing all roles in UI)
-    if x_user_id and x_user_id.isdigit():
+    # 1. Quick switcher header (active in demo/dev mode for testing all roles in UI)
+    if ALLOW_ROLE_SWITCHER and x_user_id and x_user_id.isdigit():
         user = db.query(User).filter(User.id == int(x_user_id)).first()
         if user:
             return user

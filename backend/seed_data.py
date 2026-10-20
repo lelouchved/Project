@@ -4,7 +4,8 @@ import uuid
 from backend.database import engine, Base, SessionLocal
 from backend.models import (
     Campus, User, Club, ClubMembership, ClubBudget, Event,
-    AttendanceSession, AttendanceRecord, AssignmentProject, Submission, Evaluation, Certificate, AuditLog
+    AttendanceSession, AttendanceRecord, AssignmentProject, Submission, Evaluation, Certificate, AuditLog,
+    ClubPresidentReport
 )
 from backend.auth import hash_password
 from backend.routers.certificate_routes import generate_verification_hash, create_certificate_pdf
@@ -345,8 +346,178 @@ def seed_database():
     except Exception as e:
         print(f"Notice: PDF generation warning: {e}")
 
+    ensure_bifurcation_seed_data(db)
     print("Database seeding completed successfully!")
     db.close()
 
+def ensure_bifurcation_seed_data(db):
+    """Guarantees that all 5 user bifurcation personas, 5 leadership posts, Kaizen branches, and President reports are populated."""
+    pwd = hash_password("password123")
+    hiet = db.query(Campus).filter(Campus.code == "HIET").first()
+    campus_id = hiet.id if hiet else 1
+
+    # 1. Non-Mirai Guest user
+    guest = db.query(User).filter(User.email == "guest@visitor.com").first()
+    if not guest:
+        guest = User(
+            username="guest_visitor",
+            phone="+91 99999 00000",
+            name="Pooja Sharma (Guest)",
+            email="guest@visitor.com",
+            role="GUEST",
+            user_category="NON_MIRAI",
+            is_mirai_entity=False,
+            is_domain_authorized=False,
+            campus_id=campus_id,
+            password_hash=pwd
+        )
+        db.add(guest)
+
+    # 2. Normal Teacher
+    teacher_vikram = db.query(User).filter(User.email == "teacher.vikram@msot.org").first()
+    if not teacher_vikram:
+        teacher_vikram = User(
+            username="teacher_vikram",
+            phone="+91 98000 00010",
+            name="Prof. Vikram Seth",
+            email="teacher.vikram@msot.org",
+            role="TEACHER",
+            user_category="TEACHER",
+            is_mirai_entity=True,
+            teacher_type="NORMAL",
+            is_domain_authorized=False,
+            campus_id=campus_id,
+            password_hash=pwd
+        )
+        db.add(teacher_vikram)
+
+    # 3. Club Advisor
+    advisor_tech = db.query(User).filter(User.email == "advisor.tech@msot.org").first()
+    if advisor_tech:
+        advisor_tech.role = "FACULTY_ADVISOR"
+        advisor_tech.user_category = "FACULTY_ADVISOR"
+        advisor_tech.is_mirai_entity = True
+        advisor_tech.teacher_type = "ADVISOR"
+
+    # 4. Non-Club Member Student
+    student_rahul = db.query(User).filter(User.email == "student.rahul@msot.org").first()
+    if not student_rahul:
+        student_rahul = User(
+            username="student_rahul",
+            phone="+91 98111 00099",
+            name="Rahul Verma",
+            email="student.rahul@msot.org",
+            roll_no="MSOT24NON01",
+            role="STUDENT",
+            user_category="STUDENT_NON_MEMBER",
+            is_mirai_entity=True,
+            student_type="NON_CLUB_MEMBER",
+            is_domain_authorized=False,
+            campus_id=campus_id,
+            password_hash=pwd
+        )
+        db.add(student_rahul)
+
+    # 5. General Secretary for Nextcell Club
+    kavita_sec = db.query(User).filter(User.email == "kavita.sec@msot.org").first()
+    if not kavita_sec:
+        kavita_sec = User(
+            username="kavita_sec",
+            phone="+91 98111 22339",
+            name="Kavita Deshmukh",
+            email="kavita.sec@msot.org",
+            roll_no="MSOT24CS05",
+            role="STUDENT",
+            user_category="STUDENT_MEMBER",
+            is_mirai_entity=True,
+            student_type="CLUB_MEMBER",
+            is_domain_authorized=False,
+            campus_id=campus_id,
+            password_hash=pwd
+        )
+        db.add(kavita_sec)
+
+    db.commit()
+
+    # Assign 5 leaders to Nextcell Club
+    club_nextcell = db.query(Club).filter(Club.name == "Nextcell Club").first()
+    if club_nextcell:
+        leaders = [
+            ("aarav.pres@msot.org", "PRESIDENT"),
+            ("rohan.vp@msot.org", "VICE_PRESIDENT"),
+            ("priya.fin@msot.org", "FINANCE_PRESIDENT"),
+            ("neha.media@msot.org", "MEDIA_PRESIDENT"),
+            ("kavita.sec@msot.org", "GENERAL_SECRETARY")
+        ]
+        for email, post in leaders:
+            u = db.query(User).filter(User.email == email).first()
+            if u:
+                u.user_category = "STUDENT_MEMBER"
+                u.is_mirai_entity = True
+                u.student_type = "CLUB_MEMBER"
+                m = db.query(ClubMembership).filter(
+                    ClubMembership.club_id == club_nextcell.id,
+                    ClubMembership.user_id == u.id
+                ).first()
+                if not m:
+                    m = ClubMembership(club_id=club_nextcell.id, user_id=u.id, post=post, status="ACTIVE")
+                    db.add(m)
+                else:
+                    m.post = post
+                    m.status = "ACTIVE"
+
+    # Kaizen Club (Strictly 2 leaders: President & Vice President, with 4 specialized branches)
+    club_kaizen = db.query(Club).filter(Club.name == "Kaizen Club").first()
+    if club_kaizen:
+        tanvi = db.query(User).filter(User.email == "tanvi.pres@msot.org").first()
+        if tanvi:
+            tanvi.user_category = "STUDENT_MEMBER"
+            m = db.query(ClubMembership).filter(ClubMembership.club_id == club_kaizen.id, ClubMembership.user_id == tanvi.id).first()
+            if m:
+                m.post = "PRESIDENT"
+                m.branch = "Dev Club"
+            else:
+                db.add(ClubMembership(club_id=club_kaizen.id, user_id=tanvi.id, post="PRESIDENT", branch="Dev Club", status="ACTIVE"))
+
+        karan = db.query(User).filter(User.email == "karan.fin@msot.org").first()
+        if karan:
+            karan.user_category = "STUDENT_MEMBER"
+            m = db.query(ClubMembership).filter(ClubMembership.club_id == club_kaizen.id, ClubMembership.user_id == karan.id).first()
+            if m:
+                m.post = "VICE_PRESIDENT"
+                m.branch = "Kaizen Intelligence"
+            else:
+                db.add(ClubMembership(club_id=club_kaizen.id, user_id=karan.id, post="VICE_PRESIDENT", branch="Kaizen Intelligence", status="ACTIVE"))
+
+        s1 = db.query(User).filter(User.email == "student1@msot.org").first()
+        if s1:
+            s1.user_category = "STUDENT_MEMBER"
+            m = db.query(ClubMembership).filter(ClubMembership.club_id == club_kaizen.id, ClubMembership.user_id == s1.id).first()
+            if m:
+                m.branch = "CPP Club"
+
+    # Seed sample President Vision Report
+    if club_nextcell and advisor_tech:
+        aarav = db.query(User).filter(User.email == "aarav.pres@msot.org").first()
+        if aarav and db.query(ClubPresidentReport).filter(ClubPresidentReport.club_id == club_nextcell.id).count() == 0:
+            rep = ClubPresidentReport(
+                club_id=club_nextcell.id,
+                president_id=aarav.id,
+                advisor_id=advisor_tech.id,
+                title="Q1 Strategic Vision: Scaling DeepTech Prototypes & Regional Hackathon",
+                vision_statement="Empower 50+ student founders to transition from MVPs to venture capital pitches. Organize a 24-hour Saturday DeepTech Sprint with investor demo tables.",
+                vp_operational_orders="Rohan Gupta will coordinate Saturday venue setup, high-speed fiber drops, and Saturday track schedules with the facilities desk.",
+                finance_budget_overview="Priya Patel has submitted ₹18,500 AWS & GPU inference budget, sanctioned by Campus Management.",
+                media_campaign_plan="Neha Singh leading 4-part Instagram & YouTube Dev Reel campaign showcasing student demo previews.",
+                general_secretary_notes="Kavita Deshmukh has finalized attendance compliance records, lab access logs, and safety protocols.",
+                status="SUBMITTED",
+                advisor_feedback="Comprehensive roadmap Aarav. Ensure the hardware testing lab safety clearance is signed by Wednesday.",
+                submitted_at=datetime.datetime.utcnow() - datetime.timedelta(days=1)
+            )
+            db.add(rep)
+
+    db.commit()
+
 if __name__ == "__main__":
     seed_database()
+

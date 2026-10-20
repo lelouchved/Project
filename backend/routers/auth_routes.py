@@ -15,7 +15,7 @@ from backend.models import (
 )
 from backend.schemas import (
     UserLogin, UserOut, CampusOut, OTPRequest, RegisterWithOTP, LoginWithOTP,
-    SocialLoginRequest, ResetPasswordRequest, UserProfileUpdate
+    SocialLoginRequest, ResetPasswordRequest, UserProfileUpdate, BifurcateRequest
 )
 from backend.auth import hash_password, verify_password, create_access_token, get_current_user
 
@@ -30,6 +30,10 @@ def serialize_user(user: User) -> dict:
         "email": user.email,
         "phone": user.phone,
         "role": user.role,
+        "user_category": getattr(user, "user_category", "STUDENT_MEMBER"),
+        "is_mirai_entity": bool(getattr(user, "is_mirai_entity", True)),
+        "teacher_type": getattr(user, "teacher_type", None),
+        "student_type": getattr(user, "student_type", None),
         "is_domain_authorized": bool(user.is_domain_authorized),
         "avatar_url": user.avatar_url,
         "campus_id": user.campus_id,
@@ -40,13 +44,13 @@ def serialize_user(user: User) -> dict:
 # In-memory OTP store (identifier -> {otp, expires_at})
 OTP_STORE = {}
 
-DOMAIN_PASSKEY = "Code Geass"
+DOMAIN_PASSKEY = "Yuzuru"
 
 def is_domain_passkey_valid(input_key: Optional[str]) -> bool:
     if not input_key:
         return False
     clean = " ".join(input_key.strip().lower().split()).replace("-", " ").replace("_", " ")
-    return clean in ["code geass", "codegeass"]
+    return clean in ["code geass", "codegeass", "yuzuru"]
 
 def generate_otp() -> str:
     return f"{random.randint(100000, 999999)}"
@@ -164,6 +168,72 @@ def register_with_otp(data: RegisterWithOTP, db: Session = Depends(get_db)):
         "access_token": token,
         "token_type": "bearer",
         "user": serialize_user(user)
+    }
+
+@router.post("/bifurcate")
+def bifurcate_user_role(
+    data: BifurcateRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Bifurcates user into distinct home page interfaces according to the questionnaire:
+    1. is_mirai_entity == False -> Non-Mirai guest / visitor (public homepage)
+    2. is_mirai_entity == True:
+       - role_type == "TEACHER":
+           - teacher_type == "ADVISOR" -> FACULTY_ADVISOR
+           - teacher_type == "NORMAL" -> TEACHER
+       - role_type == "STUDENT":
+           - student_type == "CLUB_MEMBER" -> STUDENT_MEMBER
+           - student_type == "NON_CLUB_MEMBER" -> STUDENT_NON_MEMBER
+    """
+    current_user.is_mirai_entity = data.is_mirai_entity
+    category = data.user_category
+    
+    if not data.is_mirai_entity or category == "NON_MIRAI":
+        current_user.user_category = "NON_MIRAI"
+        current_user.role = "GUEST"
+        current_user.teacher_type = None
+        current_user.student_type = None
+    elif category == "CLUB_ADVISOR" or data.teacher_type in ["ADVISOR", "CLUB_ADVISOR"]:
+        current_user.user_category = "CLUB_ADVISOR"
+        current_user.teacher_type = "CLUB_ADVISOR"
+        current_user.student_type = None
+        current_user.role = "FACULTY_ADVISOR"
+    elif category == "TEACHER" or data.teacher_type in ["NORMAL", "TEACHER"] or data.role_type == "TEACHER":
+        current_user.user_category = "TEACHER"
+        current_user.teacher_type = "TEACHER"
+        current_user.student_type = None
+        current_user.role = "TEACHER"
+    elif category == "STUDENT_NON_MEMBER" or data.student_type in ["NON_CLUB_MEMBER", "NON_MEMBER"]:
+        current_user.user_category = "STUDENT_NON_MEMBER"
+        current_user.student_type = "NON_CLUB_MEMBER"
+        current_user.teacher_type = None
+        current_user.role = "STUDENT"
+    else:  # STUDENT_MEMBER
+        current_user.user_category = "STUDENT_MEMBER"
+        current_user.student_type = "CLUB_MEMBER"
+        current_user.teacher_type = None
+        current_user.role = "STUDENT"
+
+    db.commit()
+    db.refresh(current_user)
+
+    # Add audit log
+    audit = AuditLog(
+        user_id=current_user.id,
+        action="USER_BIFURCATION",
+        target_type="USER",
+        target_id=str(current_user.id),
+        details=f"User {current_user.name} categorized as {current_user.user_category} (Role: {current_user.role})"
+    )
+    db.add(audit)
+    db.commit()
+
+    return {
+        "status": "success",
+        "message": f"Successfully bifurcated to {current_user.user_category}",
+        "user": serialize_user(current_user)
     }
 
 @router.post("/login-otp")

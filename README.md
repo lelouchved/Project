@@ -98,68 +98,101 @@ When opening `http://localhost:8000`, the Left Sidebar includes a fast demo swit
 
 ---
 
-## 🧪 Comprehensive Test Report (12 / 12 Passing)
+## 🧪 Comprehensive Test Report (29 / 29 Passing — 100% Pass Rate)
 
-Run tests:
+> [!NOTE]
+> For the complete itemized test execution evidence, audit logs, and load test benchmarks, see [TEST_REPORT.md](TEST_REPORT.md).
+
+Run all automated tests:
 ```bash
 PYTHONPATH=. ./venv/bin/pytest tests/ -v
 ```
 
-| Test Case | Objective & Verification Evidence | Result |
-| :--- | :--- | :---: |
-| `test_01_institution_2_club_limit` | Confirms student can join up to 2 clubs; 3rd club request is rejected with HTTP 400. | ✅ PASSED |
-| `test_02_dynamic_qr_checkin` | Verifies live TOTP code succeeds; expired/screenshot code fails anti-spoofing check. | ✅ PASSED |
-| `test_03_attendance_manual_override` | Verifies coordinator override logs mandatory reason to immutable `AuditLog`. | ✅ PASSED |
-| `test_04_deliverable_submission_rubric` | Verifies student upload and faculty evaluation across 3-part rubric (/30 points). | ✅ PASSED |
-| `test_05_certificate_tamper_detection` | Generates 20 certificates; authentic hashes verify; tampered hashes fail validation. | ✅ PASSED |
-| `test_06_finance_president_budget_workflow` | Submits budget proposal from Finance President and approves via Campus Manager. | ✅ PASSED |
-| `test_07_monthly_academic_csv_export` | Verifies monthly CSV report matches student counts and headers. | ✅ PASSED |
-| `test_08_registration_otp_and_passkey` | Tests OTP registration and elevates privileges when secret passkey 'Yuzuru' is used. | ✅ PASSED |
-| `test_social_login_google` | Verifies 1-click Google OAuth simulation and token generation. | ✅ PASSED |
-| `test_social_login_instagram` | Verifies 1-click Instagram authentication and token generation. | ✅ PASSED |
-| `test_social_login_github` | Verifies 1-click GitHub authentication and token generation. | ✅ PASSED |
-| `test_social_login_invalid_provider` | Rejects unsupported social providers with HTTP 400. | ✅ PASSED |
+| Test Suite | Purpose & Verification Focus | Test Cases | Result |
+| :--- | :--- | :---: | :---: |
+| **`test_bifurcation_flow.py`** | Multi-step role questionnaire, advisor governance & Kaizen 4 branches | 4 Tests | ✅ **PASSED** |
+| **`test_calendar_authority.py`** | Public read, Domain Authority gating & push to personal calendars | 4 Tests | ✅ **PASSED** |
+| **`test_lifecycle.py`** | 2-club limit, 20s dynamic QR TOTP, rubric grading & tamper-evident certificates | 8 Tests | ✅ **PASSED** |
+| **`test_personal_work_history.py`**| Privacy isolation & category filters across personal student portfolios | 3 Tests | ✅ **PASSED** |
+| **`test_analytics_and_championship.py`**| Inter-campus championship coalition & advisor hackathon audit gating | 3 Tests | ✅ **PASSED** |
+| **`test_settings_and_permissions.py`** | Custom avatar photo uploads & presidential club logo updates | 3 Tests | ✅ **PASSED** |
+| **`test_social_login.py`** | 1-click Google, Instagram & GitHub OAuth authentication | 4 Tests | ✅ **PASSED** |
+| **Total** | **Complete Full-Platform Automated Regression Suite** | **29 Tests** | ✅ **100% PASSED** |
 
 ### 500 Concurrent Check-Ins Load Benchmark:
 Run benchmark:
 ```bash
 PYTHONPATH=. ./venv/bin/python tests/load_test_500.py
 ```
-- **100 Concurrent:** p95 = 81.34 ms (0.00% errors)
-- **300 Concurrent:** p95 = 72.70 ms (0.00% errors)
-- **500 Concurrent:** p95 = 66.67 ms (0.00% errors) — **Exceeds target of < 1,000 ms by 15x!**
+- **100 Concurrent:** p95 = `81.34 ms` (`0.00%` errors)
+- **300 Concurrent:** p95 = `72.70 ms` (`0.00%` errors)
+- **500 Concurrent:** p95 = `66.67 ms` (`0.00%` errors) — **Exceeds target of < 1,000 ms by 15x!**
+
+---
+
+## 🔀 Multi-Step Role Bifurcation ("Tick The Correct") Architecture
+
+Upon registration or when selecting **Bifurcation Flow**, users complete a structured multi-step institutional questionnaire:
+1. **Step 1: Affiliation**
+   - **No, NOT part of Mirai:** Routed to **Public Guest Portal** (`home-non-mirai`) featuring admissions showcases, YouTube live streams, and application inquiries.
+   - **Yes, I AM part of Mirai:** Proceeds to Step 2.
+2. **Step 2: Institutional Standing**
+   - **Teacher / Faculty (Case 1):** Proceeds to Teacher Bifurcation.
+   - **Student / Scholar (Case 2):** Proceeds to Student Bifurcation.
+3. **Step 3 (Case 1 — Teachers):**
+   - **Club Advisor:** Routed to **Club Advisor Governance Console** (`home-advisor`) with student leadership appointment privileges (5 posts for standard clubs / 2 posts for Kaizen), vision report review desk, and 3-pillar audit console.
+   - **Normal Teacher:** Routed to **Teacher Academic Workbench** (`home-teacher`) with lecture timetable, academic circulars, and student directory.
+4. **Step 3 (Case 2 — Students):**
+   - **Club Member:** Routed to **Club Member & Leadership Workbench** (`home-student-member`) with 20s dynamic QR check-in, 3-part rubric submissions, and verified PDF certificates.
+   - **Non-Club Member:** Routed to **Non-Club Discovery Hub** (`home-student-non-member`) with recruitment countdowns, remaining capacities, and club applications.
+
+---
+
+## 🎨 Visual Engine: Absolute Matte Black & Foggy Mirror Optics
+
+- **Absolute Matte Black (`#000000`):** Pure obsidian canvas without slate/gray tinting.
+- **Foggy Mirror Panels:** Frosted glass panels styled with `backdrop-filter: blur(28px)`, linear glass diffusion gradients, and specular edge rim highlights.
+- **Mirai Dynamic Ambience:** Ambient isometric grid matrix, dual breathing chromatic orbs (Royal Blue `#194cd1` & Electric Cyan `#069bad`), and an ethereal cursor spotlight beam with fluid RAF lerp damping.
+- **Tactile Micro-Interactions:** Micro-elevation on hover, tactile spring press on active, and circular pointer shockwave ripples on click.
 
 ---
 
 ## 📂 Project Structure
 
 ```
-most clubs/
+Project/
+├── TEST_REPORT.md               # Official Verification & Test Execution Report (29/29 Passing)
+├── README.md                    # Institutional Documentation & Problem Statement Architecture
 ├── backend/
-│   ├── database.py              # SQLite WAL mode & timeout configuration
-│   ├── models.py                # Campus, User, Club, Budget, Attendance, Rubric, Certs
-│   ├── schemas.py               # Pydantic v2 schemas + SocialLoginRequest
-│   ├── auth.py                  # JWT creation, bcrypt hashing, RBAC dependencies
-│   ├── seed_data.py             # Seed data for RIT, HIET, JU and 4 HIET clubs
+│   ├── database.py              # SQLite WAL mode & connection pooling
+│   ├── models.py                # Campus, User, Club, Budget, Attendance, Rubric, Certs, Reports
+│   ├── schemas.py               # Pydantic v2 schemas + Bifurcation & Social Login models
+│   ├── auth.py                  # JWT authentication, bcrypt hashing, RBAC dependencies
+│   ├── seed_data.py             # Seed data for RIT, HIET, JU, and HIET clubs & leadership
 │   ├── main.py                  # FastAPI entry point & static file routing
 │   └── routers/
-│       ├── auth_routes.py       # OTP request, register, login, social-login
-│       ├── club_routes.py       # Club catalog, join limits, post assignment
-│       ├── event_routes.py      # Multi-tier calendar & recruitment dates
-│       ├── attendance_routes.py # 20s dynamic TOTP QR code & manual overrides
-│       ├── assignment_routes.py # Projects & 3-part rubric grading (/30)
+│       ├── auth_routes.py       # OTP, register, login, bifurcation flow & social auth
+│       ├── club_routes.py       # Club catalog, leadership appointments & advisor reviews
+│       ├── event_routes.py      # Common calendar & push-to-personal calendar
+│       ├── attendance_routes.py # 20s dynamic TOTP QR code & manual override audit trail
+│       ├── assignment_routes.py # Project deliverables & 3-part rubric grading (/30)
 │       ├── budget_routes.py     # Scale-based budget proposals & CM reviews
 │       ├── certificate_routes.py# ReportLab PDF generator & SHA-256 verification
 │       └── report_routes.py     # Analytics & exportable monthly academic CSV
 ├── frontend/
-│   ├── index.html               # 3D canvas, left sidebar, mirror buttons, YouTube/social stream
+│   ├── index.html               # 5 dedicated homepages, bifurcation modal, foggy mirror theme
 │   └── verify.html              # Standalone public certificate verification portal
 ├── tests/
-│   ├── test_lifecycle.py        # Automated test suite for all qualification areas
-│   ├── test_social_login.py     # Tests for Google, Instagram, GitHub auth
+│   ├── test_bifurcation_flow.py # Role bifurcation & advisor governance test suite
+│   ├── test_calendar_authority.py# Common calendar & personal calendar push tests
+│   ├── test_lifecycle.py        # Core Saturday activities & anti-spoofing tests
+│   ├── test_personal_work_history.py# Student portfolio privacy & category filter tests
+│   ├── test_analytics_and_championship.py# Inter-campus championship & performance tests
+│   ├── test_settings_and_permissions.py# Custom avatars & club logo permission tests
+│   ├── test_social_login.py     # Google, Instagram, GitHub OAuth tests
 │   └── load_test_500.py         # 100, 300, 500 concurrent check-in benchmark
 ├── uploads/                     # Storage for deliverables, receipts, certificates
 ├── requirements.txt             # Locked Python dependencies
 ├── run.sh                       # One-command quickstart script
-└── README.md                    # Complete documentation & test report
+└── vercel.json                  # Serverless deployment configuration
 ```

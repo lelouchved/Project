@@ -19,12 +19,24 @@ class UserOut(BaseModel):
     phone: Optional[str] = None
     roll_no: Optional[str] = None
     role: str
+    user_category: Optional[str] = "STUDENT_MEMBER"  # NON_MIRAI, TEACHER, FACULTY_ADVISOR, STUDENT_NON_MEMBER, STUDENT_MEMBER
+    is_mirai_entity: bool = True
+    teacher_type: Optional[str] = None  # ADVISOR, NORMAL
+    student_type: Optional[str] = None  # CLUB_MEMBER, NON_CLUB_MEMBER
     is_domain_authorized: bool = False
     avatar_url: Optional[str] = None
     campus_id: int
     campus_name: Optional[str] = None
     class Config:
         from_attributes = True
+
+class BifurcateRequest(BaseModel):
+    is_mirai_entity: bool
+    role_type: Optional[str] = None      # TEACHER or STUDENT
+    teacher_type: Optional[str] = None   # ADVISOR or NORMAL / CLUB_ADVISOR or TEACHER
+    student_type: Optional[str] = None   # CLUB_MEMBER or NON_CLUB_MEMBER
+    user_category: Optional[str] = None  # NON_MIRAI, TEACHER, CLUB_ADVISOR, STUDENT_MEMBER, STUDENT_NON_MEMBER
+
 
 class UserProfileUpdate(BaseModel):
     name: Optional[str] = None
@@ -64,6 +76,7 @@ class SocialLoginRequest(BaseModel):
 class MembershipCreate(BaseModel):
     club_id: int
     post: Optional[str] = "MEMBER"
+    branch: Optional[str] = None
 
 class MembershipOut(BaseModel):
     id: int
@@ -74,6 +87,7 @@ class MembershipOut(BaseModel):
     club_id: int
     club_name: str
     post: str
+    branch: Optional[str] = None
     status: str
     joined_at: datetime
     class Config:
@@ -316,4 +330,49 @@ class ClubAdvisorAuditUpdate(BaseModel):
     budget_audit_notes: Optional[str] = None
     project_quality_score: Optional[float] = None
     project_audit_notes: Optional[str] = None
+
+# Kaizen Branches
+class KaizenBranchSelect(BaseModel):
+    club_id: Optional[int] = None
+    branch: str  # "CPP Club", "Dev Club", "Kaizen Intelligence", "Media Club"
+
+# President Reports to Faculty Advisor
+class PresidentReportCreate(BaseModel):
+    club_id: Optional[int] = None
+    title: str
+    vision_statement: str
+    vp_operational_orders: Optional[str] = None
+    finance_budget_overview: Optional[str] = None
+    media_campaign_plan: Optional[str] = None
+    general_secretary_notes: Optional[str] = None
+
+class AssignPostRequest(BaseModel):
+    target_user_id: Optional[int] = None
+    post: Optional[str] = None
+
+class PresidentReportReview(BaseModel):
+    status: str  # APPROVED or NEEDS_REVISION
+    advisor_feedback: Optional[str] = None
+
+class PresidentReportOut(BaseModel):
+    id: int
+    club_id: int
+    club_name: Optional[str] = None
+    president_id: int
+    president_name: Optional[str] = None
+    advisor_id: Optional[int] = None
+    advisor_name: Optional[str] = None
+    title: str
+    vision_statement: str
+    vp_operational_orders: Optional[str] = None
+    finance_budget_overview: Optional[str] = None
+    media_campaign_plan: Optional[str] = None
+    general_secretary_notes: Optional[str] = None
+    status: str
+    advisor_feedback: Optional[str] = None
+    submitted_at: datetime
+    reviewed_at: Optional[datetime] = None
+    class Config:
+        from_attributes = True
+
 

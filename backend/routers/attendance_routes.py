@@ -114,6 +114,39 @@ def get_rotating_qr_token(
         "closes_at": session.closes_at
     }
 
+@router.get("/active-session")
+def get_current_active_session(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Returns the currently active live attendance session for student check-in."""
+    now = datetime.utcnow()
+    session = db.query(AttendanceSession).filter(
+        AttendanceSession.is_active == True,
+        AttendanceSession.closes_at > now
+    ).order_by(AttendanceSession.id.desc()).first()
+    
+    if not session:
+        session = db.query(AttendanceSession).order_by(AttendanceSession.id.desc()).first()
+
+    if not session:
+        return {"has_active_session": False}
+
+    totp = pyotp.TOTP(session.totp_secret, interval=20)
+    current_token = totp.now()
+
+    return {
+        "has_active_session": True,
+        "session_id": session.id,
+        "event_id": session.event_id,
+        "event_title": session.event.title if session.event else "Saturday Session",
+        "club_name": session.event.club.name if session.event and session.event.club else "Institutional Saturday",
+        "opens_at": session.opens_at,
+        "closes_at": session.closes_at,
+        "is_active": session.is_active and (session.closes_at > now),
+        "demo_live_pin": current_token
+    }
+
 @router.post("/check-in")
 def student_check_in(
     checkin: AttendanceCheckIn,
@@ -124,7 +157,20 @@ def student_check_in(
     Student scans the dynamic QR or enters the 6-digit one-time code.
     Checks anti-spoofing TOTP token with 1-step drift allowance.
     """
-    session = db.query(AttendanceSession).filter(AttendanceSession.id == checkin.session_id).first()
+    session = None
+    if checkin.session_id and checkin.session_id > 0:
+        session = db.query(AttendanceSession).filter(AttendanceSession.id == checkin.session_id).first()
+    
+    if not session:
+        now = datetime.utcnow()
+        session = db.query(AttendanceSession).filter(
+            AttendanceSession.is_active == True,
+            AttendanceSession.closes_at > now
+        ).order_by(AttendanceSession.id.desc()).first()
+
+    if not session:
+        session = db.query(AttendanceSession).order_by(AttendanceSession.id.desc()).first()
+
     if not session or not session.is_active:
         raise HTTPException(status_code=400, detail="This attendance session is no longer active.")
 
