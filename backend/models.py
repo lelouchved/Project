@@ -29,8 +29,8 @@ class User(Base):
     roll_no = Column(String(50), nullable=True)
     password_hash = Column(String(255), nullable=False)
     role = Column(String(50), nullable=False)  # ADMIN, CAMPUS_MANAGER, FACULTY_ADVISOR, TEACHER, STUDENT, GUEST
-    user_category = Column(String(50), default="STUDENT_MEMBER")  # NON_MIRAI, TEACHER, FACULTY_ADVISOR, STUDENT_NON_MEMBER, STUDENT_MEMBER
-    is_mirai_entity = Column(Boolean, default=True)
+    user_category = Column(String(50), nullable=True, default=None)  # NON_MIRAI, TEACHER, FACULTY_ADVISOR, STUDENT_NON_MEMBER, STUDENT_MEMBER
+    is_mirai_entity = Column(Boolean, nullable=True, default=None)
     teacher_type = Column(String(50), nullable=True)  # ADVISOR, NORMAL
     student_type = Column(String(50), nullable=True)  # CLUB_MEMBER, NON_CLUB_MEMBER
     is_domain_authorized = Column(Boolean, default=False)  # Granted via passkey "Code Geass"

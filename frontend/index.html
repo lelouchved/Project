@@ -105,11 +105,11 @@
   <!-- ======================================================== -->
   <!-- MODAL: MULTI-STEP ROLE BIFURCATION ("TICK THE CORRECT") -->
   <!-- ======================================================== -->
-  <div id="bifurcationModal" class="fixed inset-0 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" style="background-color: rgba(0, 0, 0, 0.85);" onclick="if(event.target === this) closeBifurcationModal()">
+  <div id="bifurcationModal" class="fixed inset-0 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" style="background-color: rgba(0, 0, 0, 0.95);" onclick="if(event.target === this) handleBifurcationBackdropClick()">
     <div class="card-3d rounded-2xl max-w-2xl w-full p-6 sm:p-8 space-y-6 shadow-2xl relative border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0a0e1c] max-h-[92vh] overflow-y-auto">
       
       <!-- Close Button -->
-      <button onclick="closeBifurcationModal()" class="p-1.5 rounded-lg absolute top-5 right-5 text-slate-400 hover:text-slate-700 dark:hover:text-white transition">
+      <button id="bifurcationCloseBtn" onclick="closeBifurcationModal()" class="p-1.5 rounded-lg absolute top-5 right-5 text-slate-400 hover:text-slate-700 dark:hover:text-white transition">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
 
@@ -1795,9 +1795,9 @@
                 <i data-lucide="graduation-cap" class="w-4 h-4 text-white"></i>
                 <span>Apply for 2026 Admissions</span>
               </button>
-              <button onclick="openBifurcationModal()" class="px-5 py-3 rounded-xl text-xs sm:text-sm font-bold text-slate-200 bg-white/5 hover:bg-white/10 border border-white/15 flex items-center space-x-2 transition">
-                <i data-lucide="compass" class="w-4 h-4 text-cyan-400"></i>
-                <span>Are you a Mirai Student/Teacher? Bifurcate Here &rarr;</span>
+              <button onclick="switchTab('events')" class="px-5 py-3 rounded-xl text-xs sm:text-sm font-bold text-slate-200 bg-white/5 hover:bg-white/10 border border-white/15 flex items-center space-x-2 transition">
+                <i data-lucide="calendar" class="w-4 h-4 text-cyan-400"></i>
+                <span>Upcoming Public Events & Competitions &rarr;</span>
               </button>
             </div>
           </div>
@@ -5597,27 +5597,55 @@
         }
 
         if (gatedBanner) gatedBanner.classList.add('hidden');
-        if (tabPersonalCal) tabPersonalCal.classList.remove('hidden');
-        if (calModeBtnPersonal) calModeBtnPersonal.classList.remove('hidden');
 
-        if (ugsotAuthTab) {
-          if (currentUser.is_domain_authorized || currentUser.role === 'ADMIN') {
-            ugsotAuthTab.classList.remove('hidden');
-          } else {
-            ugsotAuthTab.classList.add('hidden');
-          }
-        }
-        if (addEventBtn) {
-          if (currentUser.is_domain_authorized || currentUser.role === 'ADMIN') {
-            addEventBtn.classList.remove('hidden');
-          } else {
-            addEventBtn.classList.add('hidden');
-          }
-        }
+        const isNonMirai = !currentUser || currentUser.user_category === 'NON_MIRAI' || currentUser.is_mirai_entity === false;
 
-        if (currentUser.role === 'CAMPUS_MANAGER' || currentUser.role === 'ADMIN') {
+        if (isNonMirai) {
+          // Strictly gate non-Mirai entities: ONLY show Dashboard and Calendar
+          if (tabPersonalCal) tabPersonalCal.classList.add('hidden');
+          if (calModeBtnPersonal) calModeBtnPersonal.classList.add('hidden');
           const authorityControls = document.getElementById('calendarAuthorityControls');
-          if (authorityControls) authorityControls.classList.remove('hidden');
+          if (authorityControls) authorityControls.classList.add('hidden');
+          if (ugsotAuthTab) ugsotAuthTab.classList.add('hidden');
+          if (addEventBtn) addEventBtn.classList.add('hidden');
+
+          const nonMiraiAllowed = ['explore', 'events'];
+          document.querySelectorAll('.ugsot-nav-btn').forEach(btn => {
+            const navId = btn.id.replace('ugsot-tab-', '');
+            if (nonMiraiAllowed.includes(navId)) {
+              btn.classList.remove('hidden');
+            } else {
+              btn.classList.add('hidden');
+            }
+          });
+          const mobSettings = document.getElementById('mob-tab-settings');
+          if (mobSettings) mobSettings.classList.add('hidden');
+        } else {
+          // Regular Mirai faculty/scholar/advisor
+          if (tabPersonalCal) tabPersonalCal.classList.remove('hidden');
+          if (calModeBtnPersonal) calModeBtnPersonal.classList.remove('hidden');
+          const mobSettings = document.getElementById('mob-tab-settings');
+          if (mobSettings) mobSettings.classList.remove('hidden');
+
+          if (ugsotAuthTab) {
+            if (currentUser.is_domain_authorized || currentUser.role === 'ADMIN') {
+              ugsotAuthTab.classList.remove('hidden');
+            } else {
+              ugsotAuthTab.classList.add('hidden');
+            }
+          }
+          if (addEventBtn) {
+            if (currentUser.is_domain_authorized || currentUser.role === 'ADMIN') {
+              addEventBtn.classList.remove('hidden');
+            } else {
+              addEventBtn.classList.add('hidden');
+            }
+          }
+
+          if (currentUser.role === 'CAMPUS_MANAGER' || currentUser.role === 'ADMIN') {
+            const authorityControls = document.getElementById('calendarAuthorityControls');
+            if (authorityControls) authorityControls.classList.remove('hidden');
+          }
         }
       }
 
@@ -5679,8 +5707,14 @@
           localStorage.setItem('msot_user', JSON.stringify(currentUser));
           updateAuthStateUI();
           closeAuthModal();
-          showAlert(`🎉 Authenticated with ${provider.toUpperCase()}! Welcome, ${currentUser.name}.`);
-          loadClubs();
+          if (!currentUser.user_category) {
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            showAlert(`🎉 Authenticated with ${provider.toUpperCase()}! Please answer whether you are a Mirai student or teacher to access your portal.`, 'info');
+            openBifurcationModal(true);
+          } else {
+            showAlert(`🎉 Authenticated with ${provider.toUpperCase()}! Welcome, ${currentUser.name}.`);
+            routeToCategoryHome(currentUser);
+          }
         } else {
           showAlert(data.detail, 'error');
         }
@@ -5796,9 +5830,11 @@
           localStorage.setItem('msot_user', JSON.stringify(currentUser));
           updateAuthStateUI();
           closeAuthModal();
-          showAlert(data.message, 'success');
-          // Launch role bifurcation flow immediately upon registration completion
-          openBifurcationModal();
+          // Strictly hide all home page sections so user does NOT land on any home page until answered!
+          document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+          showAlert('Registration successful! Please answer whether you are a Mirai student or teacher to access your portal.', 'info');
+          // Launch role bifurcation flow immediately upon registration completion (mandatory)
+          openBifurcationModal(true);
         } else {
           showAlert(data.detail, 'error');
         }
@@ -5834,7 +5870,9 @@
             showAlert(`Welcome back, ${currentUser.name}!`);
           }
           if (!currentUser.user_category) {
-            openBifurcationModal();
+            document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+            showAlert('Please specify your institutional standing to continue into the portal.', 'info');
+            openBifurcationModal(true);
           } else {
             routeToCategoryHome(currentUser);
           }
@@ -5934,6 +5972,7 @@
     }
 
     /* Bifurcation Questionnaire State & Actions */
+    let bifurcationIsMandatory = false;
     let bifurcationState = {
       step: 1,
       is_mirai_entity: null,
@@ -5943,7 +5982,8 @@
       user_category: null
     };
 
-    function openBifurcationModal() {
+    function openBifurcationModal(isMandatory = false) {
+      bifurcationIsMandatory = isMandatory || (!!currentUser && !currentUser.user_category);
       bifurcationState = {
         step: 1,
         is_mirai_entity: null,
@@ -5952,6 +5992,15 @@
         student_type: null,
         user_category: null
       };
+
+      if (bifurcationIsMandatory) {
+        document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+        const closeBtn = document.getElementById('bifurcationCloseBtn');
+        if (closeBtn) closeBtn.classList.add('hidden');
+      } else {
+        const closeBtn = document.getElementById('bifurcationCloseBtn');
+        if (closeBtn) closeBtn.classList.remove('hidden');
+      }
 
       document.getElementById('bifurcationStep1')?.classList.remove('hidden');
       document.getElementById('bifurcationStep2')?.classList.add('hidden');
@@ -5982,8 +6031,21 @@
       if (window.lucide) lucide.createIcons();
     }
 
-    function closeBifurcationModal() {
+    function closeBifurcationModal(force = false) {
+      if (bifurcationIsMandatory && !force) {
+        showAlert('Please answer whether you are a Mirai student or teacher before proceeding.', 'error');
+        return;
+      }
       document.getElementById('bifurcationModal')?.classList.add('hidden');
+      bifurcationIsMandatory = false;
+    }
+
+    function handleBifurcationBackdropClick() {
+      if (bifurcationIsMandatory || (currentUser && !currentUser.user_category)) {
+        showAlert('Please complete your institutional role selection to proceed into the portal.', 'info');
+        return;
+      }
+      closeBifurcationModal();
     }
 
     function selectBifurcationOption(stepKey, optionVal) {
@@ -6167,7 +6229,7 @@
             currentUser = data.user;
             localStorage.setItem('msot_user', JSON.stringify(currentUser));
             updateAuthStateUI();
-            closeBifurcationModal();
+            closeBifurcationModal(true);
             showAlert(`Institutional standing verified: ${data.message || 'Configured!'}`, 'success');
             routeToCategoryHome(currentUser);
           } else {
@@ -6177,7 +6239,7 @@
           showAlert('Network error saving standing: ' + err, 'error');
         }
       } else {
-        closeBifurcationModal();
+        closeBifurcationModal(true);
         if (bifurcationState.user_category === 'NON_MIRAI') {
           switchTab('home-non-mirai');
           showAlert('Welcome to the official public portal of Mirai School of Technology!', 'success');
@@ -6772,6 +6834,12 @@
        7. NAVIGATION & TABS
        ========================================== */
     function switchTab(tabId) {
+      const isNonMirai = !currentUser || currentUser.user_category === 'NON_MIRAI' || currentUser.is_mirai_entity === false;
+      if (isNonMirai && !['explore', 'events', 'home-non-mirai'].includes(tabId)) {
+        console.warn('Restricted view: Non-Mirai entities can only view Dashboard and Calendar.');
+        tabId = (currentUser && currentUser.user_category === 'NON_MIRAI') ? 'home-non-mirai' : 'explore';
+      }
+
       document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
 
       const activeSection = document.getElementById(`view-${tabId}`);
@@ -6797,14 +6865,21 @@
       const titleEl = document.getElementById('globalViewTitle');
       if (titleEl) titleEl.innerText = tabTitles[tabId] || 'Dashboard';
 
-      // Update uGSOT Left Vertical Nav: Student only sees Dashboard, Calendar, Profile
+      // Update uGSOT Left Vertical Nav: Non-Mirai sees ONLY Dashboard and Calendar; Student sees Dashboard, Calendar, Profile
       const studentAllowed = ['explore', 'events', 'settings'];
+      const nonMiraiAllowed = ['explore', 'events'];
       const isStudentRole = !currentUser || (!currentUser.is_domain_authorized && currentUser.role === 'STUDENT');
 
       document.querySelectorAll('.ugsot-nav-btn').forEach(btn => {
         const navId = btn.id.replace('ugsot-tab-', '');
         
-        if (isStudentRole && !studentAllowed.includes(navId)) {
+        if (isNonMirai) {
+          if (nonMiraiAllowed.includes(navId)) {
+            btn.classList.remove('hidden');
+          } else {
+            btn.classList.add('hidden');
+          }
+        } else if (isStudentRole && !studentAllowed.includes(navId)) {
           btn.classList.add('hidden');
         } else if (!isStudentRole && navId !== 'authority') {
           btn.classList.remove('hidden');
@@ -6813,6 +6888,12 @@
         btn.classList.remove('bg-red-600', 'text-white', 'shadow-xs');
         btn.classList.add('text-slate-500', 'dark:text-slate-400');
       });
+
+      const mobSettings = document.getElementById('mob-tab-settings');
+      if (mobSettings) {
+        if (isNonMirai) mobSettings.classList.add('hidden');
+        else mobSettings.classList.remove('hidden');
+      }
 
       const isHomeTab = ['explore', 'home-non-mirai', 'home-teacher', 'home-advisor', 'home-student-non-member', 'home-student-member'].includes(tabId);
       const activeBtn = document.getElementById(isHomeTab ? 'ugsot-tab-explore' : `ugsot-tab-${tabId}`);
@@ -7431,6 +7512,11 @@
     }
 
     function switchCalendarMode(mode) {
+      const isNonMirai = !currentUser || currentUser.user_category === 'NON_MIRAI' || currentUser.is_mirai_entity === false;
+      if (isNonMirai && mode === 'personal') {
+        showAlert('Personal Calendar is restricted to internal Mirai faculty and scholars.', 'info');
+        mode = 'common';
+      }
       if (mode === 'personal' && !currentUser) {
         showAlert('Personal Calendar is private: please sign in to view your schedule!', 'error');
         openAuthModal('login');
@@ -7443,6 +7529,15 @@
       const btnPersonal = document.getElementById('calModeBtnPersonal');
       const viewCommon = document.getElementById('commonCalendarView');
       const viewPersonal = document.getElementById('personalCalendarView');
+      const tabPersonal = document.getElementById('tab-personal-cal');
+
+      if (isNonMirai) {
+        if (btnPersonal) btnPersonal.classList.add('hidden');
+        if (tabPersonal) tabPersonal.classList.add('hidden');
+      } else {
+        if (btnPersonal) btnPersonal.classList.remove('hidden');
+        if (tabPersonal) tabPersonal.classList.remove('hidden');
+      }
 
       if (currentCalendarMode === 'common') {
         if (btnCommon) {
@@ -7522,14 +7617,25 @@
         commonAuthorizedClubs = data.authorized_clubs || [];
         userHasCalendarAuthority = Boolean(data.user_has_authority);
 
+        const isNonMirai = !currentUser || currentUser.user_category === 'NON_MIRAI' || currentUser.is_mirai_entity === false;
+
         // Update Authority Bar
         const authControls = document.getElementById('calendarAuthorityControls');
         const pushBtn = document.getElementById('pushClubEventBtn');
         const addBtn = document.getElementById('addCommonEventBtn');
         const authBadge = document.getElementById('calAuthorityBadge');
         const authSubtitle = document.getElementById('calAuthoritySubtitle');
+        const calModeBtnPersonal = document.getElementById('calModeBtnPersonal');
+        const tabPersonalCal = document.getElementById('tab-personal-cal');
 
-        if (userHasCalendarAuthority) {
+        if (isNonMirai) {
+          if (authControls) authControls.classList.add('hidden');
+          if (pushBtn) pushBtn.classList.add('hidden');
+          if (addBtn) addBtn.classList.add('hidden');
+          if (calModeBtnPersonal) calModeBtnPersonal.classList.add('hidden');
+          if (tabPersonalCal) tabPersonalCal.classList.add('hidden');
+          userHasCalendarAuthority = false;
+        } else if (userHasCalendarAuthority) {
           if (authControls) authControls.classList.remove('hidden');
           if (pushBtn) pushBtn.classList.remove('hidden');
           if (addBtn) addBtn.classList.remove('hidden');
@@ -7554,6 +7660,19 @@
       list.innerHTML = '';
 
       let events = cachedCommonEvents || [];
+      const isNonMirai = !currentUser || currentUser.user_category === 'NON_MIRAI' || currentUser.is_mirai_entity === false;
+
+      if (isNonMirai) {
+        // Enforce only upcoming public events where anyone from outside can participate
+        const now = new Date();
+        events = events.filter(e => {
+          const vis = (e.visibility || '').toUpperCase();
+          const isPublic = (vis === 'PUBLIC' || vis === 'PUBLIC_CAMPUS');
+          const isUpcoming = new Date(e.date) >= now;
+          return isPublic && isUpcoming;
+        });
+      }
+
       if (calSelectedDateStr) {
         events = events.filter(e => {
           const d = new Date(e.date);
@@ -7596,11 +7715,17 @@
                   <span>IMPORTANT</span>
                 </span>
               ` : ''}
+              ${isNonMirai ? `
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-teal-500/20 text-teal-400 border border-teal-500/30 flex items-center space-x-1">
+                  <span>🌐</span>
+                  <span>Open for Outside Participation</span>
+                </span>
+              ` : ''}
               <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold border border-theme bg-theme-elevated text-theme-primary">
                 ${e.event_type || 'CAMPUS_EVENT'}
               </span>
               <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-blue-500/10 text-blue-600 border border-slate-200 dark:border-slate-700">
-                ${e.visibility === 'PUBLIC_CAMPUS' ? 'Public (All Campuses)' : 'Campus Students'}
+                ${e.visibility === 'PUBLIC_CAMPUS' ? 'Public (All Campuses)' : (e.visibility === 'PUBLIC' ? 'Open to Public' : 'Campus Students')}
               </span>
               <span class="text-xs text-theme-muted font-mono">${dateStr} at ${timeStr}</span>
               <span class="text-xs text-theme-muted">•</span>
@@ -7620,15 +7745,20 @@
           </div>
 
           <div class="flex items-center space-x-2 shrink-0">
-            ${e.has_active_session ? `
+            ${isNonMirai ? `
+              <span class="btn-mirror px-3 py-1.5 rounded-xl text-xs text-teal-400 font-mono border border-teal-500/30 flex items-center space-x-1">
+                <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+                <span>Open for External Guests</span>
+              </span>
+            ` : (e.has_active_session ? `
               <button onclick="guardAction(openCheckInScanner)" class="btn-mirror bg-emerald-600 text-white font-bold text-xs px-4 py-2.5 rounded-xl flex items-center space-x-1.5 shadow-lg">
                 <i data-lucide="check-circle" class="w-4 h-4"></i>
                 <span>Live QR Check-In</span>
               </button>
             ` : `
               <span class="btn-mirror px-3 py-1.5 rounded-xl text-xs text-theme-muted font-mono border border-theme">Scheduled</span>
-            `}
-            ${userHasCalendarAuthority ? `
+            `)}
+            ${!isNonMirai && userHasCalendarAuthority ? `
               <button onclick="deleteCalendarEvent(${e.id})" class="btn-mirror p-2 rounded-xl text-xs font-bold text-rose-500 hover:bg-rose-500/10 border border-rose-500/30 transition" title="Delete event">
                 <i data-lucide="trash-2" class="w-4 h-4"></i>
               </button>
@@ -10969,7 +11099,10 @@
       checkDeadlinesAndAlerts();
       setInterval(checkDeadlinesAndAlerts, 30000);
       
-      if (tabParam && ['explore', 'events', 'student', 'history', 'budget', 'analytics', 'authority', 'settings', 'home-non-mirai', 'home-teacher', 'home-advisor', 'home-student-non-member', 'home-student-member'].includes(tabParam)) {
+      if (currentUser && !currentUser.user_category) {
+        document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+        openBifurcationModal(true);
+      } else if (tabParam && ['explore', 'events', 'student', 'history', 'budget', 'analytics', 'authority', 'settings', 'home-non-mirai', 'home-teacher', 'home-advisor', 'home-student-non-member', 'home-student-member'].includes(tabParam)) {
         switchTab(tabParam);
       } else if (currentUser && currentUser.user_category) {
         routeToCategoryHome(currentUser);

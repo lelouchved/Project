@@ -170,3 +170,53 @@ def test_president_report_submission_and_advisor_review():
     assert review_resp.status_code == 200
     assert review_resp.json()["status"] == "success"
     assert "Excellent roadmap!" in review_resp.json()["advisor_feedback"]
+
+def test_non_mirai_calendar_filtering_and_registration_gating():
+    from datetime import datetime
+    unique_suffix = uuid.uuid4().hex[:6]
+
+    # 1. Register a brand new user
+    reg_resp = client.post("/api/auth/register", json={
+        "name": f"Unbifurcated Candidate {unique_suffix}",
+        "email": f"candidate.{unique_suffix}@gmail.com",
+        "phone": f"+9198755{unique_suffix[:5]}",
+        "student_id": f"EXT{unique_suffix.upper()}",
+        "username": f"ext_{unique_suffix}",
+        "password": "password123",
+        "otp": "999999",
+        "campus_id": 1
+    })
+    assert reg_resp.status_code == 200
+    user_data = reg_resp.json()["user"]
+    token = reg_resp.json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Mandatory check: User must be unbifurcated right after registration
+    assert user_data.get("user_category") is None
+
+    # 2. Bifurcate as NON_MIRAI
+    bif_resp = client.post("/api/auth/bifurcate", headers=headers, json={
+        "is_mirai_entity": False,
+        "user_category": "NON_MIRAI"
+    })
+    assert bif_resp.status_code == 200
+    assert bif_resp.json()["user"]["user_category"] == "NON_MIRAI"
+    assert bif_resp.json()["user"]["is_mirai_entity"] is False
+
+    # 3. Request common calendar as non-Mirai entity
+    cal_resp = client.get("/api/events/common-calendar", headers=headers)
+    assert cal_resp.status_code == 200
+    cal_data = cal_resp.json()
+
+    # Authority must be strictly disabled
+    assert cal_data["user_has_authority"] is False
+    assert len(cal_data["authorized_clubs"]) == 0
+
+    # Events must strictly be upcoming public events for external participation
+    events = cal_data["events"]
+    assert len(events) >= 2
+    for event in events:
+        assert event["visibility"] in ["PUBLIC", "PUBLIC_CAMPUS"]
+        event_dt = datetime.fromisoformat(event["date"].replace("Z", "+00:00")).replace(tzinfo=None)
+        assert event_dt >= datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+

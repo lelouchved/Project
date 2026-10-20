@@ -145,7 +145,9 @@ def register_with_otp(data: RegisterWithOTP, db: Session = Depends(get_db)):
         password_hash=hash_password(data.password),
         role=assigned_role,
         is_domain_authorized=is_authorized,
-        campus_id=data.campus_id or 1
+        campus_id=data.campus_id or 1,
+        user_category=None,
+        is_mirai_entity=None
     )
     db.add(user)
     db.commit()

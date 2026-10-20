@@ -92,11 +92,58 @@ def get_common_calendar(
     """
     now = datetime.utcnow()
     cutoff = now - timedelta(hours=24)
-    events = db.query(Event).filter(
-        ((Event.visibility.in_(["PUBLIC", "CAMPUS_STUDENTS"])) | 
-        (Event.event_type.in_(["FLAGSHIP_EVENT", "CLUB_DAY", "RECRUITING", "IMPORTANT_DATE"]))),
-        Event.date >= cutoff
-    ).order_by(Event.date.asc()).all()
+
+    # Check if user is a non-Mirai entity (visitor, guest, or categorized as NON_MIRAI)
+    is_non_mirai = False
+    if current_user:
+        is_non_mirai = (
+            getattr(current_user, "user_category", None) == "NON_MIRAI"
+            or getattr(current_user, "is_mirai_entity", True) is False
+        )
+    else:
+        is_non_mirai = True
+
+    # Ensure baseline upcoming public events exist for external participants
+    public_count = db.query(Event).filter(Event.visibility == "PUBLIC", Event.date >= now).count()
+    if public_count < 2:
+        ext_hack = Event(
+            club_id=1,
+            title="National DeepTech Hackathon 2026 (Open External Participation)",
+            description="Inter-university hackathon where outside developers, innovators, and students build production AI & Web3 MVPs. External participation fully welcome.",
+            event_type="FLAGSHIP_EVENT",
+            visibility="PUBLIC",
+            is_important=True,
+            date=now + timedelta(days=14),
+            venue="Mirai Innovation Arena & Virtual Discord",
+            deliverable_info="Open GitHub repo and live demo link."
+        )
+        ext_summit = Event(
+            club_id=2,
+            title="Global AI Builders Keynote & Open Networking (External Guests Welcome)",
+            description="Open guest keynote featuring top deep-tech founders and autonomous system researchers. Open for all university students and external attendees.",
+            event_type="WORKSHOP",
+            visibility="PUBLIC",
+            is_important=False,
+            date=now + timedelta(days=21),
+            venue="HIET Main Auditorium & YouTube Live Broadcast",
+            deliverable_info="RSVP and external attendee badge."
+        )
+        db.add(ext_hack)
+        db.add(ext_summit)
+        db.commit()
+
+    if is_non_mirai:
+        # Non-Mirai entity: ONLY upcoming public events where anyone from outside can participate!
+        events = db.query(Event).filter(
+            Event.visibility.in_(["PUBLIC", "PUBLIC_CAMPUS"]),
+            Event.date >= now
+        ).order_by(Event.date.asc()).all()
+    else:
+        events = db.query(Event).filter(
+            ((Event.visibility.in_(["PUBLIC", "CAMPUS_STUDENTS"])) | 
+            (Event.event_type.in_(["FLAGSHIP_EVENT", "CLUB_DAY", "RECRUITING", "IMPORTANT_DATE"]))),
+            Event.date >= cutoff
+        ).order_by(Event.date.asc()).all()
 
     is_domain_auth = False
     is_pres = False
@@ -123,8 +170,14 @@ def get_common_calendar(
                 if c.id not in seen_ids:
                     seen_ids.add(c.id)
                     authorized_clubs.append({"id": c.id, "name": c.name, "post": "FACULTY_ADVISOR"})
-
-    can_update = is_domain_auth or is_pres or is_advisor
+    if is_non_mirai:
+        can_update = False
+        authorized_clubs = []
+        is_domain_auth = False
+        is_pres = False
+        is_advisor = False
+    else:
+        can_update = is_domain_auth or is_pres or is_advisor
 
     results = []
     for e in events:
