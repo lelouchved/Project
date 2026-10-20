@@ -204,6 +204,13 @@ class AttendanceOverride(BaseModel):
     status: str = "MANUAL_OVERRIDE"
     reason: str
 
+class AdvisorManualAttendanceRequest(BaseModel):
+    student_id: int
+    club_id: Optional[int] = None
+    session_id: Optional[int] = None
+    reason: str
+    status: str = "MANUAL_OVERRIDE"
+
 class AttendanceRecordOut(BaseModel):
     id: int
     session_id: int

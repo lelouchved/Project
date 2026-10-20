@@ -417,7 +417,12 @@ def add_important_club_event(
     ).first()
 
     is_pres = membership and membership.post in ["PRESIDENT", "VICE_PRESIDENT"]
-    is_advisor = current_user.id == club.faculty_advisor_id
+    is_advisor = (
+        current_user.id == club.faculty_advisor_id
+        or current_user.role == "FACULTY_ADVISOR"
+        or getattr(current_user, "teacher_type", None) == "CLUB_ADVISOR"
+        or getattr(current_user, "user_category", None) == "CLUB_ADVISOR"
+    )
 
     if not (is_domain_auth or is_pres or is_advisor):
         raise HTTPException(
@@ -455,6 +460,7 @@ def add_important_club_event(
     creator_role = "President" if is_pres else ("Club Advisor" if is_advisor else "Domain Authority")
 
     return {
+        "status": "success",
         "message": f"Successfully added important event to all {club.name} members' personal calendars!",
         "event_id": event.id,
         "title": event.title,

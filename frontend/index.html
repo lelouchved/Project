@@ -419,7 +419,7 @@
             <option value="MEMBER">General Member (Revoke Executive Post)</option>
           </select>
           <p id="advisorAssignKaizenNotice" class="text-[11px] text-amber-500 mt-1.5 font-mono hidden">
-            ⚠️ Kaizen Club Rule: Only President and Vice President posts are valid.
+            ⚡ Kaizen Governance Rule: Kaizen features executive leadership (President, Vice President/Finance Head) plus dedicated Branch Heads for each of its 4 branches (Dev Club, Kaizen Intelligence, CPP Club, Media Club).
           </p>
         </div>
 
@@ -2196,7 +2196,11 @@
               <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">Club Advisor Console — Dr. Rajiv Menon</h1>
               <p class="text-xs sm:text-sm text-slate-400 font-mono">Assigned Club: Nextcell Club (Entrepreneurship & E-Cell) · 65 Active Members</p>
             </div>
-            <div class="flex items-center space-x-2 shrink-0">
+            <div class="flex flex-wrap items-center gap-2 shrink-0">
+              <button onclick="openPushClubEventModal()" class="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition flex items-center space-x-1.5 shadow-md">
+                <i data-lucide="calendar-plus" class="w-4 h-4 text-white"></i>
+                <span>+ Add Important Event / Date</span>
+              </button>
               <button onclick="openAdvisorLeaderAssignModal(1)" class="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 transition flex items-center space-x-1.5 shadow-md">
                 <i data-lucide="award" class="w-4 h-4 text-white"></i>
                 <span>Appoint Student Leaders</span>
@@ -2358,6 +2362,49 @@
             </div>
           </div>
         </div>
+
+        <!-- CLUB ACTIVITY & SUBMISSIONS HISTORICAL ARCHIVE (Hackathons, Projects, Assignments) -->
+        <div class="p-5 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-[#0a0e1c] space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
+            <div>
+              <div class="flex items-center space-x-2">
+                <i data-lucide="archive" class="w-4 h-4 text-emerald-400"></i>
+                <h2 class="text-base font-bold text-slate-900 dark:text-white">Club Activity & Submissions Historical Archive</h2>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Complete historical record of all hackathons won, projects built, and assignment deliverables completed by club members.
+              </p>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button onclick="loadAdvisorHistoryArchive(1)" class="px-3 py-1.5 rounded-lg text-xs font-mono font-bold text-slate-400 hover:text-white border border-slate-700 transition flex items-center space-x-1">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                <span>Refresh Archive</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Archive Tabs (Hackathons, Projects, Assignments) -->
+          <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+            <button id="advHistTabHackathons" onclick="switchAdvisorHistoryTab('hackathons')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-2 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              <i data-lucide="trophy" class="w-3.5 h-3.5"></i>
+              <span>Hackathon Achievements (<span id="advHistHackathonsCount">0</span>)</span>
+            </button>
+            <button id="advHistTabProjects" onclick="switchAdvisorHistoryTab('projects')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800 border border-transparent">
+              <i data-lucide="rocket" class="w-3.5 h-3.5"></i>
+              <span>Club Projects (<span id="advHistProjectsCount">0</span>)</span>
+            </button>
+            <button id="advHistTabAssignments" onclick="switchAdvisorHistoryTab('assignments')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800 border border-transparent">
+              <i data-lucide="check-square" class="w-3.5 h-3.5"></i>
+              <span>Assignments & Rubrics (<span id="advHistAssignmentsCount">0</span>)</span>
+            </button>
+          </div>
+
+          <!-- Archive Content Area -->
+          <div id="advHistoryArchiveContent" class="space-y-3 min-h-[160px]">
+            <div class="py-8 text-center text-slate-400 text-xs font-mono">Loading historical archive records...</div>
+          </div>
+        </div>
+
       </section>
 
       <!-- ======================================================== -->
@@ -2923,8 +2970,10 @@
       <!-- ========================================== -->
       <section id="view-attendance" class="space-y-6 hidden">
         
-        <!-- View Header Card -->
-        <div class="rounded-xl p-6 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-2">
+        <!-- STUDENT ATTENDANCE HUB (Only rendered for students) -->
+        <div id="studentAttendanceContainer" class="space-y-6">
+          <!-- View Header Card -->
+          <div class="rounded-xl p-6 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-2">
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <div class="inline-flex items-center space-x-2 text-xs font-semibold text-emerald-600 bg-emerald-500/10 px-2.5 py-1 rounded-md border border-emerald-500/20 mb-1.5">
@@ -3084,8 +3133,217 @@
             </table>
           </div>
         </div>
+        <!-- END STUDENT ATTENDANCE HUB -->
 
-      </section>
+        <!-- ========================================== -->
+        <!-- ADVISOR ATTENDANCE & GOVERNANCE DESK       -->
+        <!-- ========================================== -->
+        <div id="advisorAttendanceContainer" class="space-y-6 hidden">
+          
+          <!-- Advisor Governance Header Card -->
+          <div class="rounded-xl p-6 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-3">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <div class="inline-flex items-center space-x-2 text-xs font-semibold text-amber-500 bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-500/20 mb-1.5">
+                  <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                  <span>Faculty Club Advisor Attendance Desk · Academic Term 2026</span>
+                </div>
+                <h2 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white" id="advAttnClubHeader">Club Member Attendance & Defaulters Desk</h2>
+                <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                  Advisors do not take self-attendance. Review club member records, manually override attendance with mandatory reason for students unable to mark due to technical faults, track semester-end defaulters (&lt; 70%), and broadcast important dates.
+                </p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button onclick="openPushClubEventModal()" class="px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition flex items-center space-x-1.5 shadow-sm">
+                  <i data-lucide="calendar-plus" class="w-3.5 h-3.5 text-white"></i>
+                  <span>+ Add Important Date</span>
+                </button>
+                <button onclick="exportDefaultersCsv()" class="px-3.5 py-2 rounded-xl text-xs font-bold text-rose-400 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500 hover:text-white transition flex items-center space-x-1.5 shadow-sm">
+                  <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                  <span>Export Defaulters (&lt; 70%)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 Advisor Metric Cards -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Card 1: Total Enrolled Members -->
+            <div class="rounded-xl p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-1">
+              <span class="text-xs font-mono font-bold uppercase tracking-wider text-slate-400 block">Club Members</span>
+              <div class="text-3xl font-extrabold text-slate-900 dark:text-white" id="advAttnTotalMembers">--</div>
+              <p class="text-[11px] text-slate-500 font-mono">Active club roster</p>
+            </div>
+
+            <!-- Card 2: Average Club Attendance -->
+            <div class="rounded-xl p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-2">
+              <span class="text-xs font-mono font-bold uppercase tracking-wider text-slate-400 block">Avg Attendance Rate</span>
+              <div class="flex items-baseline space-x-2">
+                <span class="text-3xl font-extrabold text-slate-900 dark:text-white" id="advAttnAvgRate">--%</span>
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300" id="advAttnHealthBadge">HEALTHY</span>
+              </div>
+              <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                <div class="bg-emerald-500 h-full rounded-full" id="advAttnProgressBar" style="width: 0%;"></div>
+              </div>
+            </div>
+
+            <!-- Card 3: Semester Defaulters (< 70%) -->
+            <div class="rounded-xl p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-1">
+              <span class="text-xs font-mono font-bold uppercase tracking-wider text-slate-400 block">Defaulters (&lt; 70%)</span>
+              <div class="flex items-baseline space-x-2">
+                <span class="text-3xl font-extrabold text-rose-500" id="advAttnDefaultersCount">0</span>
+                <span class="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300">ACTION REQ</span>
+              </div>
+              <p class="text-[11px] text-slate-500 font-mono">Students needing remediation</p>
+            </div>
+
+            <!-- Card 4: Saturday Sessions Tracked -->
+            <div class="rounded-xl p-5 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs space-y-1">
+              <span class="text-xs font-mono font-bold uppercase tracking-wider text-slate-400 block">Saturday Sessions</span>
+              <div class="text-3xl font-extrabold text-slate-900 dark:text-white" id="advAttnTotalSessions">19</div>
+              <p class="text-[11px] text-slate-500 font-mono">Academic term total</p>
+            </div>
+          </div>
+
+          <!-- END-OF-SEMESTER DEFAULTERS WARNING TABLE (< 70%) -->
+          <div class="rounded-2xl border-2 border-rose-500/30 bg-gradient-to-br from-white via-slate-50 to-rose-50/20 dark:from-slate-900 dark:via-slate-900 dark:to-rose-950/20 p-6 shadow-sm space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-rose-500/20 pb-3">
+              <div>
+                <div class="flex items-center space-x-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-600 text-white uppercase animate-pulse">POLICY MANDATE</span>
+                  <h3 class="text-base font-bold text-slate-900 dark:text-white">End-of-Semester Defaulters List (&lt; 70% Attendance)</h3>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Students below the 70% attendance threshold at semester end. Shortfall indicates how many sessions are needed to restore good standing.
+                </p>
+              </div>
+              <span class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30">
+                Minimum 70% Cut-Off
+              </span>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 dark:bg-slate-800/60 text-slate-500 font-mono uppercase text-[10px] border-b border-slate-200 dark:border-slate-700">
+                  <tr>
+                    <th class="py-2.5 px-3">Student Name & Roll No</th>
+                    <th class="py-2.5 px-3">Current Attendance Rate</th>
+                    <th class="py-2.5 px-3">Attended / Total</th>
+                    <th class="py-2.5 px-3">Shortfall Sessions</th>
+                    <th class="py-2.5 px-3">Status</th>
+                    <th class="py-2.5 px-3 text-right">Quick Override</th>
+                  </tr>
+                </thead>
+                <tbody id="advDefaultersTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
+                  <tr>
+                    <td colspan="6" class="py-6 text-center text-slate-400 font-mono">Loading defaulters list...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- MANUAL ATTENDANCE CORRECTION DESK -->
+          <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs p-6 space-y-4">
+            <div class="border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="edit-3" class="w-4 h-4 text-amber-500"></i>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white">Manual Attendance Correction Desk</h3>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                If a club member could not mark attendance by any chance (camera broken, network glitch, battery dead), the Advisor can manually record attendance with a mandatory justification.
+              </p>
+            </div>
+
+            <form id="advManualAttendanceForm" onsubmit="handleAdvisorManualAttendance(event)" class="space-y-4">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1.5">
+                    Select Club Member *
+                  </label>
+                  <select id="advManualStudentSelect" required class="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-amber-500">
+                    <option value="">Select a student...</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1.5">
+                    Select Saturday Session *
+                  </label>
+                  <select id="advManualSessionSelect" required class="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-amber-500">
+                    <option value="">Select a session...</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1.5">
+                    Verification Status *
+                  </label>
+                  <select id="advManualStatusSelect" required class="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-amber-500">
+                    <option value="PRESENT">PRESENT (Physically Verified)</option>
+                    <option value="EXCUSED">EXCUSED (Medical / Duty Leave)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide mb-1.5">
+                  Mandatory Audit Justification / Reason (Min. 5 characters) *
+                </label>
+                <input type="text" id="advManualReasonInput" required minlength="5" placeholder="e.g. Student laptop webcam malfunctioned during 11 AM check-in; physically verified in Hall B." class="w-full p-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-amber-500 font-sans shadow-inner">
+              </div>
+
+              <div class="flex items-center justify-between pt-1">
+                <span class="text-[11px] text-slate-400 font-mono">
+                  • Permanently recorded into institutional AuditLog with Advisor credentials
+                </span>
+                <button type="submit" id="advManualSubmitBtn" class="px-6 py-2.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs uppercase tracking-wider transition shadow-sm flex items-center space-x-2">
+                  <i data-lucide="check-circle" class="w-4 h-4 text-white"></i>
+                  <span>Record Verified Attendance</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- FULL CLUB MEMBERS ATTENDANCE LEDGER -->
+          <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs p-6 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white">Full Club Member Attendance Ledger</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Complete attendance record of all club members across Saturday sessions.</p>
+              </div>
+              <div class="flex items-center space-x-2">
+                <input type="text" id="advLedgerSearchInput" oninput="filterAdvisorLedgerTable()" placeholder="Search student or roll no..." class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs font-mono focus:outline-none focus:border-amber-500">
+                <button onclick="loadAdvisorAttendanceRoster()" class="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500" title="Refresh Roster">
+                  <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 font-mono uppercase text-[10px] border-b border-slate-200 dark:border-slate-700">
+                  <tr>
+                    <th class="py-2.5 px-3">Roll No</th>
+                    <th class="py-2.5 px-3">Member Name & Email</th>
+                    <th class="py-2.5 px-3">Role / Post</th>
+                    <th class="py-2.5 px-3">Attended / Held</th>
+                    <th class="py-2.5 px-3">Attendance Rate</th>
+                    <th class="py-2.5 px-3">Standing</th>
+                    <th class="py-2.5 px-3 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="advMemberLedgerTableBody" class="divide-y divide-slate-100 dark:divide-slate-800">
+                  <tr>
+                    <td colspan="7" class="py-6 text-center text-slate-400">Loading member ledger...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+        <!-- END ADVISOR ATTENDANCE HUB -->
 
 
       <!-- ========================================== -->
@@ -5982,13 +6240,17 @@
 
             if (isKaizen) {
               const pres = club.members.find(m => m.leadership_post === 'PRESIDENT');
-              const vp = club.members.find(m => m.leadership_post === 'VICE_PRESIDENT');
+              const vp = club.members.find(m => m.leadership_post === 'VICE_PRESIDENT' || m.leadership_post === 'FINANCE_HEAD');
+              const devHead = club.members.find(m => m.leadership_post === 'BRANCH_HEAD_DEV' || (m.leadership_post === 'BRANCH_HEAD' && m.branch?.toLowerCase().includes('dev')));
+              const aiHead = club.members.find(m => m.leadership_post === 'BRANCH_HEAD_AI' || (m.leadership_post === 'BRANCH_HEAD' && m.branch?.toLowerCase().includes('ai')));
+              const cppHead = club.members.find(m => m.leadership_post === 'BRANCH_HEAD_CPP' || (m.leadership_post === 'BRANCH_HEAD' && m.branch?.toLowerCase().includes('cpp')));
+              const mediaHead = club.members.find(m => m.leadership_post === 'BRANCH_HEAD_MEDIA' || (m.leadership_post === 'BRANCH_HEAD' && m.branch?.toLowerCase().includes('media')));
 
               leadersHtml += `
                 <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-1.5">
                   <div class="flex items-center justify-between">
                     <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-400">1. PRESIDENT</span>
-                    <span class="text-[10px] font-mono text-emerald-500">Kaizen Exec</span>
+                    <span class="text-[10px] font-mono text-emerald-500">Kaizen Lead</span>
                   </div>
                   <h4 class="text-xs font-bold text-slate-900 dark:text-white">${pres ? pres.user_name : 'Vacant'}</h4>
                   <p class="text-[11px] text-slate-400 font-mono">${pres ? pres.user_email : 'Click appoint to assign'}</p>
@@ -5996,14 +6258,42 @@
                 <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-1.5">
                   <div class="flex items-center justify-between">
                     <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-500/20 text-blue-400">2. VICE PRESIDENT</span>
-                    <span class="text-[10px] font-mono text-slate-400">Kaizen Exec</span>
+                    <span class="text-[10px] font-mono text-slate-400">Kaizen Operations</span>
                   </div>
                   <h4 class="text-xs font-bold text-slate-900 dark:text-white">${vp ? vp.user_name : 'Vacant'}</h4>
                   <p class="text-[11px] text-slate-400 font-mono">${vp ? vp.user_email : 'Click appoint to assign'}</p>
                 </div>
-                <div class="p-3.5 rounded-xl border border-dashed border-cyan-500/40 bg-cyan-500/5 flex flex-col justify-center items-center text-center space-y-1">
-                  <span class="text-xs font-bold text-cyan-400 font-mono">Kaizen 2-Leader Policy</span>
-                  <p class="text-[10px] text-slate-400">4 branches lead into President & VP</p>
+                <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyan-500/20 text-cyan-400">3. BRANCH HEAD</span>
+                    <span class="text-[10px] font-mono text-slate-400">Dev Club</span>
+                  </div>
+                  <h4 class="text-xs font-bold text-slate-900 dark:text-white">${devHead ? devHead.user_name : 'Vacant'}</h4>
+                  <p class="text-[11px] text-slate-400 font-mono">${devHead ? devHead.user_email : 'Click appoint to assign'}</p>
+                </div>
+                <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-500/20 text-purple-400">4. BRANCH HEAD</span>
+                    <span class="text-[10px] font-mono text-slate-400">Kaizen Intelligence</span>
+                  </div>
+                  <h4 class="text-xs font-bold text-slate-900 dark:text-white">${aiHead ? aiHead.user_name : 'Vacant'}</h4>
+                  <p class="text-[11px] text-slate-400 font-mono">${aiHead ? aiHead.user_email : 'Click appoint to assign'}</p>
+                </div>
+                <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400">5. BRANCH HEAD</span>
+                    <span class="text-[10px] font-mono text-slate-400">CPP Club</span>
+                  </div>
+                  <h4 class="text-xs font-bold text-slate-900 dark:text-white">${cppHead ? cppHead.user_name : 'Vacant'}</h4>
+                  <p class="text-[11px] text-slate-400 font-mono">${cppHead ? cppHead.user_email : 'Click appoint to assign'}</p>
+                </div>
+                <div class="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-1.5">
+                  <div class="flex items-center justify-between">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/20 text-rose-400">6. BRANCH HEAD</span>
+                    <span class="text-[10px] font-mono text-slate-400">Media Club</span>
+                  </div>
+                  <h4 class="text-xs font-bold text-slate-900 dark:text-white">${mediaHead ? mediaHead.user_name : 'Vacant'}</h4>
+                  <p class="text-[11px] text-slate-400 font-mono">${mediaHead ? mediaHead.user_email : 'Click appoint to assign'}</p>
                 </div>
               `;
             } else {
@@ -6042,6 +6332,7 @@
         }
 
         await loadAdvisorPresidentReports(clubId);
+        await loadAdvisorHistoryArchive(clubId);
       } catch (err) {
         console.error('Error loading advisor governance data:', err);
       }
@@ -6062,7 +6353,11 @@
             noticeEl?.classList.remove('hidden');
             postSelect.innerHTML = `
               <option value="PRESIDENT">President (Kaizen Lead)</option>
-              <option value="VICE_PRESIDENT">Vice President (Kaizen Operations)</option>
+              <option value="VICE_PRESIDENT">Vice President / Finance Head (Operations)</option>
+              <option value="BRANCH_HEAD_DEV">Branch Head: Dev Club (Engineering Lead)</option>
+              <option value="BRANCH_HEAD_AI">Branch Head: Kaizen Intelligence (AI/ML Lead)</option>
+              <option value="BRANCH_HEAD_CPP">Branch Head: CPP Club (Competitive Programming Lead)</option>
+              <option value="BRANCH_HEAD_MEDIA">Branch Head: Media Club (Media & Outreach Lead)</option>
               <option value="MEMBER">General Member (Revoke Executive Post)</option>
             `;
           } else {
@@ -7791,7 +8086,12 @@
 
     /* --- PUSH IMPORTANT EVENT TO CLUB MEMBERS MODAL HANDLERS --- */
     function openPushClubEventModal() {
-      if (!userHasCalendarAuthority && currentUser?.role !== 'ADMIN' && currentUser?.role !== 'CAMPUS_MANAGER' && !currentUser?.is_domain_authorized) {
+      const isAdvisor = currentUser?.role === 'FACULTY_ADVISOR' || 
+                        currentUser?.user_category === 'CLUB_ADVISOR' || 
+                        currentUser?.teacher_type === 'CLUB_ADVISOR' || 
+                        (currentUser?.email && currentUser.email.startsWith('advisor'));
+
+      if (!userHasCalendarAuthority && !isAdvisor && currentUser?.role !== 'ADMIN' && currentUser?.role !== 'CAMPUS_MANAGER' && !currentUser?.is_domain_authorized) {
         showAlert('Restricted: Only Club Presidents and Club Advisors have authority to push important events to club members.', 'error');
         return;
       }
@@ -8845,8 +9145,31 @@
     }
 
     /* Dedicated Attendance View Loader */
+    let currentAdvisorRosterData = null;
+    let currentAdvisorHistoryData = null;
+    let currentAdvisorHistoryTab = 'hackathons';
+
     async function loadAttendanceView() {
       if (!currentUser) return;
+
+      const isAdvisor = currentUser?.role === 'FACULTY_ADVISOR' || 
+                        currentUser?.user_category === 'CLUB_ADVISOR' || 
+                        currentUser?.teacher_type === 'CLUB_ADVISOR' || 
+                        (currentUser?.email && currentUser.email.startsWith('advisor'));
+
+      const studentContainer = document.getElementById('studentAttendanceContainer');
+      const advisorContainer = document.getElementById('advisorAttendanceContainer');
+
+      if (isAdvisor) {
+        if (studentContainer) studentContainer.classList.add('hidden');
+        if (advisorContainer) advisorContainer.classList.remove('hidden');
+        await loadAdvisorAttendanceRoster();
+        return;
+      } else {
+        if (studentContainer) studentContainer.classList.remove('hidden');
+        if (advisorContainer) advisorContainer.classList.add('hidden');
+      }
+
       fetchLiveSessionDetails();
 
       try {
@@ -8949,6 +9272,488 @@
       }
     }
 
+    async function loadAdvisorAttendanceRoster(clubId = null) {
+      try {
+        const url = clubId ? `/api/attendance/advisor-club-roster?club_id=${clubId}` : '/api/attendance/advisor-club-roster';
+        const res = await fetch(url, { headers: getApiHeaders() });
+        if (!res.ok) {
+          console.error('Failed to fetch advisor attendance roster:', res.statusText);
+          return;
+        }
+        const data = await res.json();
+        currentAdvisorRosterData = data;
+
+        // Update Header & Club info
+        const headerEl = document.getElementById('advAttnClubHeader');
+        if (headerEl) {
+          headerEl.innerText = `${data.club_name} — Member Attendance & Defaulters Console`;
+        }
+
+        // Update 4 Metric Cards
+        const totalMembersEl = document.getElementById('advAttnTotalMembers');
+        if (totalMembersEl) totalMembersEl.innerText = `${data.total_members} Members`;
+
+        const avgRateEl = document.getElementById('advAttnAvgRate');
+        if (avgRateEl) avgRateEl.innerText = `${data.average_attendance}%`;
+
+        const progressBar = document.getElementById('advAttnProgressBar');
+        if (progressBar) progressBar.style.width = `${Math.min(data.average_attendance, 100)}%`;
+
+        const healthBadge = document.getElementById('advAttnHealthBadge');
+        if (healthBadge) {
+          if (data.average_attendance >= 75) {
+            healthBadge.innerText = 'HEALTHY';
+            healthBadge.className = 'px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
+          } else {
+            healthBadge.innerText = 'ATTENTION REQ';
+            healthBadge.className = 'px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300';
+          }
+        }
+
+        const defaultersCountEl = document.getElementById('advAttnDefaultersCount');
+        if (defaultersCountEl) defaultersCountEl.innerText = data.defaulters_count;
+
+        const totalSessionsEl = document.getElementById('advAttnTotalSessions');
+        if (totalSessionsEl) totalSessionsEl.innerText = `${data.total_sessions} Sessions`;
+
+        // Populate Defaulters Table (< 70% threshold)
+        const defTbody = document.getElementById('advDefaultersTableBody');
+        if (defTbody) {
+          defTbody.innerHTML = '';
+          if (data.defaulters && data.defaulters.length > 0) {
+            data.defaulters.forEach(d => {
+              defTbody.innerHTML += `
+                <tr class="hover:bg-rose-500/5 transition">
+                  <td class="py-3 px-3">
+                    <div class="font-bold text-slate-900 dark:text-white">${d.name}</div>
+                    <div class="text-[11px] font-mono text-slate-400">${d.roll_no} · ${d.email}</div>
+                  </td>
+                  <td class="py-3 px-3 font-mono font-bold text-rose-500 text-sm">
+                    ${d.attendance_rate}%
+                  </td>
+                  <td class="py-3 px-3 font-mono text-slate-300">
+                    ${d.attended_sessions} / ${d.total_sessions}
+                  </td>
+                  <td class="py-3 px-3">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                      -${d.shortfall_sessions} sessions needed
+                    </span>
+                  </td>
+                  <td class="py-3 px-3">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300">
+                      DEFAULTER (&lt; 70%)
+                    </span>
+                  </td>
+                  <td class="py-3 px-3 text-right">
+                    <button onclick="quickFillManualAttendance(${d.user_id}, '${d.name.replace(/'/g, "\\'")}')" class="px-3 py-1 rounded-lg text-xs font-bold bg-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-white border border-amber-500/30 transition">
+                      Mark Attendance
+                    </button>
+                  </td>
+                </tr>
+              `;
+            });
+          } else {
+            defTbody.innerHTML = `
+              <tr>
+                <td colspan="6" class="py-6 text-center text-emerald-500 text-xs font-semibold">
+                  ✓ Compliant Standing: All club members currently meet or exceed the mandatory 70% semester attendance threshold.
+                </td>
+              </tr>
+            `;
+          }
+        }
+
+        // Populate Member Dropdown for Manual Desk
+        const studentSelect = document.getElementById('advManualStudentSelect');
+        if (studentSelect) {
+          studentSelect.innerHTML = '<option value="">Select a student...</option>';
+          if (data.members) {
+            data.members.forEach(m => {
+              const defTag = m.is_defaulter ? ' [⚠️ DEFAULTER < 70%]' : '';
+              studentSelect.innerHTML += `
+                <option value="${m.user_id}">${m.name} (${m.roll_no}) — ${m.attendance_rate}% Attended${defTag}</option>
+              `;
+            });
+          }
+        }
+
+        // Populate Session Dropdown for Manual Desk
+        const sessionSelect = document.getElementById('advManualSessionSelect');
+        if (sessionSelect) {
+          sessionSelect.innerHTML = '<option value="">Select a session...</option>';
+          if (data.sessions && data.sessions.length > 0) {
+            data.sessions.forEach(s => {
+              sessionSelect.innerHTML += `
+                <option value="${s.id}">${s.title} (${s.opens_at})</option>
+              `;
+            });
+          } else {
+            sessionSelect.innerHTML += `
+              <option value="1">Institutional Saturday - Annual Inter-College Innovation Summit</option>
+            `;
+          }
+        }
+
+        // Populate Full Member Ledger Table
+        renderAdvisorLedgerRows(data.members || []);
+
+      } catch (err) {
+        console.error('Error loading advisor attendance roster:', err);
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function renderAdvisorLedgerRows(membersList) {
+      const tbody = document.getElementById('advMemberLedgerTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!membersList || membersList.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-6 text-center text-slate-400 text-xs">No members found in club roster.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      membersList.forEach(m => {
+        const isCompliant = m.attendance_rate >= 70.0;
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
+            <td class="py-3 px-3 font-mono text-slate-400 text-xs">${m.roll_no}</td>
+            <td class="py-3 px-3">
+              <div class="font-bold text-slate-900 dark:text-white">${m.name}</div>
+              <div class="text-[11px] font-mono text-slate-400">${m.email}</div>
+            </td>
+            <td class="py-3 px-3 font-mono text-xs text-slate-300">
+              ${m.post || 'MEMBER'} ${m.branch ? `(${m.branch})` : ''}
+            </td>
+            <td class="py-3 px-3 font-mono text-slate-300">
+              ${m.attended_sessions} / ${m.total_sessions}
+            </td>
+            <td class="py-3 px-3 font-mono font-bold ${isCompliant ? 'text-emerald-400' : 'text-rose-400'}">
+              ${m.attendance_rate}%
+            </td>
+            <td class="py-3 px-3">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isCompliant ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'}">
+                ${isCompliant ? 'COMPLIANT (≥ 70%)' : 'DEFAULTER (< 70%)'}
+              </span>
+            </td>
+            <td class="py-3 px-3 text-right">
+              <button onclick="quickFillManualAttendance(${m.user_id}, '${m.name.replace(/'/g, "\\'")}')" class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-amber-600 text-slate-300 hover:text-white transition">
+                Mark Override
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function filterAdvisorLedgerTable() {
+      if (!currentAdvisorRosterData || !currentAdvisorRosterData.members) return;
+      const q = (document.getElementById('advLedgerSearchInput')?.value || '').toLowerCase().trim();
+      if (!q) {
+        renderAdvisorLedgerRows(currentAdvisorRosterData.members);
+        return;
+      }
+      const filtered = currentAdvisorRosterData.members.filter(m => 
+        (m.name && m.name.toLowerCase().includes(q)) ||
+        (m.roll_no && m.roll_no.toLowerCase().includes(q)) ||
+        (m.email && m.email.toLowerCase().includes(q)) ||
+        (m.post && m.post.toLowerCase().includes(q))
+      );
+      renderAdvisorLedgerRows(filtered);
+    }
+
+    function quickFillManualAttendance(studentId, studentName) {
+      const select = document.getElementById('advManualStudentSelect');
+      if (select) select.value = studentId;
+
+      const reasonInput = document.getElementById('advManualReasonInput');
+      if (reasonInput) {
+        reasonInput.value = `Verified attendance for ${studentName} - technical scanner glitch / physically confirmed present`;
+        reasonInput.focus();
+      }
+
+      document.getElementById('advManualAttendanceForm')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      showAlert(`Selected ${studentName} for manual attendance entry. Verify session & submit justification.`, 'info');
+    }
+
+    async function handleAdvisorManualAttendance(e) {
+      e.preventDefault();
+      const studentId = document.getElementById('advManualStudentSelect')?.value;
+      const sessionId = document.getElementById('advManualSessionSelect')?.value;
+      const status = document.getElementById('advManualStatusSelect')?.value || 'PRESENT';
+      const reason = document.getElementById('advManualReasonInput')?.value?.trim();
+
+      if (!studentId) {
+        showAlert('Please select a student from the club roster.', 'error');
+        return;
+      }
+      if (!reason || reason.length < 5) {
+        showAlert('A mandatory audit reason (minimum 5 characters) is required for manual attendance override.', 'error');
+        return;
+      }
+
+      const submitBtn = document.getElementById('advManualSubmitBtn');
+      const originalText = submitBtn ? submitBtn.innerHTML : '';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>Recording...</span>';
+      }
+
+      try {
+        const payload = {
+          student_id: parseInt(studentId),
+          club_id: currentAdvisorRosterData?.club_id || 1,
+          session_id: sessionId ? parseInt(sessionId) : null,
+          status: status,
+          reason: reason
+        };
+
+        const res = await fetch('/api/attendance/advisor-mark-manual', {
+          method: 'POST',
+          headers: getApiHeaders(),
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          showAlert(data.message || 'Manual attendance recorded successfully into institutional AuditLog!', 'success');
+          // Reset justification input
+          const reasonEl = document.getElementById('advManualReasonInput');
+          if (reasonEl) reasonEl.value = '';
+          // Refresh the roster
+          await loadAdvisorAttendanceRoster(currentAdvisorRosterData?.club_id || 1);
+        } else {
+          showAlert(data.detail || 'Failed to record manual attendance.', 'error');
+        }
+      } catch (err) {
+        showAlert('Error marking manual attendance: ' + err, 'error');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+        }
+      }
+    }
+
+    function exportDefaultersCsv() {
+      if (!currentAdvisorRosterData || !currentAdvisorRosterData.defaulters) {
+        showAlert('No roster data available to export.', 'error');
+        return;
+      }
+
+      const defaulters = currentAdvisorRosterData.defaulters;
+      if (defaulters.length === 0) {
+        showAlert('No defaulters below 70% threshold! All members are in good standing.', 'info');
+        return;
+      }
+
+      let csvContent = 'data:text/csv;charset=utf-8,';
+      csvContent += 'Roll Number,Student Name,Email,Leadership Post,Branch,Attended Sessions,Total Sessions,Attendance Rate,Shortfall Sessions,Status\n';
+
+      defaulters.forEach(d => {
+        csvContent += `"${d.roll_no}","${d.name}","${d.email}","${d.post || 'MEMBER'}","${d.branch || 'General'}","${d.attended_sessions}","${d.total_sessions}","${d.attendance_rate}%","${d.shortfall_sessions}","${d.status}"\n`;
+      });
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `${(currentAdvisorRosterData.club_name || 'club').toLowerCase().replace(/\s+/g, '_')}_defaulters_below_70pct.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showAlert(`Exported ${defaulters.length} semester defaulters (< 70%) to CSV.`, 'success');
+    }
+
+    // Historical Archive Controller (Hackathons, Projects, Assignments)
+    async function loadAdvisorHistoryArchive(clubId = 1) {
+      try {
+        const res = await fetch(`/api/clubs/${clubId}/advisor-history-archive`, { headers: getApiHeaders() });
+        if (res.ok) {
+          currentAdvisorHistoryData = await res.json();
+          
+          const hackCountEl = document.getElementById('advHistHackathonsCount');
+          if (hackCountEl) hackCountEl.innerText = currentAdvisorHistoryData.total_hackathons || 0;
+
+          const projCountEl = document.getElementById('advHistProjectsCount');
+          if (projCountEl) projCountEl.innerText = currentAdvisorHistoryData.total_projects || 0;
+
+          const assignCountEl = document.getElementById('advHistAssignmentsCount');
+          if (assignCountEl) assignCountEl.innerText = currentAdvisorHistoryData.total_assignments || 0;
+
+          renderAdvisorHistoryTab(currentAdvisorHistoryTab);
+        }
+      } catch (err) {
+        console.error('Error loading advisor history archive:', err);
+      }
+    }
+
+    function switchAdvisorHistoryTab(tabName) {
+      currentAdvisorHistoryTab = tabName;
+      const tabBtns = {
+        hackathons: document.getElementById('advHistTabHackathons'),
+        projects: document.getElementById('advHistTabProjects'),
+        assignments: document.getElementById('advHistTabAssignments')
+      };
+
+      Object.entries(tabBtns).forEach(([key, btn]) => {
+        if (!btn) return;
+        if (key === tabName) {
+          btn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-2 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30';
+        } else {
+          btn.className = 'px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center space-x-2 text-slate-400 hover:text-white hover:bg-slate-800 border border-transparent';
+        }
+      });
+
+      renderAdvisorHistoryTab(tabName);
+    }
+
+    function renderAdvisorHistoryTab(tabName = 'hackathons') {
+      const container = document.getElementById('advHistoryArchiveContent');
+      if (!container || !currentAdvisorHistoryData) return;
+      container.innerHTML = '';
+
+      if (tabName === 'hackathons') {
+        const items = currentAdvisorHistoryData.hackathons || [];
+        if (items.length === 0) {
+          container.innerHTML = '<div class="py-8 text-center text-slate-400 text-xs font-mono">No hackathon achievements recorded yet.</div>';
+          return;
+        }
+
+        items.forEach(h => {
+          container.innerHTML += `
+            <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-2">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+                <div class="flex items-center space-x-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                    🏆 ${h.rank_position || 'Winner'}
+                  </span>
+                  <span class="font-bold text-sm text-slate-900 dark:text-white">${h.title}</span>
+                </div>
+                <div class="flex items-center space-x-2 text-xs font-mono text-slate-400">
+                  <span>${h.date}</span>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400">+${h.points_awarded} pts</span>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span class="text-slate-400 font-mono">Team:</span> <strong class="text-slate-200">${h.team_name}</strong>
+                </div>
+                <div>
+                  <span class="text-slate-400 font-mono">Level:</span> <strong class="text-slate-200">${h.level}</strong>
+                </div>
+              </div>
+              <p class="text-xs text-slate-300 font-sans">
+                <span class="text-slate-400 font-mono">Members:</span> ${h.team_members}
+              </p>
+              ${h.advisor_notes ? `
+                <div class="text-[11px] p-2.5 rounded-lg bg-emerald-950/20 border border-emerald-900/40 text-emerald-300 font-sans">
+                  <strong>Advisor Audit Note:</strong> ${h.advisor_notes}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        });
+
+      } else if (tabName === 'projects') {
+        const items = currentAdvisorHistoryData.projects || [];
+        if (items.length === 0) {
+          container.innerHTML = '<div class="py-8 text-center text-slate-400 text-xs font-mono">No club project submissions recorded yet.</div>';
+          return;
+        }
+
+        items.forEach(p => {
+          container.innerHTML += `
+            <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-2">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+                <div>
+                  <div class="font-bold text-sm text-slate-900 dark:text-white">${p.title}</div>
+                  <div class="text-xs text-slate-400 font-mono">Student: ${p.student_name} (${p.roll_no}) · Submitted: ${p.submitted_at}</div>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-purple-500/10 text-purple-400 border border-purple-500/30">
+                    Evaluation: ${p.total_score} / 30.0
+                  </span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-300">${p.description}</p>
+              <div class="flex flex-wrap items-center gap-3 pt-1 text-xs">
+                ${p.external_link ? `
+                  <a href="${p.external_link}" target="_blank" class="text-blue-400 hover:underline flex items-center space-x-1 font-mono">
+                    <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+                    <span>Repository / Live Demo</span>
+                  </a>
+                ` : ''}
+                ${p.file_url ? `
+                  <a href="${p.file_url}" target="_blank" class="text-cyan-400 hover:underline flex items-center space-x-1 font-mono">
+                    <i data-lucide="file" class="w-3.5 h-3.5"></i>
+                    <span>Project Report / Docs</span>
+                  </a>
+                ` : ''}
+              </div>
+              ${p.feedback ? `
+                <div class="text-[11px] p-2.5 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300">
+                  <span class="text-purple-400 font-bold font-mono">Rubric Feedback:</span> ${p.feedback}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        });
+
+      } else if (tabName === 'assignments') {
+        const items = currentAdvisorHistoryData.assignments || [];
+        if (items.length === 0) {
+          container.innerHTML = '<div class="py-8 text-center text-slate-400 text-xs font-mono">No assignment rubric evaluations recorded yet.</div>';
+          return;
+        }
+
+        items.forEach(a => {
+          container.innerHTML += `
+            <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 space-y-2">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
+                <div>
+                  <div class="font-bold text-sm text-slate-900 dark:text-white">${a.title}</div>
+                  <div class="text-xs text-slate-400 font-mono">Student: ${a.student_name} (${a.roll_no}) · Term 2026</div>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                    Total: ${a.total_score} / 30.0
+                  </span>
+                </div>
+              </div>
+              
+              <!-- 3-Part Rubric Breakdown -->
+              <div class="grid grid-cols-3 gap-2 p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-center text-xs">
+                <div>
+                  <div class="text-[10px] text-slate-400 uppercase font-mono">1. Content Quality</div>
+                  <div class="font-bold text-blue-400">${a.content_score} / 10</div>
+                </div>
+                <div>
+                  <div class="text-[10px] text-slate-400 uppercase font-mono">2. Presentation</div>
+                  <div class="font-bold text-amber-400">${a.presentation_score} / 10</div>
+                </div>
+                <div>
+                  <div class="text-[10px] text-slate-400 uppercase font-mono">3. Participation</div>
+                  <div class="font-bold text-emerald-400">${a.participation_score} / 10</div>
+                </div>
+              </div>
+
+              ${a.feedback ? `
+                <div class="text-[11px] p-2 rounded-lg bg-slate-800/60 text-slate-300">
+                  <strong class="text-slate-200 font-mono">Advisor Evaluation Remarks:</strong> ${a.feedback}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        });
+      }
+
+      if (window.lucide) lucide.createIcons();
+    }
+
     async function openAttendanceOverrideModal() {
       const studentId = prompt('Enter Student ID to manually override:');
       if (!studentId) return;
@@ -8959,18 +9764,22 @@
       }
 
       try {
-        const res = await fetch('/api/attendance/override', {
+        const res = await fetch('/api/attendance/advisor-mark-manual', {
           method: 'POST',
           headers: getApiHeaders(),
           body: JSON.stringify({
-            session_id: 1,
             student_id: parseInt(studentId),
-            reason: reason
+            club_id: currentAdvisorRosterData?.club_id || 1,
+            reason: reason,
+            status: 'PRESENT'
           })
         });
         const d = await res.json();
         if (res.ok) {
           showAlert(d.message);
+          if (currentAdvisorRosterData) {
+            await loadAdvisorAttendanceRoster(currentAdvisorRosterData.club_id);
+          }
         } else {
           showAlert(d.detail, 'error');
         }

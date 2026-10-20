@@ -2,9 +2,9 @@
 ### Mirai School of Technology — Autonomous Student Governance & Activities Platform
 **Problem Statement:** Autonomous Multi-Tier Student Governance, Role Bifurcation & Saturday Activities Ecosystem  
 **Repository:** [https://github.com/lelouchved/Project](https://github.com/lelouchved/Project)  
-**Execution Timestamp:** 2026-10-20  
+**Execution Timestamp:** 2026-10-21  
 **Test Framework:** `pytest 8.4.2` · `Python 3.9.6` · `FastAPI / AnyIO`  
-**Overall Status:** **29 / 29 TESTS PASSED (100% PASS RATE)**  
+**Overall Status:** **34 / 34 TESTS PASSED (100% PASS RATE)**  
 
 ---
 
@@ -12,10 +12,13 @@
 
 | Metric | Target Requirement | Measured Result | Status |
 | :--- | :--- | :--- | :---: |
-| **Total Test Cases** | Complete Suite Coverage | **29 Test Cases** | ✅ 100% Passed |
-| **Pass Rate** | 100% Zero Defects | **100.0% (29 Passed, 0 Failed)** | ✅ Verified |
-| **Test Execution Duration** | < 5.0 seconds | **0.93 seconds** | ✅ High Speed |
+| **Total Test Cases** | Complete Suite Coverage | **34 Test Cases** | ✅ 100% Passed |
+| **Pass Rate** | 100% Zero Defects | **100.0% (34 Passed, 0 Failed)** | ✅ Verified |
+| **Test Execution Duration** | < 5.0 seconds | **0.85 seconds** | ✅ High Speed |
 | **Role Bifurcation Coverage** | All 5 Target Personas | **5/5 Dedicated Homepages Tested** | ✅ Verified |
+| **Club Advisor Governance** | Manual Attendance & Audit | **AuditLog & Mandatory Reason Verified** | ✅ Verified |
+| **Defaulters Threshold** | < 70% Semester Cut-Off | **Automatic Detection & Shortfall Count** | ✅ Verified |
+| **Kaizen Branch Leadership** | 4 Autonomous Branch Heads | **dev, ai, cpp, media Heads Enforced** | ✅ Verified |
 | **Security & Anti-Spoofing** | 20s Rotating TOTP QR | **Dynamic Expiration & Tamper-Proof** | ✅ Verified |
 | **Audit Logging Integrity** | Coordinator Overrides | **Immutable `AuditLog` Entry Required** | ✅ Verified |
 | **High Concurrency Load** | 500 Concurrent Check-Ins (< 1000ms) | **p95 = 66.67ms (15x faster)** | ✅ Verified |
@@ -106,6 +109,19 @@ Verifies single-click federated authentication for students and visitors.
 | 27 | `test_social_login_instagram` | Verifies 1-click Instagram authentication and token generation. | ✅ **PASSED** |
 | 28 | `test_social_login_github` | Verifies 1-click GitHub authentication and token generation. | ✅ **PASSED** |
 | 29 | `test_social_login_invalid_provider` | Rejects unsupported OAuth providers with HTTP 400. | ✅ **PASSED** |
+
+---
+
+### Suite H: Club Advisor Governance, Defaulters < 70%, Activity Archive & Kaizen Leadership (`tests/test_advisor_governance_features.py`)
+Validates Club Advisor persona workflows, defaulters cut-off (< 70%), manual attendance audit desk, historical activity archive (hackathons, projects, assignments), and Kaizen autonomous branch leadership pattern.
+
+| # | Test Function | Problem Statement Requirement Verified | Result |
+| :-: | :--- | :--- | :---: |
+| 30 | `test_advisor_club_roster_and_defaulters_below_70` | Verifies Club Advisor attendance ledger, automatic classification of semester defaulters below 70%, and shortfall session calculations. | ✅ **PASSED** |
+| 31 | `test_advisor_manual_attendance_with_mandatory_audit_reason` | Validates manual attendance marker for students unable to check in (camera/network/battery issue); enforces mandatory justification logged permanently in `AuditLog`. | ✅ **PASSED** |
+| 32 | `test_advisor_history_archive_hackathons_projects_assignments` | Verifies comprehensive historical archive of all hackathon achievements, member projects, and assignment deliverables with 3-part rubric evaluations (/30). | ✅ **PASSED** |
+| 33 | `test_kaizen_branch_head_governance_vs_standard_clubs` | Enforces institutional rule: All standard clubs strictly follow the 5-leader pattern (President, VP, Finance, Media, Secretary); ONLY Kaizen permits Branch Heads for its 4 autonomous branches (`dev`, `ai`, `cpp`, `media`). | ✅ **PASSED** |
+| 34 | `test_advisor_adds_important_event_for_club_members` | Verifies that Club Advisors can add important dates and upcoming events to the calendar that automatically push into all club members' personal calendars. | ✅ **PASSED** |
 
 ---
 
